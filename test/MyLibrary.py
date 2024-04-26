@@ -9,8 +9,53 @@ class MyLibrary:
     def join_two_strings(self, arg1, arg2):
         return str(arg1) + " " + str(arg2)
 
+    @staticmethod
+    def generate_locators(json_data):
+        locators = []
+
+        # Extract information from JSON data
+        tag_name = json_data.get('tagName')
+        id_ = json_data.get('id')
+        class_ = json_data.get('class')
+        text_content = json_data.get('textContent')
+
+        # Generate locators based on extracted information
+        if id_:
+            locators.append(f"id:{id_}")
+
+        if class_:
+            classes = class_.split()
+            for class_name in classes:
+                locators.append(f"class:{class_name}")
+
+        if tag_name:
+            locators.append(f"tag:{tag_name}")
+
+        if text_content:
+            locators.append(f"text:{text_content}")
+
+        # Extract possible locators from parent elements
+        parents = json_data.get('parents', [])
+        parent_locators = []
+        for parent in parents:
+            parent_locators.extend(MyLibrary.generate_locators(parent))
+
+        # Add parent locators as a separate dictionary key within locators
+        locators.append({'parent_locators': parent_locators})
+
+        for locator in locators:
+            print("Generated Locators:", locator)
+
+        return locators
+
     @keyword
-    def read_json_file(self, file_path):
+    def process_json_file_and_generate_locators(self, file_path):
+        json_data = self.read_json_file(file_path)
+        locators = self.generate_locators(json_data)
+        return locators
+
+    @staticmethod
+    def read_json_file(file_path):
         """
         Reads the content of a JSON file and returns it as a dictionary.
 

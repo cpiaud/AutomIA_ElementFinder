@@ -5,6 +5,7 @@ Library     MyLibrary.py
 Library     SeleniumLibrary     #plugins=C:/Users/MSU23906/SpyWeb_RobotFramework/test/resources/CustomLocators.py
 Resource    ../test/pages/LoginPage.robot
 Resource    ../test/pages/JobApplicationForm.robot
+Library    ../test/resources/CustomLocatorsLibrary.py
 *** Variables ***
 ${username}     test
 ${password}     test
@@ -24,11 +25,19 @@ ${startdatevalue}   13/06/2024
 ${mobilenumbervalue}    06 77 77 77 77
 ${testlibrary}      text
 ${email_locator}    ${EMPTY}
+${browser}    ${EMPTY}
+${locator}    ${EMPTY}
+${tag}    ${EMPTY}
+${constraints}   ${EMPTY}
 
 *** Keywords ***
 Custom Locator Strategy
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
     ${element}=    Execute Javascript    return window.document.getElementsByName('${locator}')[0];
+    [Return]    ${element}
+Custom Locator Strategy External Library
+    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
+    ${element}=     process_json_file_and_generate_locators   test/objectrepository/${locator}.json
     [Return]    ${element}
 
 *** Test Cases ***
@@ -58,5 +67,17 @@ Custom Locator Library Test
     Add Location Strategy    custom    Custom Locator Strategy
     Open Browser        ${loginpageurl}
     Maximize Browser Window
-    Wait Until Element Is Visible  name:email
+    Wait Until Element Is Visible  custom:email
     Input Text  custom:email    ${firstnamevalue}
+Custom Locator External Library Test
+    Add Location Strategy    findElementByAI    Custom Locator Strategy External Library
+    Open Browser        ${loginpageurl}
+    Maximize Browser Window
+    Log     findElementByAI:login_username
+    Wait Until Element Is Visible  findElementByAI:login_username
+    Input Text  findElementByAI:login_username    ${firstnamevalue}
+Locator Generator Test
+    Add Location Strategy    findElementByAI    Custom Locator Strategy External Library
+    Open Browser        ${loginpageurl}
+    Maximize Browser Window
+    Wait Until Element Is Visible  findElementByAI:login_username
