@@ -5,7 +5,6 @@ Library     MyLibrary.py
 Library     SeleniumLibrary     #plugins=C:/Users/MSU23906/SpyWeb_RobotFramework/test/resources/CustomLocators.py
 Resource    ../test/pages/LoginPage.robot
 Resource    ../test/pages/JobApplicationForm.robot
-Library    ../test/resources/CustomLocatorsLibrary.py
 *** Variables ***
 ${username}     test
 ${password}     test
@@ -81,3 +80,5 @@ Locator Generator Test
     Open Browser        ${loginpageurl}
     Maximize Browser Window
     Wait Until Element Is Visible  findElementByAI:login_username
+Properties File Test
+    read_properties_file        test/resources/selectorWeight.properties
