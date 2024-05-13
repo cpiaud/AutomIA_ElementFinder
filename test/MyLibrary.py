@@ -1,12 +1,9 @@
 import json
+
 from robot.api.deco import keyword
 
 
 class MyLibrary:
-
-    @keyword
-    def join_two_strings(self, arg1, arg2):
-        return str(arg1) + " " + str(arg2)
 
     @staticmethod
     def generate_locators(json_data):

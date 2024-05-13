@@ -2,7 +2,8 @@
 Library  OperatingSystem
 Library     ../test/resources/MyLibraryTest.py
 Library     MyLibrary.py
-Library     SeleniumLibrary     #plugins=C:/Users/MSU23906/SpyWeb_RobotFramework/test/resources/CustomLocators.py
+Library     RetrieveDOMElements.py
+Library     SeleniumLibrary
 Resource    ../test/pages/LoginPage.robot
 Resource    ../test/pages/JobApplicationForm.robot
 *** Variables ***
@@ -47,10 +48,6 @@ DemoTest
     login   ${username}   ${password}
     job application form    ${firstnamevalue}   ${lastnamevalue}    ${emailvalue}   ${addressvalue}   ${cityvalue}    ${zipcodevalue}   ${countryvalue}     ${appliedpositionvalue}     ${coverlettervalue}     ${yearsexperiencevalue}     ${startdatevalue}   ${mobilenumbervalue}
     Close Browser
-Example that calls a Python keyword
-    MyLibrary.join_two_strings     hello      world
-    ${result}=   join_two_strings  hello  world
-    Should be equal  ${result}  hello world
 Read JSON File Test
     ${json_data}=   read_json_file    test/objectrepository/login_username.json
     Log    ${json_data}
@@ -81,4 +78,15 @@ Locator Generator Test
     Maximize Browser Window
     Wait Until Element Is Visible  findElementByAI:login_username
 Properties File Test
-    read_properties_file        test/resources/selectorWeight.properties
+    read_properties_file    test/resources/selectorWeight.properties
+    Create Webdriver    Chrome
+    Open Browser        ${loginpageurl}     Chrome
+    Maximize Browser Window
+    Close Browser
+Retrieve All DOM Elements Test
+    Open Browser    ${loginpageurl}     Chrome
+    ${elements_json}=    Get Elements From Url
+    Log    ${elements_json}
+    ${filter_json}=    Filter Elements By Tag Name    test/objectrepository/login_password.json
+    Log    ${filter_json}
+    Close Browser
