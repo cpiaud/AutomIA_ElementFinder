@@ -1,13 +1,14 @@
 from robot.libraries.BuiltIn import BuiltIn
 from bs4 import BeautifulSoup
 import json
+
 from MyLibrary import MyLibrary
 
 
 class RetrieveDOMElements:
 
     def __init__(self):
-        self.read_json = MyLibrary()
+        self.mylibrary = MyLibrary()
 
     @staticmethod
     def get_current_url():
@@ -47,14 +48,86 @@ class RetrieveDOMElements:
 
     def filter_elements_by_tag_name(self, json_file_content):
         dom_elements = json.loads(self.get_elements_from_url())
-        # Load JSON file content
-        # json_data = self.read_json.read_json_file(json_file_content)
 
         # Extract tag name from JSON file
-        tag_name = self.read_json.read_json_file(json_file_content).get("tagName")
-        print(f"json file tag name: {tag_name}")
+        tag_name = self.mylibrary.read_json_file(json_file_content).get("tagName")
+
         # Filter elements based on tag name
         filtered_elements = [element for element in dom_elements if element.get("tag_name") == tag_name]
 
         # Return the filtered elements list
         return filtered_elements
+
+    def extract_values(self, scanned_element_json, attribute_weight):
+        sorted_list = self.mylibrary.read_properties_file(attribute_weight)
+        json_data = self.mylibrary.read_json_file(scanned_element_json)
+        extracted_values = []
+        for key, _ in sorted_list:
+            if key in json_data:
+                extracted_values.append((key, json_data[key]))
+        return extracted_values
+
+    def filter_elements_by_attributes(self, scanned_element_json, attribute_weight):
+        starting_list = self.filter_elements_by_tag_name(scanned_element_json)
+        sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight)
+        current_cached_list = starting_list
+
+        filtered_elements = []
+        # Filter elements based on tag name
+        for attribute_name, value in sorted_tag_list:
+            for element in current_cached_list:
+                # if element.get(attribute_name) == value:
+                if attribute_name in element['attributes'] and element['attributes'][attribute_name] == value:
+                    filtered_elements.append(element)
+
+            if len(filtered_elements) == 1:
+                current_cached_list = filtered_elements
+                print("Element found")
+                break
+            elif len(filtered_elements) > 1:
+                if filtered_elements < current_cached_list:
+                    current_cached_list = filtered_elements
+                else:
+                    filtered_elements = current_cached_list
+                    print("Multiple Elements found")
+            else:
+                print("No Element found")
+
+        return current_cached_list
+
+    def find_elements_by_IA(self, scanned_element_json_name):
+        attribute_weight = "test/resources/selectorWeight.properties"
+        scanned_element_path_name = 'test/objectrepository/%s.json' % scanned_element_json_name
+        unique_element = self.filter_elements_by_attributes(scanned_element_path_name, attribute_weight)
+        print(self.build_xpath(unique_element[0]))
+
+        return self.build_xpath(unique_element[0])
+
+    @staticmethod
+    def build_xpath(element_dict):
+        tag_name = element_dict['tag_name']
+        attributes = element_dict['attributes']
+        text_value = element_dict['text']
+
+        xpath = f"//{tag_name}"
+
+        # Generate attribute strings with 'and' between them
+        attribute_strings = []
+        for key, value in attributes.items():
+            if isinstance(value, list):
+                # Convert list to string with single value
+                value = value[0]
+            attribute_strings.append(f"@{key}='{value}'")
+        attribute_string = ' and '.join(attribute_strings)
+
+        # Add attribute string to XPath if it's not empty
+        if attribute_string:
+            xpath += f"[{attribute_string}]"
+
+        # Add text attribute if it is not empty
+        if text_value:
+            xpath += f"[text()='{text_value}']"
+
+        # formatted_xpath = 'xpath:' + xpath
+
+        return xpath

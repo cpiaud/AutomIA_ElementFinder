@@ -4,6 +4,7 @@ Library     ../test/resources/MyLibraryTest.py
 Library     MyLibrary.py
 Library     RetrieveDOMElements.py
 Library     SeleniumLibrary
+Library    XML
 Resource    ../test/pages/LoginPage.robot
 Resource    ../test/pages/JobApplicationForm.robot
 *** Variables ***
@@ -39,7 +40,17 @@ Custom Locator Strategy External Library
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
     ${element}=     process_json_file_and_generate_locators   test/objectrepository/${locator}.json
     [Return]    ${element}
-
+Find Element By IA Library
+    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
+    ${xpath}=     find_elements_by_IA   ${locator}
+    ${element}=    ${xpath}
+    #${element}=    Execute Javascript    return window.document.getElementByXpath("${xpath}");
+    [Return]    ${element}
+Custom Locator Strategy for XPath
+    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
+    ${xpath}=     find_elements_by_IA   ${locator}
+    ${element}=    Execute Javascript    return document.evaluate("${xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    [Return]    ${element}
 *** Test Cases ***
 DemoTest
     [Tags]  Authentification
@@ -61,7 +72,7 @@ Custom Locator Test
     Input Text  by_testid   email    ${firstnamevalue}
 Custom Locator Library Test
     Add Location Strategy    custom    Custom Locator Strategy
-    Open Browser        ${loginpageurl}
+    Open Browser        ${loginpageurl}     chrome
     Maximize Browser Window
     Wait Until Element Is Visible  custom:email
     Input Text  custom:email    ${firstnamevalue}
@@ -89,4 +100,18 @@ Retrieve All DOM Elements Test
     Log    ${elements_json}
     ${filter_json}=    Filter Elements By Tag Name    test/objectrepository/login_password.json
     Log    ${filter_json}
+    Close Browser
+Find Element By IA Test
+    Open Browser    ${loginpageurl}     Chrome
+    ${find_element_by_IA} =    Find Elements By IA  login_password
+    Close Browser
+Demo Find Elements By IA Test
+    Add Location Strategy    FindElementsByIA    Custom Locator Strategy for XPath
+    Open Browser        ${loginpageurl}     chrome
+    Maximize Browser Window
+    Log to Console  login
+    Wait Until Element Is Visible       FindElementsByIA:login_username
+    Input Text      FindElementsByIA:login_username  ${username}
+    Input Text      FindElementsByIA:login_password  ${password}
+    Click Element   FindElementsByIA:login_ConnexionButton
     Close Browser

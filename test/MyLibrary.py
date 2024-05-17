@@ -86,9 +86,9 @@ class MyLibrary:
         # Sort the properties list based on the value (second element in the tuple)
         properties.sort(key=lambda x: x[1], reverse=True)
 
-        print(f"Properties file values:\n")
-        for propertyValue, value in properties:
-            print(f"{propertyValue} = {value}")
+        # print(f"Properties file values:\n")
+        # for propertyValue, value in properties:
+        #     print(f"{propertyValue} = {value}")
 
         # Return sorted properties
         return properties
