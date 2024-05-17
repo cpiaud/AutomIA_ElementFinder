@@ -44,13 +44,16 @@ Find Element By IA Library
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
     ${xpath}=     find_elements_by_IA   ${locator}
     ${element}=    ${xpath}
-    #${element}=    Execute Javascript    return window.document.getElementByXpath("${xpath}");
     [Return]    ${element}
 Custom Locator Strategy for XPath
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
     ${xpath}=     find_elements_by_IA   ${locator}
     ${element}=    Execute Javascript    return document.evaluate("${xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     [Return]    ${element}
+Custom Locator Strategy for IA
+    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
+    ${webelement}=     Find Elements By IA With Driver   ${locator}
+    [Return]    ${webelement}
 *** Test Cases ***
 DemoTest
     [Tags]  Authentification
@@ -101,11 +104,7 @@ Retrieve All DOM Elements Test
     ${filter_json}=    Filter Elements By Tag Name    test/objectrepository/login_password.json
     Log    ${filter_json}
     Close Browser
-Find Element By IA Test
-    Open Browser    ${loginpageurl}     Chrome
-    ${find_element_by_IA} =    Find Elements By IA  login_password
-    Close Browser
-Demo Find Elements By IA Test
+Find Web Elements By IA With DOM Elements Test
     Add Location Strategy    FindElementsByIA    Custom Locator Strategy for XPath
     Open Browser        ${loginpageurl}     chrome
     Maximize Browser Window
@@ -114,4 +113,30 @@ Demo Find Elements By IA Test
     Input Text      FindElementsByIA:login_username  ${username}
     Input Text      FindElementsByIA:login_password  ${password}
     Click Element   FindElementsByIA:login_ConnexionButton
+    Close Browser
+Find Web Elements By IA Test
+    Add Location Strategy    FindElementsByIA    Custom Locator Strategy for IA
+    Open Browser        ${loginpageurl}     chrome
+    Maximize Browser Window
+    Log to Console  login
+    Wait Until Element Is Visible       FindElementsByIA:login_username
+    Input Text      FindElementsByIA:login_username  ${username}
+    Input Text      FindElementsByIA:login_password  ${password}
+    Click Element   FindElementsByIA:login_ConnexionButton
+    Log to Console  job application form
+    Wait Until Element Is Visible       FindElementsByIA:JobApp_FirstName
+    Input Text	    FindElementsByIA:JobApp_FirstName    ${firstnamevalue}
+    Input Text      FindElementsByIA:JobApp_LastName     ${lastnamevalue}
+    Input Text	    FindElementsByIA:JobApp_Email        ${emailvalue}
+    Input Text  	FindElementsByIA:JobApp_MobileNumber      ${mobilenumbervalue}
+    Input Text  	FindElementsByIA:JobApp_Address      ${addressvalue}
+    Input Text      FindElementsByIA:JobApp_City     ${cityvalue}
+    Input Text	    FindElementsByIA:JobApp_ZipCode      ${zipcodevalue}
+    Select From List by Value	    FindElementsByIA:JobApp_Country      ${countryvalue}
+    Input Text	    FindElementsByIA:JobApp_AppliedPosition      ${appliedpositionvalue}
+    Input Text	    FindElementsByIA:JobApp_CoverLetter      ${coverlettervalue}
+    Input Text	    FindElementsByIA:JobApp_TotalYearsOfExperience      ${yearsexperiencevalue}
+    Click Element  FindElementsByIA:JobApp_ApplyButton
+    Wait Until Element Is Visible       FindElementsByIA:JobApplicationForm_SuccessfullySubmittedMsg
+    Log to Console  Job application complete
     Close Browser

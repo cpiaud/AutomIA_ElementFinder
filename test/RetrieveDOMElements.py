@@ -2,6 +2,8 @@ from robot.libraries.BuiltIn import BuiltIn
 from bs4 import BeautifulSoup
 import json
 
+from selenium.webdriver.common.by import By
+
 from MyLibrary import MyLibrary
 
 
@@ -76,7 +78,6 @@ class RetrieveDOMElements:
         # Filter elements based on tag name
         for attribute_name, value in sorted_tag_list:
             for element in current_cached_list:
-                # if element.get(attribute_name) == value:
                 if attribute_name in element['attributes'] and element['attributes'][attribute_name] == value:
                     filtered_elements.append(element)
 
@@ -131,3 +132,48 @@ class RetrieveDOMElements:
         # formatted_xpath = 'xpath:' + xpath
 
         return xpath
+
+# Method 2 of getting web elements and filtering by driver
+
+    def filter_elements_by_attributes_by_driver(self, scanned_element_json, attribute_weight):
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        tag_name = self.mylibrary.read_json_file(scanned_element_json).get("tagName")
+        starting_list = self.filter_elements_by_tag_name_by_driver(scanned_element_json)
+        sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight)
+        current_cached_list = starting_list
+
+        filtered_elements = []
+        for attribute_name, value in sorted_tag_list:
+            xpath = "//" + tag_name + "[@" + attribute_name + "='" + value + "']"
+
+            filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
+
+            if len(filtered_elements) == 1:
+                current_cached_list = filtered_elements
+                print("Element found")
+                break
+            elif len(filtered_elements) > 1:
+                if filtered_elements < current_cached_list:
+                    current_cached_list = filtered_elements
+                else:
+                    filtered_elements = current_cached_list
+                    print("Multiple Elements found")
+            else:
+                print("No Element found")
+
+        return current_cached_list
+
+    def filter_elements_by_tag_name_by_driver(self, json_scanned_element_content):
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+
+        # Extract tag name from JSON file
+        tag_name = self.mylibrary.read_json_file(json_scanned_element_content).get("tagName")
+        script = f"return document.getElementsByTagName('{tag_name}')"
+        dom_elements = selenium_lib.driver.execute_script(script)
+        return dom_elements
+
+    def find_elements_by_ia_with_driver(self, scanned_element_json_name):
+        attribute_weight = "test/resources/selectorWeight.properties"
+        scanned_element_path_name = 'test/objectrepository/%s.json' % scanned_element_json_name
+        unique_element = self.filter_elements_by_attributes_by_driver(scanned_element_path_name, attribute_weight)
+        return unique_element
