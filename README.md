@@ -6,7 +6,9 @@ Recherche d'élements Web via robot framework à partir d'une description JSON d
 
 1. Importez la librairie BeautifulSoup.
 
+```sh
 pip install beautifulsoup4
+```
 
 2. Importez la bibliothèque FindElementByIA dans votre test.
 
