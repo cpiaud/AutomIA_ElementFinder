@@ -4,12 +4,16 @@ Recherche d'élements Web via robot framework à partir d'une description JSON d
 
 # Guide étape par étape:
 
-1. Importez la bibliothèque FindElementByIA dans votre test.
+1. Importez la librairie BeautifulSoup.
+
+pip install beautifulsoup4
+
+2. Importez la bibliothèque FindElementByIA dans votre test.
 
 ```robot
 Library     FindElementByIA.py
 ```
-2. Utilisez la stratégie de localisation personnalisée de Robot Framework dans la section keyword pour pouvoir définir les localisateurs personnalisés.
+3. Utilisez la stratégie de localisation personnalisée de Robot Framework dans la section keyword pour pouvoir définir les localisateurs personnalisés.
 
 ```robot
 *** Keywords ***
@@ -20,7 +24,7 @@ ${webelement}=     Find Elements By IA With Driver   ${locator}
 [Return]    ${webelement}
 ```
 
-3. Utilisez les localisateurs personnalisés dans vos tests comme l'exemple suivant :
+4. Utilisez les localisateurs personnalisés dans vos tests comme l'exemple suivant :
 
 ```robot
 *** Test Cases ***
