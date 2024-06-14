@@ -1,7 +1,7 @@
 *** Settings ***
 Library    OperatingSystem
-Library    AutomIAlib.py
-Library    FindWebElements.py
+Library    resources/AutomIAlib.py
+Library    resources/FindWebElements.py
 Library    SeleniumLibrary
 Library    XML
 
@@ -29,16 +29,17 @@ ${tag}    ${EMPTY}
 ${constraints}   ${EMPTY}
 
 *** Keywords ***
-Custom Locator Strategy for IA
+AutomIA Locator Strategy
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
-    ${webelement}=     Find Elements By IA With Driver   ${locator}
+    ${objPath} =   Set Variable    ${CURDIR}/objectrepository/${locator}
+    ${webelement}=     Find Elements By IA With Driver   ${objPath}
     [Return]    ${webelement}
 
     
 *** Test Cases ***
 TestClassicRobotFramework
     [Tags]  Classic
-    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteDemo/${siteDemo}/Login.html
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     chrome
     Maximize Browser Window
@@ -67,7 +68,7 @@ TestClassicRobotFramework
 
 TestAvecAutomIA
     [Tags]  AutomIA
-    Add Location Strategy    FindElementsByIA    Custom Locator Strategy for IA
+    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     chrome

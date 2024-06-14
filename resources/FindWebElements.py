@@ -1,16 +1,17 @@
 from robot.libraries.BuiltIn import BuiltIn
 from bs4 import BeautifulSoup
 import json
+import os
 
 from selenium.webdriver.common.by import By
 
-from MyLibrary import MyLibrary
+from AutomIAlib import AutomIAlib
 
 
-class RetrieveDOMElements:
+class FindWebElements:
 
     def __init__(self):
-        self.mylibrary = MyLibrary()
+        self.AutomIAlib = AutomIAlib()
 
     @staticmethod
     def get_current_url():
@@ -75,7 +76,7 @@ class RetrieveDOMElements:
         dom_elements = json.loads(self.get_elements_from_url())
 
         # Extract tag name from JSON file
-        tag_name = self.mylibrary.read_json_file(json_file_content).get("tagName")
+        tag_name = self.AutomIAlib.read_json_file(json_file_content).get("tagName")
 
         # Filter elements based on tag name
         filtered_elements = [element for element in dom_elements if element.get("tag_name") == tag_name]
@@ -95,10 +96,10 @@ class RetrieveDOMElements:
             list: A list of tuples containing attribute and its value.
         """
         # Read the attribute weight properties file
-        sorted_list = self.mylibrary.read_properties_file(attribute_weight)
+        sorted_list = self.AutomIAlib.read_properties_file(attribute_weight)
 
         # Read the scanned element JSON file
-        json_data = self.mylibrary.read_json_file(scanned_element_json)
+        json_data = self.AutomIAlib.read_json_file(scanned_element_json)
 
         # Extract values based on the sorted attribute list
         extracted_values = []
@@ -169,8 +170,8 @@ class RetrieveDOMElements:
             str: XPath of the unique element found.
         """
 
-        attribute_weight = "test/resources/selectorWeight.properties"
-        scanned_element_path_name = f'test/objectrepository/{scanned_element_json_name}.json'
+        attribute_weight = "resources/selectorWeight.properties"
+        scanned_element_path_name = f'{scanned_element_json_name}.json'
         unique_element = self.filter_elements_by_attributes(scanned_element_path_name, attribute_weight)
         print(self.build_xpath(unique_element[0]))
 
@@ -228,7 +229,7 @@ class RetrieveDOMElements:
             list: A list of filtered elements.
         """
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
-        tag_name = self.mylibrary.read_json_file(scanned_element_json).get("tagName")
+        tag_name = self.AutomIAlib.read_json_file(scanned_element_json).get("tagName")
         starting_list = self.filter_elements_by_tag_name_by_driver(scanned_element_json)
         sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight)
         current_cached_list = starting_list
@@ -244,7 +245,7 @@ class RetrieveDOMElements:
                 print("Element found")
                 break
             elif len(filtered_elements) > 1:
-                if filtered_elements < current_cached_list:
+                if len(filtered_elements) < len(current_cached_list):
                     current_cached_list = filtered_elements
                 else:
                     filtered_elements = current_cached_list
@@ -267,7 +268,7 @@ class RetrieveDOMElements:
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
 
         # Extract tag name from JSON file
-        tag_name = self.mylibrary.read_json_file(json_scanned_element_content).get("tagName")
+        tag_name = self.AutomIAlib.read_json_file(json_scanned_element_content).get("tagName")
         script = f"return document.getElementsByTagName('{tag_name}')"
         dom_elements = selenium_lib.driver.execute_script(script)
         return dom_elements
@@ -282,7 +283,7 @@ class RetrieveDOMElements:
         Returns:
             list: A list of unique elements found.
         """
-        attribute_weight = "test/resources/selectorWeight.properties"
-        scanned_element_path_name = f'test/objectrepository/{scanned_element_json_name}.json'
+        attribute_weight = "resources/selectorWeight.properties"
+        scanned_element_path_name = f'{scanned_element_json_name}.json'
         unique_element = self.filter_elements_by_attributes_by_driver(scanned_element_path_name, attribute_weight)
         return unique_element
