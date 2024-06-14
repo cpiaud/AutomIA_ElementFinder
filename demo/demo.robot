@@ -1,9 +1,7 @@
 *** Settings ***
-Library    OperatingSystem
-Library    resources/AutomIAlib.py
-Library    resources/FindWebElements.py
+Resource   ../resources/CustomKeywords.robot
 Library    SeleniumLibrary
-Library    XML
+
 
 *** Variables ***
 ${siteDemo}    SiteDemoOriginal  # "SiteDemoOriginal" or "SiteDemoEvoTexte" or "SiteDemoEvoTech" or "SiteDemoRefonte"
@@ -28,14 +26,10 @@ ${locator}    ${EMPTY}
 ${tag}    ${EMPTY}
 ${constraints}   ${EMPTY}
 
-*** Keywords ***
-AutomIA Locator Strategy
-    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
-    ${objPath} =   Set Variable    ${CURDIR}/objectrepository/${locator}
-    ${webelement}=     Find Elements By IA With Driver   ${objPath}
-    [Return]    ${webelement}
 
-    
+*** Keywords ***
+
+
 *** Test Cases ***
 TestClassicRobotFramework
     [Tags]  Classic
@@ -68,7 +62,7 @@ TestClassicRobotFramework
 
 TestAvecAutomIA
     [Tags]  AutomIA
-    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy
+    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     chrome

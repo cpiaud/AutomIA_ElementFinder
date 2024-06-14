@@ -1,7 +1,6 @@
 from robot.libraries.BuiltIn import BuiltIn
 from bs4 import BeautifulSoup
 import json
-import os
 
 from selenium.webdriver.common.by import By
 
