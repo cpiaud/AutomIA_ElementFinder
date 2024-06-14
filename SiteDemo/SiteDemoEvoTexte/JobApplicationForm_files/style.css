@@ -1,0 +1,10 @@
+/*!Theme Name: Kadence Child
+Theme URI: https://www.kadencewp.com/kadence-theme/
+Template: kadence
+Author: Kadence WP
+Author URI: https://www.kadencewp.com/
+Description: A child theme for the Kadence Theme.
+Version: 1.0.0
+License: GNU General Public License v3.0 (or later)
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Text Domain: kadence-child*/ul#menu-form-archive-menu{text-align:center;list-style:none;font-size:0}ul#menu-form-archive-menu li{display:inline-block;border:1px solid var(--global-palette-highlight);margin-right:-1px;font-size:16px}ul#menu-form-archive-menu li a{text-decoration:none;padding:10px 15px;display:block}ul#menu-form-archive-menu li.current-menu-item{background:var(--global-palette-highlight)}ul#menu-form-archive-menu li.current-menu-item a{color:#fff}ul#menu-form-archive-menu li:first-child{border-top-left-radius:5px;border-bottom-left-radius:5px}ul#menu-form-archive-menu li:last-child{border-top-right-radius:5px;border-bottom-right-radius:5px}
