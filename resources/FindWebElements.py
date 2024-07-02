@@ -235,7 +235,10 @@ class FindWebElements:
 
         filtered_elements = []
         for attribute_name, value in sorted_tag_list:
-            xpath = f"//{tag_name}[@{attribute_name}='{value}']"
+            if attribute_name == "textContent":
+                xpath = f"//{tag_name}[contains(., '{value}')]"
+            else:
+                xpath = f"//{tag_name}[@{attribute_name}='{value}']"
 
             filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
 
