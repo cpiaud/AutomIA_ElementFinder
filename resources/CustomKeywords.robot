@@ -11,4 +11,4 @@ AutomIA Locator Strategy
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
     ${objPath} =   Set Variable    ${EXECDIR}${ObjectRepositoryPath}${locator}
     ${webelement}=     Find Elements By IA With Driver   ${objPath}
-    [Return]    ${webelement}
+    RETURN    ${webelement}
