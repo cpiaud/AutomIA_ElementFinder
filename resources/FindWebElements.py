@@ -99,13 +99,13 @@ class FindWebElements:
 
         return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
 
-    def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attribute_weight_file_path:str) -> any:
+    def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attributes_weight_file_path:str) -> any:
         """
         Filter elements by attributes using Selenium WebDriver.
 
         Args:
             scanned_element_path (str): Path to the scanned element JSON file.
-            attribute_weight_file_path (str): Path to the attribute weight properties file.
+            attributes_weight_file_path (str): Path to the attribute weight properties file.
 
         Returns:
             list: A list of filtered elements.
@@ -123,7 +123,7 @@ class FindWebElements:
         starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
         
         # Get all the attribute and their value to begin the search
-        sorted_tag_list = self.get_element_attributes(scanned_element_json, attribute_weight_file_path)
+        sorted_tag_list = self.get_element_attributes(scanned_element_json, attributes_weight_file_path)
         
         # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list
@@ -182,9 +182,9 @@ class FindWebElements:
             list: A list of unique elements found.
         """
         # Path to the attributes weight definition file
-        attribute_weight_file_path = "resources/selectorWeight.properties"
+        attributes_weight_file_path = "resources/attributesWeight.properties"
 
         # Pathname of the json element file
         scanned_element_path = f'{scanned_element_json_name}.json'
 
-        return self.filter_elements_by_attributes_by_driver(scanned_element_path, attribute_weight_file_path)
+        return self.filter_elements_by_attributes_by_driver(scanned_element_path, attributes_weight_file_path)
