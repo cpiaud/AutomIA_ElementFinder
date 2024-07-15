@@ -67,35 +67,45 @@ class FindWebElements:
         # Return the filtered elements list
         return filtered_elements
 
-    def extract_values(self, scanned_element_json:any, attribute_weight_file_path:str) -> any:
+    def get_element_attributes(self, scanned_element_json:any, attributes_weight_file_path:str) -> list[any]:
         """
-        Extract values from JSON based on attribute weights.
+        Get all the attributes and their weight of the scanned_element_json.
+        if one of the found attribute has no weight define in the attributes_weight file, is default weight will be 10
 
         Args:
-            scanned_element_json (any): scanned element JSON data.
-            attribute_weight_file_path (str): Path to the attribute weight properties file.
-
+            scanned_element_json (json): scanned element JSON data.
+            attributes_weight_file_path (str): Path to the attribute weight properties file.
+        
         Returns:
-            list: A list of tuples containing attribute and its value.
+            list[(key, value, weight)]: A list of tuples containing this attribute key is value and is weight.
         """
         # Read the attribute weight properties file
-        sorted_list = self.AutomIAlib.read_properties_file(attribute_weight_file_path)
-
+        file_attributes = self.AutomIAlib.read_properties_file(attributes_weight_file_path)
         # Extract values based on the sorted attribute list
-        extracted_values = []
-        for key, _ in sorted_list:
-            if key in scanned_element_json:
-                extracted_values.append((key, scanned_element_json[key]))
+        attributes = []
 
-        return extracted_values
+        for attr in scanned_element_json:
+            in_attributes_weight_file = False
 
-    def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attribute_weight_file_path:str) -> any:
+            if attr in ['parents', 'siblings']: # special case
+                continue
+            for key, weight in file_attributes:
+                if attr == key:
+                    in_attributes_weight_file = True
+                    attributes.append((attr, scanned_element_json[attr], weight))
+                    break
+            if not in_attributes_weight_file:
+                attributes.append((attr, scanned_element_json[attr], 10))
+
+        return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
+
+    def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attributes_weight_file_path:str) -> any:
         """
         Filter elements by attributes using Selenium WebDriver.
 
         Args:
             scanned_element_path (str): Path to the scanned element JSON file.
-            attribute_weight_file_path (str): Path to the attribute weight properties file.
+            attributes_weight_file_path (str): Path to the attribute weight properties file.
 
         Returns:
             list: A list of filtered elements.
@@ -113,7 +123,7 @@ class FindWebElements:
         starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
         
         # Get all the attribute and their value to begin the search
-        sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight_file_path)
+        sorted_tag_list = self.get_element_attributes(scanned_element_json, attributes_weight_file_path)
         
         # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list
@@ -121,7 +131,7 @@ class FindWebElements:
         # The list of possible elements found by the current attribute
         filtered_elements = []
 
-        for attribute_name, value in sorted_tag_list:
+        for attribute_name, value, _ in sorted_tag_list:
             if attribute_name == "textContent":
                 xpath = f"//{tag_name}[contains(., '{value}')]"
             else:
@@ -172,9 +182,9 @@ class FindWebElements:
             list: A list of unique elements found.
         """
         # Path to the attributes weight definition file
-        attribute_weight_file_path = "resources/selectorWeight.properties"
+        attributes_weight_file_path = "resources/attributesWeight.properties"
 
         # Pathname of the json element file
         scanned_element_path = f'{scanned_element_json_name}.json'
 
-        return self.filter_elements_by_attributes_by_driver(scanned_element_path, attribute_weight_file_path)
+        return self.filter_elements_by_attributes_by_driver(scanned_element_path, attributes_weight_file_path)
