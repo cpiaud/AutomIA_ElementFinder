@@ -87,7 +87,7 @@ class FindWebElements:
         for attr in scanned_element_json:
             in_attributes_weight_file = False
 
-            if attr in ['parents', 'siblings']: # special case
+            if attr in ['parents']: # special case
                 continue
             for key, weight in file_attributes:
                 if attr == key:
@@ -98,6 +98,69 @@ class FindWebElements:
                 attributes.append((attr, scanned_element_json[attr], 10))
 
         return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
+
+    def create_element_xpath(self, element:any) -> str:
+        """
+        Create the xpath of an element using all of his attributes
+
+        Args:
+            element (json): all the attribute and value that compose the element
+
+        Returns:
+            str: the xpath of the element.
+        """
+        xpath = f"//{element['tagName']}["
+        is_starting_attribute = True
+
+        for attr in element:
+            match attr:
+                case 'tagName':
+                    continue
+                case 'textContent':
+                    if not is_starting_attribute:
+                        xpath += f" and contains(., '{element[attr]}')"
+                    else:
+                        xpath += f"contains(., '{element[attr]}')"
+                case _:
+                    if not is_starting_attribute:
+                        xpath += f" and @{attr}='{element[attr]}'"
+                    else:
+                        xpath += f"@{attr}='{element[attr]}'"
+            is_starting_attribute = False
+        return xpath + "]"
+
+    def get_by_siblings_attribute(self, siblings_json:any) -> list[any]:
+        """
+        Get all the possible elements by checking the siblings of the wanted element
+
+        Args:
+            siblings_json (json): all the siblings element as attribute json data.
+
+        Returns:
+            list: A list of filtered elements.
+        """
+        # Initialize a SeleniumLibrary instance
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        siblings = []
+        first_node_siblings = []
+        is_first_node_sibling_filed = False
+        
+        # TODO reinforce this method by reusing "find_elements_by_ia_with_driver".
+        # Need the implementation of the no locator definition strategy
+        for sibling in siblings_json:
+            xpath = self.create_element_xpath(sibling)
+            siblings.append(selenium_lib.driver.find_element(By.XPATH, xpath))
+            if not is_first_node_sibling_filed:
+                xpathSiblings = xpath + "/following-sibling::* | preceding-sibling::*" # get all the next and previous sibling of the element
+                first_node_siblings = selenium_lib.driver.find_elements(By.XPATH, xpathSiblings)
+                is_first_node_sibling_filed = True
+
+        # Remove all the siblings element in the first-node-siblings array to retrieve the wanted element
+        for sibling in siblings:
+            if sibling in first_node_siblings:
+                first_node_siblings.remove(sibling)
+        
+        return first_node_siblings
 
     def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attributes_weight_file_path:str) -> any:
         """
@@ -132,12 +195,16 @@ class FindWebElements:
         filtered_elements = []
 
         for attribute_name, value, _ in sorted_tag_list:
-            if attribute_name == "textContent":
-                xpath = f"//{tag_name}[contains(., '{value}')]"
-            else:
-                xpath = f"//{tag_name}[@{attribute_name}='{value}']"
-
-            filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
+            match attribute_name:
+                case 'siblings':
+                    filtered_elements = self.get_by_siblings_attribute(value)
+                    continue
+                case 'textContent':
+                    xpath = f"//{tag_name}[contains(., '{value}')]"
+                    filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
+                case _:
+                    xpath = f"//{tag_name}[@{attribute_name}='{value}']"
+                    filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
 
             if len(filtered_elements) == 1: # Element found
                 current_cached_list = filtered_elements
