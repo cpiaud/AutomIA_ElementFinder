@@ -105,6 +105,16 @@ class FindWebElements:
         return current_cached_list
 
     def check_by_siblings(self, siblings, soup) -> list[any]:
+        """
+        This method check if one of the siblings is present and try to recongised the researched element
+        by creating a list of all of the siblings in the soup element and compared them with the seiblings of the research element
+
+        Args:
+            siblings (list[json]): the list of all of the siblings element of the reasearched element
+            soup (Beautifullsoup): the html node where we gonna try to find the researched element
+        Returns:
+            list : the list of plausible research element in format Beautifullsoup
+        """
         is_one_child_found = False
         childrens = []
         res = []
@@ -133,7 +143,17 @@ class FindWebElements:
                     continue
         return res if is_one_child_found else []
 
-    def get_to_parent(self, parents, siblings, soup, a) -> list[any]:
+    def get_to_parent(self, parents, siblings, soup) -> list[any]:
+        """
+        Recursive method to reach the last known parent of the researching element before comparing the found elements and the siblings elements
+
+        Args:
+            parents (list[json]): the list of all of the parent element of the researched element
+            siblings (list[json]): the list of all of the siblings element of the reasearched element
+            soup (Beautifullsoup): the html node where we gonna try to find the researched element
+        Returns:
+            list : the list of plausible research element in format Beautifullsoup
+        """
         find_elements = []
 
         if not parents:
@@ -143,7 +163,7 @@ class FindWebElements:
         else:
             for elm in soup.find_all(parents[len(parents) - 1]["tagName"]):
                 if (len(parents) - 1 >= 0):
-                    e = self.get_to_parent(parents[:-1], siblings, elm, a - 1)
+                    e = self.get_to_parent(parents[:-1], siblings, elm)
                     if e:
                         find_elements.extend(e)
 
@@ -163,7 +183,7 @@ class FindWebElements:
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
         soup = BeautifulSoup(selenium_lib.driver.page_source, 'html.parser')
 
-        soupElms = self.get_to_parent(scanned_element_json["parents"][:-1], scanned_element_json["siblings"], soup, len(scanned_element_json["parents"]) - 1)
+        soupElms = self.get_to_parent(scanned_element_json["parents"][:-1], scanned_element_json["siblings"])
         BuiltIn().log_to_console(soupElms)
         # TODO Add the retrieving method from soup element to web element
         exit(0)
@@ -189,7 +209,7 @@ class FindWebElements:
             return self.get_by_siblings_and_parents(scanned_element_json)
         return attributes_way_result
     
-def create_element_xpath(self, element:any) -> str:
+    def create_element_xpath(self, element:any) -> str:
         """
         Create the xpath of an element using all of his attributes
 
