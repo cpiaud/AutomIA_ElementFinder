@@ -169,6 +169,36 @@ class FindWebElements:
 
         return find_elements if find_elements else None
 
+    def create_xpath_for_soup_element(self, soupElm:str) -> str:
+        """
+        Create the xpath of a BeautifullSoup element
+
+        Args:
+            soupElm (str): The BeautifullSoup element
+
+        Returns:
+            str: the xpath of the element.
+        """
+        xpath = f"//{soupElm.name}["
+        is_starting_attribute = True
+
+        for attr in soupElm.attrs:
+            match attr:
+                case 'name':
+                    continue
+                case 'class':
+                    res = ""
+                    for c in soupElm["class"]:
+                        res += ' ' + c
+                    res = res.strip()
+                    xpath += f" and @{attr}='{res}'" if not is_starting_attribute else f"@{attr}='{res}'"
+                case 'textContent':
+                    xpath += f" and contains(., '{soupElm[attr]}')" if not is_starting_attribute else f"contains(., '{soupElm[attr]}')"
+                case _:
+                    xpath += f" and @{attr}='{soupElm[attr]}'" if not is_starting_attribute else f"@{attr}='{soupElm[attr]}'"
+            is_starting_attribute = False
+        return xpath + "]"
+
     def get_by_siblings_and_parents(self, scanned_element_json:any) -> any:
         """
         Get all corresponding elements with the parents and siblings of the scanned element.
@@ -183,11 +213,12 @@ class FindWebElements:
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
         soup = BeautifulSoup(selenium_lib.driver.page_source, 'html.parser')
 
-        soupElms = self.get_to_parent(scanned_element_json["parents"][:-1], scanned_element_json["siblings"])
-        BuiltIn().log_to_console(soupElms)
-        # TODO Add the retrieving method from soup element to web element
-        exit(0)
-        return
+        soupElms = self.get_to_parent(scanned_element_json["parents"][:-1], scanned_element_json["siblings"], soup)
+        if len(soupElms) != 1:
+            return []
+        
+        web_elm_xpath = self.create_xpath_for_soup_element(soupElms[0])
+        return selenium_lib.driver.find_elements(By.XPATH, web_elm_xpath)
 
     
     def find_elements_by_ia_with_driver(self, scanned_element_json_name:str) -> any:
@@ -205,112 +236,6 @@ class FindWebElements:
         attributes_way_result = self.get_by_attributes(scanned_element_json)
         
         # TODO reinforce the error handling
-        if (True): # len(attributes_way_result) != 1
+        if (len(attributes_way_result) != 1):
             return self.get_by_siblings_and_parents(scanned_element_json)
         return attributes_way_result
-    
-    def create_element_xpath(self, element:any) -> str:
-        """
-        Create the xpath of an element using all of his attributes
-
-        Args:
-            element (json): all the attribute and value that compose the element
-
-        Returns:
-            str: the xpath of the element.
-        """
-        xpath = f"//{element['tagName']}["
-        is_starting_attribute = True
-
-        for attr in element:
-            match attr:
-                case 'tagName':
-                    continue
-                case 'textContent':
-                    if not is_starting_attribute:
-                        xpath += f" and contains(., '{element[attr]}')"
-                    else:
-                        xpath += f"contains(., '{element[attr]}')"
-                case _:
-                    if not is_starting_attribute:
-                        xpath += f" and @{attr}='{element[attr]}'"
-                    else:
-                        xpath += f"@{attr}='{element[attr]}'"
-            is_starting_attribute = False
-        return xpath + "]"
-
-
-    # def create_element_xpath(self, element:any) -> str:
-    #     """
-    #     Create the xpath of an element using all of his attributes
-
-    #     Args:
-    #         element (json): all the attribute and value that compose the element
-
-    #     Returns:
-    #         str: the xpath of the element.
-    #     """
-    #     xpath = f"//{element['tagName']}["
-    #     is_starting_attribute = True
-
-    #     for attr in element:
-    #         match attr:
-    #             case 'tagName':
-    #                 continue
-    #             case 'textContent':
-    #                 if not is_starting_attribute:
-    #                     xpath += f" and contains(., '{element[attr]}')"
-    #                 else:
-    #                     xpath += f"contains(., '{element[attr]}')"
-    #             case _:
-    #                 if not is_starting_attribute:
-    #                     xpath += f" and @{attr}='{element[attr]}'"
-    #                 else:
-    #                     xpath += f"@{attr}='{element[attr]}'"
-    #         is_starting_attribute = False
-    #     return xpath + "]"
-
-    # def get_by_siblings_and_parents(self, scanned_element_json:any) -> any:
-    #     """
-    #     Get all corresponding elements with the parents and siblings of the scanned element.
-
-    #     Args:
-    #         scanned_element_json (json): scanned element JSON data.
-
-    #     Returns:
-    #         list: A list of the plausible corresponding elements.
-    #     """
-    #     # Initialize a SeleniumLibrary instance
-    #     selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
-    #     first_parent = scanned_element_json.get('parents')[0]
-    #     siblings = scanned_element_json.get('siblings')
-
-    #     parent_childs = selenium_lib.driver.find_elements(By.XPATH, self.create_element_xpath(first_parent) + '/child::*')
-    #     res = []
-    #     for child in parent_childs:
-    #         res.append(child)
-
-    #     BuiltIn().log_to_console(self.create_element_xpath(first_parent) + '/child::*')
-    #     BuiltIn().log_to_console(len(parent_childs))
-    #     BuiltIn().log_to_console(parent_childs)
-    #     for child in parent_childs:
-    #         BuiltIn().log_to_console("[===========new element===========]")
-    #         BuiltIn().log_to_console("Child : " + child.tag_name)
-    #         for sibling in siblings:
-    #             same_element = True
-    #             BuiltIn().log_to_console("sibling : " + sibling["tagName"])
-    #             BuiltIn().log_to_console(sibling.keys())
-    #             for attr in sibling.keys():
-    #                 BuiltIn().log_to_console(attr)
-    #                 BuiltIn().log_to_console('+' + sibling[attr] + '+')
-    #                 BuiltIn().log_to_console('+' + child.get_attribute(attr).strip().lower() + '+')
-    #                 if sibling[attr] != child.get_attribute(attr).strip().lower():
-    #                     same_element = False
-    #                     break
-    #                 BuiltIn().log_to_console("<--------->")
-    #             BuiltIn().log_to_console(same_element)
-    #             if same_element:
-    #                 BuiltIn().log_to_console("Child remove !")
-    #                 res.remove(child)
-    #                 break
-    #     return res
