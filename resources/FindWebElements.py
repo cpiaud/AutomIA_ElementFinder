@@ -1,86 +1,49 @@
-from robot.libraries.BuiltIn import BuiltIn
 from bs4 import BeautifulSoup
-import json
+from robot.libraries.BuiltIn import BuiltIn
 
 from selenium.webdriver.common.by import By
 
 from AutomIAlib import AutomIAlib
 
-
 class FindWebElements:
+    
+    # Path to the attributes weight definition file
+    attributes_weight_file_path = "resources/attributesWeight.properties"
 
     def __init__(self) -> None:
         self.AutomIAlib = AutomIAlib()
 
-    @staticmethod
-    def get_elements_from_url() -> list[any]:
+    def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
         """
-        Retrieve all DOM elements from the current page.
+        Filter elements by tag name using Selenium WebDriver.
+
+        Args:
+            tag_name (str): tag name of the scanned element JSON file.
 
         Returns:
-            str: A JSON string representation of all DOM elements.
+            list: A list of DOM elements.
         """
         # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        # Get DOM elements by tag name
+        script = f"return document.getElementsByTagName('{tag_name}')"
+        dom_elements = selenium_lib.driver.execute_script(script)
 
-        # Get the page source HTML
-        page_source = selenium_lib.driver.page_source
+        return dom_elements
 
-        # Parse the HTML using BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
-
-        # Find all elements in the HTML
-        elements = soup.find_all()
-
-        # Convert elements to JSON format
-        elements_json = []
-        for element in elements:
-            element_json = {
-                'tag_name': element.name,
-                'attributes': dict(element.attrs),
-                'text': element.text.strip()
-            }
-            elements_json.append(element_json)
-
-        # Serialize the list of dictionaries to JSON format
-        return json.dumps(elements_json)
-
-    def filter_elements_by_tag_name(self, json_file_content:str) -> list[any]:
-        """
-        Filter elements by tag name specified in the JSON file.
-
-        Args:
-            json_file_content (str): Path to the JSON file containing the tag name.
-
-        Returns:
-            list: A list of filtered elements.
-        """
-        # Get all DOM elements from the current page
-        dom_elements = json.loads(self.get_elements_from_url())
-
-        # Extract tag name from JSON file
-        tag_name = self.AutomIAlib.read_json_file(json_file_content).get("tagName")
-
-        # Filter elements based on tag name
-        filtered_elements = [element for element in dom_elements if element.get("tag_name") == tag_name]
-
-        # Return the filtered elements list
-        return filtered_elements
-
-    def get_element_attributes(self, scanned_element_json:any, attributes_weight_file_path:str) -> list[any]:
+    def get_element_attributes(self, scanned_element_json:any) -> list[any]:
         """
         Get all the attributes and their weight of the scanned_element_json.
         if one of the found attribute has no weight define in the attributes_weight file, is default weight will be 10
 
         Args:
             scanned_element_json (json): scanned element JSON data.
-            attributes_weight_file_path (str): Path to the attribute weight properties file.
         
         Returns:
             list[(key, value, weight)]: A list of tuples containing this attribute key is value and is weight.
         """
         # Read the attribute weight properties file
-        file_attributes = self.AutomIAlib.read_properties_file(attributes_weight_file_path)
+        file_attributes = self.AutomIAlib.read_properties_file(self.attributes_weight_file_path)
         # Extract values based on the sorted attribute list
         attributes = []
 
@@ -99,35 +62,26 @@ class FindWebElements:
 
         return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
 
-    def filter_elements_by_attributes_by_driver(self, scanned_element_path:str, attributes_weight_file_path:str) -> any:
+    def get_by_attributes(self, scanned_element_json:any) -> list[any]:
         """
-        Filter elements by attributes using Selenium WebDriver.
+        Get all corresponding elements with the attributes of the scanned element.
 
         Args:
-            scanned_element_path (str): Path to the scanned element JSON file.
-            attributes_weight_file_path (str): Path to the attribute weight properties file.
+            scanned_element_json (json): scanned element JSON data.
 
         Returns:
             list: A list of filtered elements.
         """
         # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
-
-        # Get the data of the element json file
-        scanned_element_json = self.AutomIAlib.read_json_file(scanned_element_path)
-        
         # Get the tagName of the element to retrieve in the DOM
         tag_name = scanned_element_json.get("tagName")
-        
         # Get all the DOM elements possible for the element to find
         starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
-        
         # Get all the attribute and their value to begin the search
-        sorted_tag_list = self.get_element_attributes(scanned_element_json, attributes_weight_file_path)
-        
+        sorted_tag_list = self.get_element_attributes(scanned_element_json)
         # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list
-        
         # The list of possible elements found by the current attribute
         filtered_elements = []
 
@@ -148,28 +102,124 @@ class FindWebElements:
                 else:
                     filtered_elements = current_cached_list
 
-            # TODO no elements or mutiple elements error handling missing
-
         return current_cached_list
 
-    def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
+    def check_by_siblings(self, siblings, soup) -> list[any]:
         """
-        Filter elements by tag name using Selenium WebDriver.
+        This method check if one of the siblings is present and try to recongised the researched element
+        by creating a list of all of the siblings in the soup element and compared them with the seiblings of the research element
 
         Args:
-            tag_name (str): tag name of the scanned element JSON file.
+            siblings (list[json]): the list of all of the siblings element of the reasearched element
+            soup (Beautifullsoup): the html node where we gonna try to find the researched element
+        Returns:
+            list : the list of plausible research element in format Beautifullsoup
+        """
+        is_one_child_found = False
+        childrens = []
+        res = []
+
+        for sc in soup.children:
+            if sc != "\n":
+                childrens.append(sc)
+                res.append(sc)
+
+        for c in childrens:
+            for s in siblings:
+                same_element = True
+                for attr in s.keys():
+                    match attr:
+                        case 'tagName':
+                            same_element = c.name.__eq__(s[attr])
+                        case 'textContent':
+                            same_element = c.get_text().strip().__eq__(s[attr])
+                        case _:
+                            same_element = c[attr][0].strip().__eq__(s[attr])
+                    if not same_element:
+                        break
+                if same_element:
+                    is_one_child_found = True
+                    res.remove(c)
+                    continue
+        return res if is_one_child_found else []
+
+    def get_to_parent(self, parents, siblings, soup) -> list[any]:
+        """
+        Recursive method to reach the last known parent of the researching element before comparing the found elements and the siblings elements
+
+        Args:
+            parents (list[json]): the list of all of the parent element of the researched element
+            siblings (list[json]): the list of all of the siblings element of the reasearched element
+            soup (Beautifullsoup): the html node where we gonna try to find the researched element
+        Returns:
+            list : the list of plausible research element in format Beautifullsoup
+        """
+        find_elements = []
+
+        if not parents:
+            e = self.check_by_siblings(siblings, soup)
+            for el in e:
+                find_elements.append(el)
+        else:
+            for elm in soup.find_all(parents[len(parents) - 1]["tagName"]):
+                if (len(parents) - 1 >= 0):
+                    e = self.get_to_parent(parents[:-1], siblings, elm)
+                    if e:
+                        find_elements.extend(e)
+
+        return find_elements if find_elements else None
+
+    def create_xpath_for_soup_element(self, soupElm:str) -> str:
+        """
+        Create the xpath of a BeautifullSoup element
+
+        Args:
+            soupElm (str): The BeautifullSoup element
 
         Returns:
-            list: A list of DOM elements.
+            str: the xpath of the element.
+        """
+        xpath = f"//{soupElm.name}["
+        is_starting_attribute = True
+
+        for attr in soupElm.attrs:
+            match attr:
+                case 'name':
+                    continue
+                case 'class':
+                    res = ""
+                    for c in soupElm["class"]:
+                        res += ' ' + c
+                    res = res.strip()
+                    xpath += f" and @{attr}='{res}'" if not is_starting_attribute else f"@{attr}='{res}'"
+                case 'textContent':
+                    xpath += f" and contains(., '{soupElm[attr]}')" if not is_starting_attribute else f"contains(., '{soupElm[attr]}')"
+                case _:
+                    xpath += f" and @{attr}='{soupElm[attr]}'" if not is_starting_attribute else f"@{attr}='{soupElm[attr]}'"
+            is_starting_attribute = False
+        return xpath + "]"
+
+    def get_by_siblings_and_parents(self, scanned_element_json:any) -> any:
+        """
+        Get all corresponding elements with the parents and siblings of the scanned element.
+
+        Args:
+            scanned_element_json (json): scanned element JSON data.
+
+        Returns:
+            list: A list of the plausible corresponding elements.
         """
         # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        soup = BeautifulSoup(selenium_lib.driver.page_source, 'html.parser')
 
-        # Get DOM elements by tag name
-        script = f"return document.getElementsByTagName('{tag_name}')"
-        dom_elements = selenium_lib.driver.execute_script(script)
+        soupElms = self.get_to_parent(scanned_element_json["parents"][:-1], scanned_element_json["siblings"], soup)
+        if len(soupElms) != 1:
+            return []
+        
+        web_elm_xpath = self.create_xpath_for_soup_element(soupElms[0])
+        return selenium_lib.driver.find_elements(By.XPATH, web_elm_xpath)
 
-        return dom_elements
     
     def find_elements_by_ia_with_driver(self, scanned_element_json_name:str) -> any:
         """
@@ -181,10 +231,11 @@ class FindWebElements:
         Returns:
             list: A list of unique elements found.
         """
-        # Path to the attributes weight definition file
-        attributes_weight_file_path = "resources/attributesWeight.properties"
-
-        # Pathname of the json element file
-        scanned_element_path = f'{scanned_element_json_name}.json'
-
-        return self.filter_elements_by_attributes_by_driver(scanned_element_path, attributes_weight_file_path)
+        # Get the data of the element json file
+        scanned_element_json = self.AutomIAlib.read_json_file(f'{scanned_element_json_name}.json')
+        attributes_way_result = self.get_by_attributes(scanned_element_json)
+        
+        # TODO reinforce the error handling
+        if (len(attributes_way_result) != 1):
+            return self.get_by_siblings_and_parents(scanned_element_json)
+        return attributes_way_result
