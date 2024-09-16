@@ -1,10 +1,11 @@
 *** Settings ***
 Resource   ../resources/CustomKeywords.robot
 Library    SeleniumLibrary
+Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
+    
 
 
 *** Variables ***
-${siteDemo}    SiteDemoOriginal  # "SiteDemoOriginal" or "SiteDemoEvoTexte" or "SiteDemoEvoTech" or "SiteDemoRefonte"
 ${username}     myUsername
 ${password}     myPassword
 ${firstnamevalue}     myFirstname
@@ -26,13 +27,35 @@ ${locator}    ${EMPTY}
 ${tag}    ${EMPTY}
 ${constraints}   ${EMPTY}
 
+*** Test Cases ***
+Test Classic V1
+    TestClassic       SiteDemoOriginal
+
+Test Avec AutomIA V1
+    TestAvecAutomIA   SiteDemoOriginal
+
+Test Classic V2 
+    TestClassic       SiteDemoEvoTexte
+
+Test Avec AutomIA V2
+    TestAvecAutomIA   SiteDemoEvoTexte
+
+Test Classic V3
+    TestClassic       SiteDemoEvoTech
+
+Test Avec AutomIA V3
+    TestAvecAutomIA   SiteDemoEvoTech
+
+Test Classic V4
+    TestClassic       SiteDemoRefonte
+
+Test Avec AutomIA V4
+    TestAvecAutomIA   SiteDemoRefonte
 
 *** Keywords ***
-
-
-*** Test Cases ***
-TestClassicRobotFramework
-    [Tags]  Classic
+TestClassic
+    [Arguments]  ${siteDemo}
+    [Tags]  Classic    
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     chrome
@@ -61,8 +84,9 @@ TestClassicRobotFramework
     Close Browser
 
 TestAvecAutomIA
+    [Arguments]  ${siteDemo}
     [Tags]  AutomIA
-    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
+    #Set Selenium Speed  0.2
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     chrome
