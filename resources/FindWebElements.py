@@ -107,7 +107,7 @@ class FindWebElements:
     def check_by_siblings(self, siblings, soup) -> list[any]:
         """
         This method check if one of the siblings is present and try to recongised the researched element
-        by creating a list of all of the siblings in the soup element and compared them with the seiblings of the research element
+        by creating a list of all of the siblings in the soup element and compared them with the siblings of the research element
 
         Args:
             siblings (list[json]): the list of all of the siblings element of the reasearched element

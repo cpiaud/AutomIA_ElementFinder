@@ -1,0 +1,2450 @@
+.tipsy{padding:5px; font-size: 10px; position: absolute; z-index: 100000; }
+.tipsy-inner {padding: 5px 8px 4px 8px; background-color: black; color: white; max-width: 200px; text-align: center;
+	      font-family:sans-serif;
+/*border:1px solid rgb(255,255,255);box-shadow:0 0 2px black;*/
+border-radius: 2px; -moz-border-radius:2px; -webkit-border-radius:2px; }
+.tipsy-arrow { position: absolute; background: url(//static.infoclimat.net/images/v5.2/tipsy.gif) no-repeat top left; width: 9px; height: 5px; }
+.tipsy-n .tipsy-arrow { top: 0; left: 50%; margin-left: -4px; }
+.tipsy-nw .tipsy-arrow { top: 0; left: 10px; }
+.tipsy-ne .tipsy-arrow { top: 0; right: 10px; }
+.tipsy-s .tipsy-arrow { bottom: 0; left: 50%; margin-left: -4px; background-position: bottom left; }
+.tipsy-sw .tipsy-arrow { bottom: 0; left: 10px; background-position: bottom left; }
+.tipsy-se .tipsy-arrow { bottom: 0; right: 10px; background-position: bottom left; }
+.tipsy-e .tipsy-arrow { top: 50%; margin-top: -4px; right: 0; width: 5px; height: 9px; background-position: top right; }
+.tipsy-w .tipsy-arrow { top: 50%; margin-top: -4px; left: 0; width: 5px; height: 9px; }
+
+.mobile-app-download{
+    position:fixed;
+    bottom:0;
+    font-size:25px;
+    left:0;
+    right:0;
+    background:rgba(255,255,255,0.8);
+    color:black;
+}
+.mobile-app-download a{
+    display:block;
+    text-decoration:none;
+    padding:10px 0px;
+}
+a.livestream-like-button{
+    background-image:url(//static.infoclimat.net/images/up_like1.png);
+    background-repeat:no-repeat;
+    background-position:2px 2px;
+    padding-left:16px;
+    padding-right:3px;
+    background-color:rgba(0,0,0,0.7);
+    border-radius:3px;
+    text-decoration:none;
+    color:#ffffff;
+    font-family:Exo,sans-serif;
+    vertical-align:top;
+}
+
+.IC_realtime_date{
+	color:#333;
+	font-size:8px;
+	float:left;
+    }
+    
+    .IC_realtime_link {
+	float:right;
+    }
+    
+    .IC_realtime_container{
+	margin-bottom:10px;
+	margin-top:5px;
+	border-top: 1px solid rgba(0,0,0,0.5);
+	clear:both;
+    }
+
+#infoclimat-livestream{
+    width:630px;
+    background:white;
+    margin:0 auto;
+    text-align:left;
+    /*position:relative;*/
+}
+
+.livestream-etiq-wrapper{
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    height:17px;
+    overflow:hidden;
+    display:inline-block;
+    border-radius:3px;
+    padding:0 3px 0 0;
+    margin-bottom:-3px;
+    color:white;
+
+    background: -moz-linear-gradient(top, #40a9bf 0%, #1e535f 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#40a9bf), color-stop(100%,#1e535f));
+background: -webkit-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+background: -o-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+background: -ms-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+background: linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40a9bf', endColorstr='#1e535f',GradientType=0 );
+
+}
+.livestream-etiq-img, .livestream-etiq-desc, .livestream-etiq-value{
+    height:17px;
+    line-height:17px;
+    overflow:hidden;
+    display:inline-block;
+    font-size:11px;
+    margin:0;
+    padding:0;
+    float:left;
+}
+.livestream-etiq-img{
+    background-position:0px -2px;
+    width:18px;
+    background-repeat:no-repeat;
+}
+.livestream-etiq-value{
+    padding-left:3px;
+    margin-left:3px;
+    border-left:1px solid rgba(255,255,255,0.4);
+
+background: -moz-linear-gradient(left, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.4)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left, rgba(0,0,0,0.4) 0%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left, rgba(0,0,0,0.4) 0%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left, rgba(0,0,0,0.4) 0%,rgba(255,255,255,0) 100%); /* IE10+ */
+background: linear-gradient(to right, rgba(0,0,0,0.4) 0%,rgba(255,255,255,0) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#66000000', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
+font-family:Exo,sans-serif;
+}
+
+#infoclimat-livestream-scrollup{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:150px;
+    margin:0 auto;
+    text-align:center;
+    background:red;
+    color:white;
+    box-shadow: 0 0 3px #222;
+    cursor:pointer;
+
+    -webkit-border-top-right-radius: 3px;
+    -moz-border-radius-topright: 3px;
+    border-top-right-radius: 3px;
+
+    display:none;
+}
+
+.infoclimat-livestream-title{
+    background:#333;
+    color:white;
+    text-shadow:0 0 2px black;
+    padding:2px 5px;
+}
+
+#infoclimat-livestream-timestamp {
+    float:right;
+    font-size:10px;
+    margin-top:2px;
+}
+
+#infoclimat-livestream-slider {
+    /*height:150px;*/
+    height:140px;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    position:relative;
+    /*overflow:hidden;*/
+}
+
+#infoclimat-livestream .infoclimat-livestream-title a{
+    color:white;
+}
+#infoclimat-livestream a:hover{
+    color:#FF7A51;
+}
+
+#infoclimat-livestream-slider ul {
+    padding:0;
+    margin:0;
+    list-style-type:none;
+}
+
+#infoclimat-livestream-slider ul li {
+    padding:2px 4px;
+    margin:0;
+    background-color:#eee;
+    box-shadow:0 0 2px black;
+    display:block;
+    min-height:32px;
+
+    background-repeat:no-repeat;
+    background-position:100% 0%;
+    padding-right:38px;
+}
+
+.livestream-timestamp{
+    font-size:13px;
+    margin-right:5px;
+    font-family:'Exo','Nunito',sans-serif;
+}
+.livestream-location {
+    float:right;
+    margin-top:1px;
+    margin-right:1px;
+    text-align:right;
+}
+
+.livestream-image-MA{
+    margin-bottom:-4px;
+}
+.livestream-image-photolive{
+    float:left;
+    margin-right:5px;
+    margin-left:-4px;
+    height:60px;
+
+    height:72px;
+    margin-top:-2px;
+    border:0;
+}
+
+.livestream-image-profile{
+    height:36px;
+    width:36px;
+    float:right;
+    margin-top:-2px;
+    margin-right:-4px;
+    margin-left:4px;
+    background-position:50% 50%;
+}
+
+.livestream-more-description{
+    overflow:hidden;
+}
+
+
+.better-inputs{
+    
+    color:#999999;
+    background:#FFF;
+    border:1px solid #CCC;
+    box-shadow:0 1px 1px rgba(0,0,0,0.075) inset;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.075) inset;-moz-box-shadow:0 1px 1px rgba(0,0,0,0.075) inset;
+    transition: all 0.2s linear 0s;
+    -moz-transition: all 0.2s linear 0s;-webkit-transition: all 0.2s linear 0s;
+    border-radius:4px; -webkit-border-radius:4px; -moz-border-radius:4px;
+    font-size:14px;
+    height:20px;
+    line-height:20px;
+    padding:4px 6px;
+    vertical-align:middle;
+    margin-bottom:5px;
+}
+textarea.better-inputs{
+    height:auto;
+    line-height:auto;
+}
+.better-inputs:focus{
+    box-shadow:0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+    border-color:rgba(82, 168, 236, 0.8);
+    outline:none;
+    color:black;
+}
+.better-inputs-labels{
+    padding-top:5px;
+    text-align:right;
+    width:160px;
+    display:inline-block;
+    margin-bottom:5px;
+    font-size:14px;
+    line-height:20px;
+    margin-right:5px;
+    color:#555;
+}
+.better-inputs-append{
+    border-top-right-radius:0;
+    border-bottom-right-radius:0;
+}
+.better-inputs-append-label{
+    vertical-align:top;
+    border-radius:0 4px 4px 0;-webkit-border-radius:0 4px 4px 0;-moz-border-radius:0 4px 4px 0;
+    background:#EEE;
+    border:1px solid #CCCCCC;
+    border-left-width:0;
+    border-left-color:transparent;
+    font-size:14px;
+    font-family:sans-serif;
+    height:20px;
+    line-height:20px;
+    padding:4px 6px;
+    text-align:center;
+    text-shadow:0 1px 0 #FFFFFF;
+    display:inline-block;
+    white-space:nowrap;
+    width:auto;
+    margin-left:-1px;
+    margin-top:1px;
+}
+.better-fieldset{
+    background: rgb(255,255,255); /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(47%,rgba(246,246,246,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+border-radius:0;
+border:none;
+box-shadow: 0 0 3px black;-webkit-box-shadow: 0 0 3px black;-moz-box-shadow: 0 0 3px black;
+}
+.better-fieldset .better-fieldset-explain{
+    font-size:14px;
+    color:#222;
+    text-align:left;
+    border-bottom:1px solid #ccc;
+    margin-bottom:5px;
+    padding:5px;
+}
+
+.better-fieldset legend{
+    background:#1E535F;
+    color:white;
+    padding:0 5px;
+}
+
+.led-rouge{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    margin:0 7px 0 4px;
+    -webkit-border-radius:50%;
+    border-radius:50%;
+    background: rgb(248,80,50);
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y4NTAzMiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2NlNDI0MiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUxJSIgc3RvcC1jb2xvcj0iI2Y2MjkwYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjcxJSIgc3RvcC1jb2xvcj0iI2YwMmYxNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlNzM4MjciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, rgba(248,80,50,1) 0%, rgba(206,66,66,1) 50%, rgba(246,41,12,1) 51%, rgba(240,47,23,1) 71%, rgba(231,56,39,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(248,80,50,1)), color-stop(50%,rgba(206,66,66,1)), color-stop(51%,rgba(246,41,12,1)), color-stop(71%,rgba(240,47,23,1)), color-stop(100%,rgba(231,56,39,1)));
+    background: -webkit-linear-gradient(top, rgba(248,80,50,1) 0%,rgba(206,66,66,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%);
+    background: -o-linear-gradient(top, rgba(248,80,50,1) 0%,rgba(206,66,66,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%);
+    background: -ms-linear-gradient(top, rgba(248,80,50,1) 0%,rgba(206,66,66,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%);
+    background: linear-gradient(to bottom, rgba(248,80,50,1) 0%,rgba(206,66,66,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f85032', endColorstr='#e73827',GradientType=0 );
+    box-shadow: 0 0 2px red;
+    -webkit-box-shadow: 0 0 2px red;
+}
+
+.led-orange{
+    display:inline-block;
+    margin:0 7px 0 4px;
+    width:8px;
+    height:8px;
+    -webkit-border-radius:50%;
+    border-radius:50%;
+    
+background: #ea5507; /* Old browsers */
+    
+    box-shadow: 0 0 2px #fb955e;
+    -webkit-box-shadow: 0 0 2px #fb955e;
+}
+
+.led-verte{
+    display:inline-block;
+    margin:0 7px 0 4px;
+    width:8px;
+    height:8px;
+    -webkit-border-radius:50%;
+    border-radius:50%;
+    background: rgb(210,255,82);
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QyZmY1MiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5MWU4NDIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, rgba(210,255,82,1) 0%, rgba(145,232,66,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(210,255,82,1)), color-stop(100%,rgba(145,232,66,1)));
+    background: -webkit-linear-gradient(top, rgba(210,255,82,1) 0%,rgba(145,232,66,1) 100%);
+    background: -o-linear-gradient(top, rgba(210,255,82,1) 0%,rgba(145,232,66,1) 100%);
+    background: -ms-linear-gradient(top, rgba(210,255,82,1) 0%,rgba(145,232,66,1) 100%);
+    background: linear-gradient(to bottom, rgba(210,255,82,1) 0%,rgba(145,232,66,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d2ff52', endColorstr='#91e842',GradientType=0 );
+    box-shadow: 0 0 2px green;
+    -webkit-box-shadow: 0 0 2px green;
+}
+
+.led-bleue{
+    display:inline-block;
+    margin:0 7px 0 4px;
+    width:8px;
+    height:8px;
+    -webkit-border-radius:50%;
+    border-radius:50%;
+    background: rgb(109,179,242); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(109,179,242,1) 0%, rgba(84,163,238,1) 50%, rgba(54,144,240,1) 51%, rgba(30,105,222,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(109,179,242,1)), color-stop(50%,rgba(84,163,238,1)), color-stop(51%,rgba(54,144,240,1)), color-stop(100%,rgba(30,105,222,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom, rgba(109,179,242,1) 0%,rgba(84,163,238,1) 50%,rgba(54,144,240,1) 51%,rgba(30,105,222,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6db3f2', endColorstr='#1e69de',GradientType=0 ); /* IE6-9 */
+}
+
+.better-lists {
+    padding:0;
+    margin:5px 0;
+    list-style-type:none;
+    background:#ddd;
+    box-shadow:0 0px 2px rgba(0, 0, 0, 0.4) inset;
+}
+ul.better-lists li{
+    padding:0;
+    margin:0;
+}
+ul.better-lists li:first-child a{
+    border-top:none;
+}
+ul.better-lists li a{
+    text-shadow:0 1px 0 rgba(255, 255, 255, 0.5);
+    color:#1E535F;
+    text-decoration:none;
+    display:block;
+    padding:3px 15px;
+    border-top:1px solid rgba(127,127,127,0.5);
+    height:100%;
+}
+ul.better-lists li a:hover{
+    background:#40A9BF;
+    color:white;
+    text-shadow:0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.basic-ic-form{
+    
+    padding:15px;
+    margin:5px auto 5px auto;
+    background:rgba(64,169,191,0.7);
+    border-radius:10px;
+    
+}
+.basic-ic-form fieldset{
+    border:0;
+    background:white;
+    box-shadow: 0 0 4px #000000;
+}
+.basic-ic-form .legende{
+    text-align:left;
+    margin:2px 2px 8px 2px;
+    clear:both;
+    padding: 0px;
+    border-bottom:1px solid #40A9BF;
+    padding-left:5px;
+    font-size:16px;
+}
+.basic-ic-form .bold-form{
+    color:#0e8aa4;
+}
+
+#modeles-layer-infobulle{
+    display:none;
+    position:absolute;
+    background-color:rgb(0,0,0);
+    background-color:rgba(0,0,0,0.8);
+    height:auto;
+    color:white;
+    font-size:10px;
+    box-shadow:0px 0px 4px black;
+    border-radius:4px;
+    text-align:left;
+    padding:4px;
+    z-index:4000;
+    border:1px solid rgb(255,255,255);
+}
+
+input[type=text].inputicv5 {
+    border-color: #848484 #C1C1C1 #E1E1E1;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    padding: 4px;
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+input[type=text].inputicv5:focus{
+    border-color: rgb(78, 78, 78) rgb(124, 124, 124) rgb(163, 163, 163);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+}
+
+#link-accueil-header{
+    text-decoration:none;
+    display:block;
+    width:100%;
+    height:100%;
+    padding:0;
+    color:white;
+    font-size:15px;
+    text-shadow:0 0 2px black;
+    font-family:Exo,Nunito,sans-serif;
+}
+#text-accueil-header{
+    display:none;
+}
+
+.degrade-vertical-gris{
+    background: rgb(238,238,238);
+    background: -moz-linear-gradient(top, rgba(238,238,238,1) 0%, rgba(204,204,204,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(238,238,238,1)), color-stop(100%,rgba(204,204,204,1)));
+    background: -webkit-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: -o-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: -ms-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
+}
+
+.header-climsrc-date{
+    width:180px;
+    height:24px;
+    line-height:24px;
+    font-size:18px;
+    border:1px solid rgba(0,0,0,0.2);
+    background-color:#3c9fb4;
+    color:#ddd;
+    box-shadow: 0 0 3px white inset;
+    outline:none;
+}
+.header-climsrc-date:active, .header-climsrc-date:focus{
+    box-shadow: 0 0 5px black;
+    border:1px solid white;
+    color:white;
+    outline:none;
+}
+.header-climsrc-submit{
+    width:180px;
+    height:24px;
+    font-size:16px;
+    border:1px solid rgba(0,0,0,0.2);
+    background-color:#3c9fb4;
+    color:#ddd;
+    box-shadow: 0 0 3px black;
+    outline:none;
+}
+.header-climsrc-submit:active,.header-climsrc-submit:hover{
+    box-shadow: 0 0 5px black;
+    color:white;
+    text-shadow:0 0 1px rgba(0,0,0,0.2);
+    border:1px solid rgba(255,255,255,0.2);
+}
+
+.itphoto_info{
+    display:none;
+    font-size:9px;
+    height:64px;
+    width:84px;
+    border:3px solid white;
+    color:white;
+    background-color:transparent;
+    text-shadow:0 0 1px black;
+    text-decoration:none !important;
+    background-image:url(//static.infoclimat.net/images/v5.1/bg.png);
+}
+
+#menu_haut_1{
+    height:40px;
+    width:100%;
+    padding:0;
+    margin:0;
+}
+#menu_haut_1 ul {
+    width:100%;
+    height:40px;
+    padding:0;
+    margin:0;
+    background: #40a9bf;
+    background: -moz-linear-gradient(top, #40a9bf 0%, #1e535f 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#40a9bf), color-stop(100%,#1e535f));
+    background: -webkit-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: -o-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: -ms-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40a9bf', endColorstr='#1e535f',GradientType=0 );
+    box-shadow:0 0 5px black;-moz-box-shadow:0 0 5px black;-webkit-box-shadow:0 0 5px black;-o-box-shadow:0 0 5px black;
+}
+#menu_haut_1 ul li:last-child{
+    border-right:none;
+}
+#menu_haut_1 ul li{
+    display:inline-block;
+    list-style-type:none;
+    padding:0;
+    margin:0;
+    border-right: 1px solid rgb(255, 255, 255);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    width:150px;
+    font-size:20px;
+    line-height:40px;
+    height:100%;
+    font-family:Exo,'Nunito',Arial,sans-serif;
+}
+#menu_haut_1 ul li a{
+    text-decoration:none;
+    text-shadow: 0px 2px 3px rgba(0, 0, 0, 1);
+    display:block;
+    width:100%;
+    height:100%;
+    outline:none;
+    color:white;
+}
+#menu_haut_1 ul li a:hover, #menu_haut_1 ul li a.ui-opened-menu-waw{
+    color:white;
+    text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.8) !important;
+    background:#225962;
+    background: -moz-linear-gradient(left, #222222 0%, #225965 5%, #225965 95%, #222222 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#222222), color-stop(5%,#225965), color-stop(95%,#225965), color-stop(100%,#222222));
+    background: -webkit-linear-gradient(left, #222222 0%,#225965 5%,#225965 95%,#222222 100%);
+    background: -o-linear-gradient(left, #222222 0%,#225965 5%,#225965 95%,#222222 100%);
+    background: -ms-linear-gradient(left, #222222 0%,#225965 5%,#225965 95%,#222222 100%);
+    background: linear-gradient(left, #222222 0%,#225965 5%,#225965 95%,#222222 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#222222', endColorstr='#222222',GradientType=1 );
+}
+#menu_haut_1 ul li a.ui-opened-menu-waw{
+    /*background: #33717e;
+    background: -moz-linear-gradient(top, #33717e 0%, #225965 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33717e), color-stop(100%,#225965));
+    background: -webkit-linear-gradient(top, #33717e 0%,#225965 100%);
+    background: -o-linear-gradient(top, #33717e 0%,#225965 100%);
+    background: -ms-linear-gradient(top, #33717e 0%,#225965 100%);
+    background: linear-gradient(top, #33717e 0%,#225965 100%);*/
+}
+
+.moteur-archives {
+    background-color:transparent;
+    background-image:url(//static.infoclimat.net/images/champs_recherche_inactif.png);
+    border:0;
+    display:inline-block;
+    outline:0;
+    margin:0;
+    padding:16px 5px 62px 32px;
+    height:80px;
+    width:653px;
+    line-height:80px;
+    font-size:80px;
+    vertical-align:top;
+    text-align:center;
+}
+.moteur-archives:focus {
+    background-image:url(//static.infoclimat.net/images/champs_recherche.png);
+}
+.archives-submit {
+    background-color:transparent;
+    background-image:url(//static.infoclimat.net/images/champs_recherche_inactif.png);
+    background-position:-687px 0px;
+    width:109px;
+    margin:0;
+    height:158px;
+    display:inline-block;
+}
+.archives-submit:hover {
+    background-image:url(//static.infoclimat.net/images/champs_recherche.png);
+}
+
+.title-catd {
+    text-align:left;
+    height:30px;
+    line-height:30px;
+    width:100%;
+    font-size:17px;
+    font-weight:bold;
+    color:white;
+    text-shadow:0px 1px 2px #000;
+    -moz-text-shadow: 0px 1px 2px #000;
+    -webkit-text-shadow: 0px 1px 2px #000;
+    padding-left:15px;
+    margin-top:25px;
+    background:rgb(80,154,170);
+    background: -moz-linear-gradient(top, rgba(80,154,170,1) 0%, rgba(62,128,143,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(80,154,170,1)), color-stop(100%,rgba(62,128,143,1)));
+    background: -webkit-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: -o-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: -ms-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#509aaa', endColorstr='#3e808f',GradientType=0 );
+    box-shadow:0 0 3px black;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-top:1px solid rgba(255,255,255,0.3);
+    border-bottom:1px solid rgba(0,0,0,0.3);
+}
+.title-catd a {
+    color:white !important;
+}
+
+.an_titre {
+    display:block;
+    padding-left:15px;
+    font-weight:bold;
+    text-decoration:none;
+    height:20px;
+    line-height:20px;
+    color:white !important;
+    text-shadow:0px 1px 2px #000;
+    -moz-text-shadow: 0px 1px 2px #000;
+    -webkit-text-shadow: 0px 1px 2px #000;
+}
+
+.an_titre span {
+    float:right;
+    font-weight:normal;
+    margin-right:10px;
+}
+
+.alink-bottom {
+    display:block;
+    margin-top:5px;
+}
+
+.cont-annu {
+    border:1px solid black;
+    border-top:none;
+    margin-top:10px;
+    padding:0px 5px 5px 5px;
+    background-color:rgb(111,111,56);
+    background-position:0px 0px;
+    background-image:url(//static.infoclimat.net/images/degrade2.png);
+    background-repeat:repeat-x;
+    -moz-border-radius-bottomright:5px;-webkit-border-bottom-right-radius:5px;border-bottom-right-radius:5px;
+    -moz-border-radius-bottomleft:5px;-webkit-border-bottom-left-radius:5px;border-bottom-left-radius:5px;
+    box-shadow:0px 0px 4px #666; -moz-box-shadow:0px 0px 4px #666; -webkit-box-shadow:0px 0px 4px #666;
+}
+
+.flechegauche {
+    background-image:url(//static.infoclimat.net/images/module_fleche.png);
+    background-repeat:no-repeat;
+    background-position:-20px 0px;
+    display:inline-block;
+    height:17px;
+    width:10px;
+    float:left;
+    margin:5px 0px 0px 8px;
+    text-decoration:none;
+}
+
+.flechegauche:hover {
+    background-position:-30px 0px;
+}
+
+.flechedroite {
+    background-image:url(//static.infoclimat.net/images/module_fleche.png);
+    background-repeat:no-repeat;
+    background-position:0px 0px;
+    display:inline-block;
+    height:17px;
+    width:10px;
+    float:right;
+    margin:5px 8px 0px 0px;
+    text-decoration:none;
+}
+
+.flechedroite:hover {
+    background-position:-10px 0px;
+}
+
+#div_txt5
+{
+    background-color:#88c5d2;
+    margin:auto;
+    width:800px;
+    padding:5px;
+}
+#div_txt5 p{
+    text-shadow:1px 1px 0px rgba(255,255,255,0.4);
+}
+.header_photolive{
+    padding:5px;
+    background: rgb(69,72,77);
+    background: -moz-linear-gradient(top, rgba(69,72,77,1) 0%, rgba(0,0,0,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(69,72,77,1)), color-stop(100%,rgba(0,0,0,1)));
+    background: -webkit-linear-gradient(top, rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%);
+    background: -o-linear-gradient(top, rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%);
+    background: -ms-linear-gradient(top, rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%);
+    background: linear-gradient(top, rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#45484d', endColorstr='#000000',GradientType=0 );
+}
+
+#container-photolive-all {
+    -moz-border-radius:10px;-webkit-border-radius:10px;border-radius:10px;
+    box-shadow:0px 0px 6px #666; -moz-box-shadow:0px 0px 6px #666; -webkit-box-shadow:0px 0px 6px #666;
+    min-width:800px;
+    margin:auto;
+}
+#container-photolive {
+    min-width:800px;
+    margin:auto;
+    background-color:#3c4547;
+    background-image:url(//static.infoclimat.net/images/degrade3.png);
+    background-repeat:repeat-x;
+    -moz-border-radius-topright:10px;-webkit-border-top-right-radius:10px;border-top-right-radius:10px;
+    -moz-border-radius-topleft:10px;-webkit-border-top-left-radius:10px;border-top-left-radius:10px;
+}
+
+#div_txt5 div.one
+{
+    font-weight:bold;
+    color:white;
+    text-shadow:0px 1px 2px #000;
+    -moz-text-shadow: 0px 1px 2px #000;
+    -webkit-text-shadow: 0px 1px 2px #000;
+}
+
+#div_txt5 .header_photolive a {
+    color:white;
+}
+
+.attributclasse{
+    height:30px;
+    display:inline-block;
+    margin-left:-1px;
+    background: url("//static.infoclimat.net/styles/jqueryUI/images/ui-bg_glass_45_0078ae_1x400.png") repeat-x scroll 50% 50% #0078AE;
+    font-family:"Trebuchet",Arial,sans-serif;
+}
+.tbl_norm_olp{
+    background-color:#acd5ff;
+}
+.tbl_norm_okp{
+    background-color:#7bbcff;
+}
+.tbl_norm_sum{
+    background-color:#185898;
+    color:white;
+    font-weight:bold;
+}
+.tbl_norm_ht{
+    background-color:#4288d0;
+}
+.tbl_norm_bt{
+    background-color:blue;
+    color:white;
+    text-align:left;
+}
+.historic_croisement{
+    margin:auto;
+}
+.line_historic{
+    background-color:#D3D6FF;
+    padding-left:5px;padding-right:5px;
+}
+.barre_petite{
+    box-shadow:0px 0px 6px #666; -moz-box-shadow:0px 0px 6px #666; -webkit-box-shadow:0px 0px 6px #666;
+    -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+    margin-right:5px;
+    margin-top:8px;
+    text-align:center;
+    padding:3px;
+    background-color:#dfedf4;
+}
+.hoverICk{
+    visibility:hidden;
+    border:0;
+    position:absolute;
+    z-index:11;
+}
+input[type=checkbox]{
+    vertical-align:bottom;
+}
+.barre_petite a{
+    text-decoration:none;
+}
+.barre_petite:hover{
+    background-color:#ffffff;
+}
+.elm_boutique{
+    border:1px solid black;
+    width:230px;
+    min-height:330px;
+    padding:5px;
+    -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+    box-shadow:0px 0px 6px #666; -moz-box-shadow:0px 0px 6px #666; -webkit-box-shadow:0px 0px 6px #666;
+    background-color:white;
+    margin-right:15px;
+    margin-top:15px;
+    background-repeat:no-repeat;
+    float:left;
+}
+.boutique_indispo{
+    border-color:red;
+    background-image:url('//static.infoclimat.net/images/boutique_indispo.png');
+}
+fieldset{
+    -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px;
+    border-color:#0f4d5a;
+    border-color:rgba(15,77,90,0.7);
+    max-width:800px;
+    margin:auto;
+    background: rgb(255,255,255);
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1)));
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
+    background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
+    background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
+    background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 );
+}
+fieldset legend{
+    font-weight:bold;
+}
+.boutique_dispo{
+    border-color:#72bbff;
+    background-image:url('//static.infoclimat.net/images/boutique_dispo.png');
+}
+
+.listsqrt{
+    padding-top:10px;
+    text-align:left;
+}
+.bs_para{
+    border:1px solid black;
+    min-height:88px;
+    margin:5px;
+}
+.vignette_bs{
+    border:0;
+    float:left;
+    margin:2px;
+}
+.scroll-container
+{
+    left:150px;
+    width:71%;
+    height:25px;
+    overflow:hidden;
+    position:relative;
+}
+
+.scroll-content{
+    line-height:25px;
+    position:absolute;
+    white-space:nowrap;
+    font-size:0.9em;
+}
+
+.scroll-c{
+    line-height:25px;
+font-size:0.9em;}
+
+.ago_fixed{
+display:inline-block;
+width:50px;
+}
+.tmin{
+    color:blue;
+    font-weight:bold;
+}
+.tmax{
+    color:red;
+}
+.blackovlay{
+position:absolute;
+width:100%;
+background-color:black;
+display:none;
+z-index:3000;
+}
+.infolayer{height:480px;width:640px;background-image:url(//static.infoclimat.net/images/player.png);background-repeat:no-repeat;color:white;text-align:left;
+          font-family:"trebuchet ms","Arial",serif;font-size:12px;padding-top:137px;cursor:pointer;text-align:justify;overflow:auto;}
+
+/* tableaux file */
+table.tbca tr th{background-color:#344883;color:white;}table.tbca tr th:first-of-type{-moz-border-radius-topleft:5px;-webkit-border-top-left-radius:5px;border-top-left-radius:5px;}table.tbca tr th:last-of-type{-moz-border-radius-topright:5px;-webkit-border-top-right-radius:5px;border-top-right-radius:5px;}table.tbca tr{height:35px;}
+.ustdgr{background-color:green;color:white;font-weight:bold;}.ustdg{background-color:#90da1b;color:black;font-weight:bold;}.pcalendar{padding:0px;margin:0px;line-height:35px;}.tdc{color:white;background-color:#344883;}
+
+.error, .winfo, .winfo_src, .success
+{
+    padding:10px 15px 10px 15px;
+    max-width:600px;
+    margin: 10px auto 10px auto;
+    text-align:justify;
+    line-height:20px;
+    box-shadow:0 0 2px black;
+}
+.error
+{
+    color:white;
+    text-shadow:1px 1px 0 rgba(0,0,0,0.4);
+    border:0;
+    background: rgb(169,3,41);
+    background: -moz-linear-gradient(top, rgba(169,3,41,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(169,3,41,1)), color-stop(44%,rgba(143,2,34,1)), color-stop(100%,rgba(109,0,25,1)));
+    background: -webkit-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+    background: -o-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+    background: -ms-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+    background: linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=0 );
+}
+.error a {
+    color:white;
+    color:white !important;
+}
+.error a:hover{
+    color:#aaa !important;
+}
+
+.winfo
+{
+    background: rgb(238,238,238);
+    background: -moz-linear-gradient(top, rgba(238,238,238,1) 0%, rgba(204,204,204,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(238,238,238,1)), color-stop(100%,rgba(204,204,204,1)));
+    background: -webkit-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: -o-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: -ms-linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    background: linear-gradient(top, rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
+    border:0;
+    text-shadow: 1px 1px 0 white;
+}
+
+.winfo_src
+{
+    background: rgb(167,199,220);
+    background: -moz-linear-gradient(top, rgba(167,199,220,1) 0%, rgba(133,178,211,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(167,199,220,1)), color-stop(100%,rgba(133,178,211,1)));
+    background: -webkit-linear-gradient(top, rgba(167,199,220,1) 0%,rgba(133,178,211,1) 100%);
+    background: -o-linear-gradient(top, rgba(167,199,220,1) 0%,rgba(133,178,211,1) 100%);
+    background: -ms-linear-gradient(top, rgba(167,199,220,1) 0%,rgba(133,178,211,1) 100%);
+    background: linear-gradient(top, rgba(167,199,220,1) 0%,rgba(133,178,211,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a7c7dc', endColorstr='#85b2d3',GradientType=0 );
+    border:0;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.success
+{
+    background: rgb(205,235,142);
+    background: -moz-linear-gradient(top, rgba(205,235,142,1) 0%, rgba(165,201,86,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(205,235,142,1)), color-stop(100%,rgba(165,201,86,1)));
+    background: -webkit-linear-gradient(top, rgba(205,235,142,1) 0%,rgba(165,201,86,1) 100%);
+    background: -o-linear-gradient(top, rgba(205,235,142,1) 0%,rgba(165,201,86,1) 100%);
+    background: -ms-linear-gradient(top, rgba(205,235,142,1) 0%,rgba(165,201,86,1) 100%);
+    background: linear-gradient(top, rgba(205,235,142,1) 0%,rgba(165,201,86,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cdeb8e', endColorstr='#a5c956',GradientType=0 );
+    border:0;
+    text-shadow:1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.error-wide{
+    margin-top:100px;
+}
+
+div.boite_previ h3
+{
+    padding-left:4px;
+    color:white;
+    text-shadow: 0px 0px 3px black;
+    padding:0;
+    margin:0;
+    height:30px;
+    line-height:30px;
+    font-size:18px;
+    background: rgb(80,154,170);
+    background: -moz-linear-gradient(top, rgba(80,154,170,1) 0%, rgba(62,128,143,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(80,154,170,1)), color-stop(100%,rgba(62,128,143,1)));
+    background: -webkit-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: -o-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: -ms-linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    background: linear-gradient(top, rgba(80,154,170,1) 0%,rgba(62,128,143,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#509aaa', endColorstr='#3e808f',GradientType=0 );
+    border-bottom: 1px solid rgba(0,0,0,0.5);
+}
+.boite_previ
+{
+    box-shadow: 0 0 3px black;
+    margin: 10px 0 10px 0px;
+    padding-bottom: 8px;
+    width: 100%;
+    background: rgb(204,204,204);
+    background: -moz-linear-gradient(top, rgba(204,204,204,1) 0%, rgba(238,238,238,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(204,204,204,1)), color-stop(100%,rgba(238,238,238,1)));
+    background: -webkit-linear-gradient(top, rgba(204,204,204,1) 0%,rgba(238,238,238,1) 100%);
+    background: -o-linear-gradient(top, rgba(204,204,204,1) 0%,rgba(238,238,238,1) 100%);
+    background: -ms-linear-gradient(top, rgba(204,204,204,1) 0%,rgba(238,238,238,1) 100%);
+    background: linear-gradient(top, rgba(204,204,204,1) 0%,rgba(238,238,238,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#eeeeee',GradientType=0 );
+}
+div.boite_previ p, div.boite_previ div
+{
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:0px;
+    font-size:15px;
+    text-align:justify;
+    text-shadow:1px 1px 0px white;
+}
+
+tr.tb1
+{
+	background-color: #ffe491;
+}
+
+.pagination
+{
+	border:1px solid black; padding-left:3px;padding-right:3px;margin:2px;text-decoration:none;
+	background-color:#DDD;
+}
+
+.p_selected
+{background-color:#88C;}
+
+.boite_contact_01
+{
+	border:1px solid black;
+	padding-top:10px;padding-bottom:10px;
+	margin:10px;
+	text-align:left;
+	padding-left:5px;
+	background-color:#e7e7e7;
+        -moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+}
+.actionmailc
+{
+	margin-top:8px;
+}
+/* bulles interface contact */
+.bulle1_contt{background:url("/images/milieu1.png") repeat-y scroll 0 0 transparent;padding-left:60px;max-width:550px;}.bulle1_title{background:url("/images/haut1.png") no-repeat scroll 0 0 transparent;padding-left:100px;height:33px;width:550px;padding-top:28px;}.bulle2_title{background:url("/images/haut2.png") no-repeat scroll 0 0 transparent;padding-left:100px;height:37px;max-width:610px;width:610px;padding-top:28px;margin-left:100px;}.bulle2_contt{background:url("/images/milieu2.png") repeat-y scroll 0 0 transparent;padding-left:15px;margin-left:100px;max-width:540px;width:540px;padding-top:-45px;}div.bulle2_contt p{display:inline;margin:0;padding-right:10px;width:530px;}div.bulle1_contt p{display:inline;margin:0;padding-right:10px;width:530px;}div.bulle2_contt hr{width:400px;}div.bulle1_contt hr{width:400px;}
+
+.photolive_table{width:100%;}
+
+.photolive_tr
+{
+	height:200px;
+}
+.sst_photolive
+{
+	font-size:1.1em;
+}
+
+.photolive_fr
+{
+	border:0;
+        box-shadow:0px 0px 10px #444; -moz-box-shadow:0px 0px 10px #444; -webkit-box-shadow:0px 0px 10px #444;
+}
+.coche_tc
+{
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+.coche_tc_pl
+{
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+/* tooltips */
+.toolTip-picture img, .toolTip-thumbnail img{}.toolTip-picture, .toolTip-thumbnail{min-height:32px;min-width:32px;}.toolTip-caption{position:relative;margin-top:-10px;}.toolTip-text, .toolTip-caption{font:11px Arial,Helvetica,sans-serif;color:#FFF;text-align:center;background:transparent url(/images/caption-right.png) no-repeat right center;padding-right:26px;z-index:3000;}.toolTip-text span, .toolTip-caption span{display:block;background:transparent url(/images/caption-left.png) no-repeat left center;padding:11px 0px 15px 25px;} 
+
+label.alignement
+{
+	float:left;
+	display:block;
+}
+
+#aplay-menu{
+    z-index:200;
+    background: rgb(34,89,101);
+    background: -moz-linear-gradient(top, rgba(34,89,101,1) 0%, rgba(26,71,79,0.75) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(34,89,101,1)), color-stop(100%,rgba(26,71,79,1)));
+    background: -webkit-linear-gradient(top, rgba(34,89,101,1) 0%,rgba(26,71,79,1) 100%);
+    background: -o-linear-gradient(top, rgba(34,89,101,1) 0%,rgba(26,71,79,1) 100%);
+    background: -ms-linear-gradient(top, rgba(34,89,101,1) 0%,rgba(26,71,79,1) 100%);
+    background: linear-gradient(top, rgba(34,89,101,1) 0%,rgba(26,71,79,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#225965', endColorstr='#1a474f',GradientType=0 );
+    width:994px;
+    margin:auto;
+    display:none;
+    height:310px;
+    text-align:left;
+    overflow:hidden;
+    
+    position:relative;
+}
+
+.header-local-smenu {
+    margin:auto;
+    text-align:justify;
+    height:35px;
+    background-image:url(//static.infoclimat.net/images/menu_fond_sousmenus.png);
+}
+
+ul.header-esp20 li {
+    width:18%;
+}
+
+ul.header-esp16 li {
+    width:15%;
+}
+
+.menu-sdouble li a, .menu-sdouble li a:hover {
+    width:50%;
+}
+
+.menu-sdouble li {
+    width:50%;
+}
+
+.menu-sdouble-right li {
+    width:50%;
+}
+
+.header-local-smenu li {
+    margin-left:-6px;
+    margin-right:2px;
+    padding-left:5px;
+    list-style:none;
+    line-height:20px;
+    float:left;
+    min-width:105px;
+    background-image:url(//static.infoclimat.net/images/menu_ligne_separatrice.png);
+    background-repeat:no-repeat;
+    background-position:0px 0px;
+    min-height:145px;
+}
+
+.header-local-smenu li:first-child {
+    background-image:none;
+}
+
+.header-local-smenu li ul {
+    width:100%;
+    margin:0;
+    margin-top:10px;
+    padding:0;
+}
+
+.header-local-smenu li a {
+    width:100%;
+    display:block;
+    color:white;
+    text-align:center;
+    line-height:25px;
+    text-decoration:none;
+    font-size:1.1em;
+    text-shadow: 0px 1px 1px #555;
+    -moz-text-shadow: 0px 1px 1px #000000;
+    -webkit-text-shadow: 0px 1px 1px #000000;
+}
+
+.header-local-smenu li a:hover {
+    background-image:url(//static.infoclimat.net/images/menu_sousmenu_item_hover.png);
+    color:#333;
+    text-shadow: 0px 1px 1px #fff;
+    -moz-text-shadow: 0px 1px 1px #fff;
+    -webkit-text-shadow: 0px 1px 1px #fff;
+}
+
+.header-local-smenu li ul li {
+    padding:0;
+    width:97%;
+    padding-right:5px;
+    background-image:none;
+    min-height:0px;
+    list-style:none;
+    clear:both;
+    margin:0;
+}
+
+.header-local-smenu li ul li a {
+    line-height:20px;
+    padding-left:2px;
+    padding-right:2px;
+    display:block;
+    line-height:17px;
+    height:20px;
+    width:100%;
+    text-align:left;
+    font-size:0.9em;
+    text-shadow: none;
+    -moz-text-shadow: none;
+    -webkit-text-shadow: none;
+    color:#fff;
+}
+
+.header-local-smenu li ul li a:hover {
+    background-image:url(//static.infoclimat.net/images/menu_item_tiroir_hover.png);
+    color:#000;
+}
+
+
+#aplay-menu div{
+    display:none;
+    padding-bottom:5px;
+}
+#aplay-menu div.menu-ui-opened{
+    position:absolute;
+    top:0;
+    left:0;
+    width:994px;
+}
+
+.menu-principal-colonne-left{
+    box-sizing: content-box;
+    padding:0;
+    margin:8px 13px 8px 13px;
+    text-align:left;
+    width:180px;
+    display:block;
+    float:left;
+}
+.menu-principal-odd{
+    height:294px;
+    background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.15)));
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.15) 100%);
+    background: -o-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.15) 100%);
+    background: -ms-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.15) 100%);
+    background: linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.15) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#26000000',GradientType=0 );
+    margin:0;
+    padding:8px 13px 8px 13px;
+}
+
+html body .menu-ui-opened .menu-principal-colonne-left a {
+    display:block;
+    outline:none;
+    text-decoration:none;
+}
+
+.menu-principal-colonne-left a.titre-pchref{
+    font-size:15px;
+    text-transform:uppercase;
+    background-image:url(//static.infoclimat.net/images/v5.1/separateur_1px.png);
+    background-repeat:repeat-x;
+    background-position:50% 100%;
+    margin:15px 0 5px 0;
+    font-family:Exo,Nunito,Arial,sans-serif;
+    color:#ddd;
+    padding:0;
+}
+.menu-principal-colonne-left a.titre-pchref img{
+    float:right;
+    border:0;
+    outline:none;
+}
+.menu-principal-colonne-left a.titre-pchref:hover{
+    background-image:url(//static.infoclimat.net/images/v5.1/separateur_1px_hover.png);
+    color:#eee;
+}
+.menu-principal-colonne-left a.titre-pchref span.pchrf{
+    font-size:16px;
+    color:white;
+    font-weight:bold;
+    text-shadow:0px 0px 1px black;
+}
+.menu-principal-colonne-left a.pchref{
+    font-size:12px;
+    color:white;
+    font-family:Nunito,Arial,sans-serif;
+    padding:0px 0px 0px 5px;
+    margin:0px;
+    
+    border-left:3px solid transparent;
+}
+.menu-principal-colonne-left a.link-publish{
+    border-left:1px solid #3e7583;
+}
+.menu-principal-colonne-left a.link-publish:hover{
+    border-left:1px solid transparent;
+}
+.menu-principal-colonne-left a.pchref:hover{
+    background:black;
+    background:rgba(0,0,0,0.2);
+    
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC4zIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(left, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(50%,rgba(0,0,0,0.3)), color-stop(100%,rgba(0,0,0,0)));
+    background: -webkit-linear-gradient(left, rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);
+    background: -o-linear-gradient(left, rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);
+    background: -ms-linear-gradient(left, rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);
+    background: linear-gradient(to right, rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4d000000', endColorstr='#00000000',GradientType=1 );
+    
+    border-left:3px solid yellow;
+}
+.titre-ariane{
+    background-color:#0f4550;
+    color:white;
+    display:inline-block;
+    font-size:14px;
+    font-weight:bold;
+    line-height:26px;
+    padding:0 20px 0 5px;
+    height:26px;
+    background-image:url(//static.infoclimat.net/images/v5.1/bread1.png);
+    background-repeat:no-repeat;
+    background-position:100% 50%;
+}
+.ariane-niv1{
+    background-color:#1a5663;
+    color:white;
+    display:inline-block;
+    padding:0 20px 0 5px;
+    margin:0;
+    margin-bottom:-1px;
+    outline:none;
+    border:none;
+    height:26px;
+    font-size:14px;
+    line-height:26px;
+}
+.menu-principal-colonne-right{
+    padding:0;
+    margin:8px 13px 8px 13px;
+    text-align:left;
+    display:block;
+    float:right;
+}
+.div-tempsreel{
+    background-color:#2e8294;
+    width:185px;
+    text-align:center;
+    border-radius:5px;
+    box-shadow:0px 0px 2px black;
+    color:white;
+    margin:2px auto 5px auto;
+}
+.div-tempsreel b{
+    margin:0 0 5px 0;
+    padding-top:4px;
+    display:block;
+    text-shadow:0px 0px 1px black;
+}
+
+.recherche_input
+{
+    border:0px;
+    vertical-align:top;
+    color:#333;
+    width:140px;
+    height:21px;
+    display:inline-block;
+    margin:0;
+    padding:0;
+    padding-left:10px;
+    background-image:url(//static.infoclimat.net/images/champ_recherche_fond.png);
+    background-position:0px 0px;
+    background-repeat:no-repeat;
+    background-color:transparent;
+}
+
+.recherche_input:focus
+{
+    background-position:0px -22px;
+}
+
+a.recherche_avancee{
+    height:21px;
+    display:inline-block;
+    margin:0;
+    padding:0;
+    width:23px;
+    background-image:url(//static.infoclimat.net/images/champ_recherche_fond.png);
+    background-position:52px 0px;
+}
+
+form#formsrch a.recherche_avancee:hover
+{
+    background-image:url(//static.infoclimat.net/images/champ_recherche_fond.png) !important;
+    background-position:52px 22px;
+}
+
+a.valide_recherche{
+    height:21px;
+    display:inline-block;
+    width:29px;
+    margin:0;
+    padding:0;
+    background-image:url(//static.infoclimat.net/images/champ_recherche_fond.png);
+    background-position:29px 0px;
+}
+
+form#formsrch a.valide_recherche:hover{
+    background-image:url(//static.infoclimat.net/images/champ_recherche_fond.png) !important;
+    background-position:29px 22px;
+}
+
+a.sbuttons-top {
+    margin:0;
+    float:right;
+    width:70px;
+    display:inline-block;
+    height:29px;
+    line-height:29px;
+    background-image:url(//static.infoclimat.net/images/v5.1/menu_bas_bg.png);
+    background-repeat:repeat-x;
+    font-weight:bold;
+    text-decoration:none;
+    border-radius:6px;
+    background-color:#2f7382;
+    border:1px solid #425a61;
+    border:1px solid rgba(66,90,97,0.71);
+    text-shadow:0px 0px 1px white;
+    margin-right:2px;
+    padding:0;
+}
+
+a.sbuttons-top:hover {
+    color:white;
+    background-image:url(//static.infoclimat.net/images/v5.1/menu_bas_bg_hover.png);
+    background-color:#2f7382;
+    text-shadow:0px 0px 1px black;
+}
+
+.input_pseudo_header{
+    border:0px;
+    vertical-align:top;
+    color:#333;
+    width:103px;
+    height:21px;
+    display:inline;
+    margin:0;
+    padding:0;
+    padding-left:10px;
+    padding-right:6px;
+    background-position:0px 0px;
+    background-repeat:no-repeat;
+    background-image:url(//static.infoclimat.net/images/v5.1/champs_login.png);
+    background-color:transparent;
+    outline:none;
+}
+.input_pseudo_header:focus{
+    background-position:0px -21px;
+}
+
+.input_pass_header{
+    border:0px;
+    vertical-align:top;
+    color:#333;
+    width:96px;
+    height:21px;
+    display:inline;
+    margin:0;
+    padding:0;
+    padding-right:13px;
+    padding-left:4px;
+    background-position:-120px 0px;
+    background-repeat:no-repeat;
+    background-image:url(//static.infoclimat.net/images/v5.1/champs_login.png);
+    background-color:transparent;
+}
+.input_pass_header:focus{
+    background-position:-120px -21px;
+}
+
+.submit_header_login{
+    height:21px;
+    width:24px;
+    display:inline;
+    vertical-align:top;
+    border:0;
+    margin:0;
+    padding:0;
+    background-image:url(//static.infoclimat.net/images/v5.1/champs_login.png);
+    background-color:transparent;
+    background-repeat:no-repeat;
+    background-position:-231px 0px;
+}
+.submit_header_login:hover{
+    background-position:-231px -21px;
+}
+
+.sub_recherche
+{
+	display:none;
+}
+
+
+input {
+	margin:1px;
+}
+
+body {
+	background-color:#e4f2f5;
+	background-color:#efefef;
+	text-align:center;
+	font-family:helvetica,verdana,trebuchet,arial,sans-serif;
+	font-size:12px;
+	color:#000;
+	margin:0;
+	padding:0;
+        background-image:url(//static.infoclimat.net/images/v5.2/fond_5.2.jpg);
+        /*background-image:url(//static.infoclimat.net/images/v5.2/fond_5.2_festivites.png);*/
+	/*background-image:url(//static.infoclimat.net/images/orage/fond_5.2_orageux.jpg);*/
+	/*background-image:url(//static.infoclimat.net/images/v5.2/fond_neigeux.jpg);*/
+        background-repeat:repeat-x;
+        background-position:0px -420px;
+}
+
+inpt {
+	background-color:#133135;
+	border:1px solid #29BAEF;
+	color:#29BAEF;
+}
+
+#page {
+
+	clear:both;
+	padding:0;
+	margin:0;
+	/*position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;*/
+}
+
+#bandeau-inner{
+    /*clear:both;*/
+    
+    background-image:url(//static.infoclimat.net/images/v5.2/header_fond_5.2_normal.png);
+    /*background-image:url(//static.infoclimat.net/images/v5.2/header_festivites_fond_5.2.png);*/
+    /*background-image:url(//static.infoclimat.net/images/v5.2/header_fond_5.2_feu.png);*/
+    /*background-image:url(//static.infoclimat.net/images/v5.2/header_fond_5.2_neige.png);*/
+    /*background-image:url(//static.infoclimat.net/images/v5.2/header_pluie_fond_5.3.png);*/
+    /*background-image:url(//static.infoclimat.net/images/v5.2/orage2.png);*/
+    
+    /*background-image:url(//static.infoclimat.net/images/v5.1/header_fond.png?2.png);*/
+    /*background-image:url(//static.infoclimat.net/images/orage/header-fond.png);*/
+    
+    background-position:bottom center;
+    background-repeat:repeat-x;
+   /**** width:100%;****/
+    height:131px;
+    position:relative;
+    /*height:198px;*/
+    
+    z-index:155;
+}
+#topmenu-ic{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    width:100%;
+    height:26px;
+    /*background-image:url(//static.infoclimat.net/images/v5.1/bg2.png);
+    background-position:0px -1px;*/
+    text-align:left;
+}
+#topmenu-ic a.icmenu-k{
+    display:inline-block;
+    height:26px;
+    text-decoration:none;
+    /*border-left:1px solid white;*/
+    color:white;
+    text-shadow:0 1px 2px black;
+    /*background:white;
+    background:rgba(255,255,255,0.5);*/
+    font-size:16px;
+    line-height:27px;
+    padding:0 10px 0 10px;
+    outline:none;
+    min-width:60px;
+    text-align:center;
+    position:relative;
+}
+#topmenu-ic a.icmenu-k:first-child{
+    border-left:0;
+}
+#topmenu-ic a.icmenu-k:hover{
+    background:rgba(0,0,0,0.5);
+    color:white;
+}
+#topmenu-ic a.topmenu-ic-selected{
+    color:black;
+    text-shadow:none;
+    background-image:url(//static.infoclimat.net/images/v5.1/bg3.png);
+}
+.counter-icmenu{
+    text-decoration:none;
+    font-size:9px;
+    float:right;
+    text-shadow:none;
+    margin:-5px -5px 0 0;
+}
+.stats-icmenu{
+    position:absolute;
+    right:2px;
+    bottom:0px;
+    margin-bottom:-5px;
+    font-size:9px;
+}
+#logo {
+    width:115px;
+    text-align:left;
+    left:4%;
+    top:58px;
+    z-index:140;
+    position:absolute;
+}
+#logo a:active, #logo a:visited, #logo-asso a:active, #logo-asso a:visited {
+    outline:none;
+}
+#logo a img, #logo-asso a img {
+    border:0;
+}
+
+#logo-asso {
+    margin-top:3px;
+}
+
+#bandeau-deco{
+    background-image:url(//static.infoclimat.net/images/header-fond-nuageux.png);
+    background-repeat:no-repeat;
+    background-color:transparent;
+    background-position:center center;
+    width:100%;
+    height:198px;
+    position:absolute;
+}
+
+.pl-header-container{
+    margin:0;
+    margin:auto;
+    width:986px;
+    position:relative;
+    height:88px;
+    padding:3px 0 0 0;
+}
+
+.pl-header-container ul {
+    padding:0;
+    margin:0;
+    padding-top:5px;
+}
+
+.pl-header-container ul li {
+    list-style-type:none;
+    float:left;
+    margin:0;
+    padding:0;
+    width:105px;
+    padding-top:12px;
+}
+
+#apercus {
+    margin:auto;
+    position:relative;
+    text-align:left;
+    width:100%;
+    text-align:center;
+    color:white;
+}
+#corps {
+    /*max-width:90%;*/
+    background-color:#f1f6ff;
+    background-position:50% 0%;
+    background-image:url(//static.infoclimat.net/images/fond_corps_de_page.png);
+    background-repeat:repeat-y;
+    min-width:980px;
+    margin:auto;
+    margin-top:0px;
+    clear:both;
+    
+    /*-moz-box-shadow:0px 0px 5px #888;
+    box-shadow:0px 0px 5px #888;
+    -webkit-box-shadow:0px 0px 5px #888;*/
+    
+    /*border-left:1px solid #9b9b9b;
+    border-right:1px solid #9b9b9b;*/
+    z-index:150;
+    padding:0px;
+    min-height:500px;
+    padding-bottom:15px;
+}
+
+.header-visits {
+    width:980px;
+    margin:auto;
+}
+.header-visits a {
+    color:white;
+    text-decoration:none;
+}
+
+.header-visits a:visited {
+    color:white;
+}
+
+#centre {	
+	text-align:center;
+        font-family:Helvetica,verdana,"Trebuchet MS","Lucida Grande",Tahoma,sans-serif;
+	/*margin-top:1px;*/
+}
+
+#centre ul.puce {
+    text-align:left;
+    line-height:17px;
+}
+#centre ul.puce li {
+    list-style-type:none;
+    background-image:url(//static.infoclimat.net/images/puce.png);
+    background-repeat:no-repeat;
+    padding-left:15px;
+}
+
+#panels_droite{
+	position:absolute;
+	right:0px;
+	display:none;
+}
+
+#droite {
+	float:left;
+	width:200px;
+	margin:10px;
+	padding:0px 0px 10px 0px;
+}
+#pied
+{
+    margin:0 auto 0 auto;
+    padding:0;
+    background: #40a9bf;
+    background: -moz-linear-gradient(top, #40a9bf 0%, #1e535f 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#40a9bf), color-stop(100%,#1e535f));
+    background: -webkit-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: -o-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: -ms-linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    background: linear-gradient(top, #40a9bf 0%,#1e535f 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40a9bf', endColorstr='#1e535f',GradientType=0 );
+    height:34px;
+    box-shadow: 0 0 3px black;
+    vertical-align:bottom;
+    font-family: 'Nunito',Arial,sans-serif;
+    font-size:18px;
+}
+#pied-container{
+    width:100%;
+    margin:0;
+    padding:0;
+    
+    background: -moz-linear-gradient(top, rgba(62,165,186,1) 0%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(62,165,186,1)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(62,165,186,1) 0%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(62,165,186,1) 0%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(62,165,186,1) 0%,rgba(255,255,255,0) 100%); /* IE10+ */
+    background: linear-gradient(top, rgba(62,165,186,1) 0%,rgba(255,255,255,0) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3ea5ba', endColorstr='#00ffffff',GradientType=0 ); /* IE6-9 */
+}
+#pied li {
+    list-style-type:none;
+    display:inline-block;
+    width:441px;
+    padding:0;
+    margin:0;
+    line-height:34px;
+    height:34px;
+    color:white;
+    text-shadow: 0px 0px 2px #000;
+    -moz-text-shadow: 0px 0px 2px #000;
+    -webkit-text-shadow: 0px 0px 2px #000;
+    vertical-align:bottom;
+}
+#pied-item {
+    padding:0;
+    margin:0;
+    width:986px;
+    margin:auto;
+    font-family: 'Nunito',Arial,sans-serif;
+    font-size:14px;
+    padding-top:5px;
+}
+#pied-item li {
+    list-style-type:none;
+    display:inline-block;
+    width:435px;
+}
+#pied-item li ul{
+    padding:0;
+    margin:0;
+}
+#pied-item li ul li {
+    float:none;
+    width:auto;
+    line-height:20px;
+    padding-right:30px;
+    width:435px;
+}
+#pied-item li ul li a {
+    text-decoration:none;
+    color:black;
+    /*text-shadow:1px 1px 0px rgba(0,0,0,0.2);*/
+}
+#pied-item li ul li a:hover {
+    text-decoration:none;
+    text-shadow:0 0 1px rgba(255,255,255,0.8);
+}
+
+.pied-left{
+    text-align:right;
+}
+.pied-right{
+    text-align:left;
+}
+#pied li a img {
+    border:0;
+}
+#pied li a:active, #pied li a:visited {
+    outline:none;
+}
+
+.page_table_entete{
+	background-color:#C5EEFF;
+	margin:0px;
+	padding:2px;
+	font-weight:bold;
+	border-bottom:1px solid #5197FF;
+}
+
+.titre_hidden {
+	display:none;
+	
+}
+
+.titre {
+	display:block;
+	margin:0px;
+	padding:3px 3px 3px 10px;
+	background-repeat:no-repeat;
+	background-color:#B4C4DC;
+	color:#394D72;
+	border-left:1px solid #394D72;
+	border-right:1px solid #394D72;
+	border-bottom:1px solid #394D72;
+	font-size:12px;
+	font-weight:bold;
+	width:auto;
+	text-align:left;
+}
+
+.item_texte {
+	display:block;
+	margin:0px;
+	padding:10px 5px 10px 20px;
+	background-repeat:no-repeat;
+	background-color:#E6EDF7;
+	border-left:1px solid #B4C4DC;
+	border-right:1px solid #B4C4DC;
+	border-bottom:1px solid #B4C4DC;
+	width:auto;
+	text-align:left;
+}
+
+
+.item_texte_hidden {
+	display:none;
+}
+
+.red_dis_reduce {
+	background:url('../images/red_dis_reduce.gif');
+	background-repeat:no-repeat;
+	padding-left:20px;
+}
+
+.red_dis_display {
+	background:url('../images/red_dis_display.gif');
+	background-repeat:no-repeat;
+	padding-left:20px;
+}
+
+.input_fond {
+	background-color:#F0F0F0;
+	color:#344883;
+	text-align:left;
+	margin:0px;
+	border:0px;
+}
+
+.selector_list {
+	display:block;
+	margin:0px 0px 0px 0px;
+	padding:2px;
+	background-color:#F0F0F0;
+	color:#344883;
+	border-left:1px solid #344883;
+	border-bottom:1px solid #344883;
+	cursor:pointer;
+}
+
+.selector_list:hover {
+	display:block;
+	margin:0px 0px 0px 0px;
+	padding:2px;
+	background-color:#F0F080;
+	color:#344883;
+	border-left:1px solid #344883;
+	border-bottom:1px solid #344883;
+	cursor:pointer;
+}
+
+.boite a:link, .boite a:visited, .boite a:active{
+	color:#5488A3;
+	font-weight:bold;
+}
+
+.boite a:hover{
+	color:#FF7A51;
+	font-weight:bold;
+}
+
+.boite td {
+	font-size:12px;
+	text-align:left;
+
+}
+
+/*** VIGNETTES STATION MINI ***/
+
+.vignettes{
+    background:url(//static.infoclimat.net/images/fond_vignette_station.png);
+    background-repeat:no-repeat;
+    width:100px;
+    height:70px;
+    margin:0px;
+    padding:0px;
+    font-size:9px;
+    text-align:center;
+    color:white;
+    font-size:11px;
+    text-shadow: 0px 0px 1px #000;-moz-text-shadow: 0px 0px 1px #000;-webkit-text-shadow: 0px 0px 1px #000;
+}
+
+.vignettes a.station {
+    display:block;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom:5px;
+}
+
+.vignettes a:link, .vignettes a:visited {
+    color:#FFF;
+}
+
+.vignettes a:hover {
+    color:#29BAEF;
+}
+
+/*** FIN VIGNETTES ***/
+
+.div-inner-station {
+    -moz-box-shadow:0px 0px 3px #000;
+    -webkit-box-shadow:0px 0px 3px #000;
+    box-shadow:0px 0px 3px #000;
+    width:100px;
+    border-radius:4px;
+}
+
+.boite_photo {
+	text-align:center;
+	padding:0px;
+	margin:0px;
+	width:88px;
+	height:66px;
+	color:#29BAEF;
+}
+.boite_photo img {
+    border:0;
+}
+
+h1 {
+    color:#1c859b;
+    /*font-size:24px;*/
+    font-family:'Nunito',Helvetica,Verdana,Arial,sans-serif;
+    margin: 0px auto 10px auto;
+    padding-top:10px;
+}
+
+a {
+	color:blue;
+}
+a:link, a:visited {
+	color:#000000;
+}
+
+a:hover {
+	color:#16779b;
+}
+
+.lien_action {
+	border:1px solid #5488A3;
+	background-color:#FFF;
+	padding:4px;
+	text-decoration:none;
+}
+
+.lien_action:hover {
+	background-color:#FFF;
+}
+
+.lien_action_en_cours{
+	border-top:1px solid #394D72;
+	border-left:1px solid #394D72;
+	border-right:1px solid #394D72;
+	background-color:#B4C4DC;
+	padding:4px;
+	text-decoration:none;
+}
+
+.erreur {
+	margin:0px 0px 0px 0px;
+	padding:20px 40px 20px 120px;
+	background:url('images/erreur.gif');
+	background-repeat:no-repeat;
+	background-color:#FFFFFF;
+	border:1px dotted #FF0000;
+	color:#FF0000;
+	text-align:left;
+	font-size:14px;
+}
+
+.bandelette {
+	width:auto;
+	background-color:#000;
+	color:#29BAEF;
+	padding:3px;
+	margin-bottom:10px;
+}
+
+.bandelette a:link, .bandelette a:visited {
+	color:#29BAEF;
+}
+
+.bandelette a:hover {
+	color:#FFF;
+}
+
+.news {
+	background-color:#BCECFE;
+	border-top:3px solid #000;
+	margin-top:15px;
+	padding-left:4px;
+	padding-right:4px;
+}
+
+.tof:link, .tof:visited {
+
+	color:#29BAEF;
+	text-decoration:none;
+}
+
+.tof:hover {
+	text-decoration:underline;
+}
+
+#masque
+{
+	background-color:white;
+	z-index:2000;
+	width:100%;
+	height:100%;
+	position:fixed;
+	display:none;
+	opacity:0.75;
+	-moz-opacity:0.80;
+	-khtml-opacity:0.80;
+	top:0%;
+	left:0%;
+}
+
+.onglet_actif
+{
+	background-color:#55aaff;
+	margin-left:3px;
+	margin-right:3px;
+	padding:0px 4px 1px 4px;;
+	border:1px solid black;
+	border-top:0;
+	/*font-weight:bold;*/
+	cursor:default;
+}
+.onglet
+{
+	background-color:#77ccff;
+	margin-left:3px;
+	margin-right:3px;
+	padding:0px 4px 1px 4px;;
+	border:1px solid grey;
+	border-top:0;
+	cursor:pointer;
+}
+#box_ms2
+{
+	z-index:2010;
+	background-color:#F0F0F0;
+	display:none;
+	position:fixed;
+	left:30%;
+	top:35%;
+	width:40%;
+	border:1px solid black;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	overflow:auto;
+}
+#menu_alerte_bas
+{
+    position:absolute;
+    margin:0;
+    z-index:1498;
+    display:none;
+    -moz-border-radius-bottomleft:6px;
+    -webkit-border-bottom-left-radius:6px;
+    border-bottom-left-radius:6px;
+    -moz-border-radius-bottomright:6px;
+    -webkit-border-bottom-right-radius:6px;
+    border-bottom-right-radius:6px;
+    -moz-box-shadow:0px 0px 3px black;
+    -webkit-box-shadow:0px 0px 3px black;
+    box-shadow:0px 0px 3px black;
+    text-align:left;
+    
+    background-color:rgb(0,0,0);
+    background-color:rgba(0,0,0,0.85);
+    color:white;
+    text-shadow:0 0 1px black;
+}
+#menu_alerte_bas a{
+    color:white !important;
+}
+#menu_alerte_bas ul
+{
+	margin:0;
+	padding:0;
+	padding-bottom:5px;
+}
+#menu_alerte_bas li
+{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	padding-left:10px;
+	padding-right:10px;
+	line-height:17px;
+}
+#menu_alerte_bas li a
+{
+	text-decoration:none;
+	color:black;
+	display:block;
+}
+#menu_alerte_bas li a:hover
+{
+    text-shadow:none;
+    color:black !important;
+    text-shadow:0 0 1px white;
+}
+#menu_alerte_bas li:hover{
+    box-shadow: 0 0 3px black inset;
+    background-color:#fff;
+    color:black !important;
+}
+
+.case_couleur_choix
+{
+	height:30px;
+	width:30px;
+	cursor:pointer;
+}
+.sup_coord
+{
+	vertical-align:bottom;
+	cursor:pointer;
+}
+.tb_nf
+{
+	text-align:left;
+	padding-left:10px;
+	border: 1px solid black;
+	border-left:0;
+	border-right:0;
+}
+
+.tb_an
+{
+	border:1px solid black;
+	border-left:0;
+	border-right:0;
+}
+
+#infobulleStock{display:none;position:absolute;z-index:1900;border:1px solid black;width:200px;right:0px;top:0px;}
+
+#icmailer-aff{
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    position:absolute;
+    top:2px;
+    right:60px;
+    background-color:red;
+    height:12px;
+    line-height:10px;
+    border-radius:5px;
+    font-weight:bold;
+    background-image:url(//static.infoclimat.net/images/v5.2/Email.png);
+    background-repeat:no-repeat;
+    background-position:3px 2px;
+    padding-left:15px;
+    padding-right:5px;
+    min-width:10px;
+    display:none;
+}
+
+#automodule-BS
+{
+    background: rgb(169,3,41);
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2E5MDMyOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjQ0JSIgc3RvcC1jb2xvcj0iIzhmMDIyMiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM2ZDAwMTkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(169,3,41,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(169,3,41,1)), color-stop(44%,rgba(143,2,34,1)), color-stop(100%,rgba(109,0,25,1)));
+background: -webkit-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+background: -o-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+background: -ms-linear-gradient(top, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+background: linear-gradient(to bottom, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=0 );
+box-shadow:0 0 3px black;
+}
+
+#automodule-BS a{
+    background:rgba(0,0,0,0.2);
+    display:block;
+    color:white;
+    text-shadow:0 0 2px black;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+/** autoprevi next gen **/
+#div-tempsreel-tempsreel{
+    width:223px;
+    height:200px;
+    position:relative;
+    margin-top:-10px;
+    margin-bottom:0;
+    border-radius:0;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family:Exo,sans-serif;
+}
+
+#autoprevi-tr-name {
+    width:223px;
+    position:absolute;
+    top:30px;
+    left:0px;
+    font-family:Exo,Nunito,sans-serif;
+    font-size:15px;
+    text-shadow:1px 1px 2px black, 0 0 15px rgba(0,0,0,0.7);
+}
+
+#autoprevi-tr-pic{
+    position:absolute;
+    top:5px;
+    right:5px;
+}
+
+#autoprevi-tr-dh{
+    position:absolute;
+    top:12px;
+    left:12px;
+    font-size:14px;
+    color:white;
+    text-shadow:1px 1px 1px black;
+}
+
+#autoprevi-tr-moy{
+    position:absolute;
+    top:60px;
+    right:10px;
+    font-size:14px;
+    color:white;
+    text-shadow:1px 1px 1px black;
+}
+
+#autoprevi-tr-raf{
+    position:absolute;
+    top:75px;
+    right:10px;
+    font-size:10px;
+    color:white;
+    text-shadow:1px 1px 1px black;
+}
+
+#autoprevi-tr-h{
+    position:absolute;
+    top:114px;
+    left:10px;
+    font-size:13px;
+    color:black;
+    text-shadow:0 0 1px rgba(255,255,255,0.7);
+}
+#autoprevi-desc-h{
+    position:absolute;
+    top:102px;
+    left:10px;
+    font-size:11px;
+    color:#99f2fb;
+    text-shadow:0 0 5px rgb(0,0,0);
+}
+
+#autoprevi-tr-p{
+    position:absolute;
+    top:114px;
+    left:60px;
+    font-size:13px;
+    color:black;
+    text-shadow:0 0 1px rgba(255,255,255,0.5);
+}
+#autoprevi-desc-p{
+    position:absolute;
+    top:102px;
+    left:60px;
+    font-size:11px;
+    color:#99f2fb;
+    text-shadow:0 0 5px rgb(0,0,0);
+}
+
+#autoprevi-tr-r{
+    position:absolute;
+    top:114px;
+    left:130px;
+    font-size:13px;
+    color:black;
+    text-shadow:0 0 1px rgba(255,255,255,0.5);
+}
+#autoprevi-desc-r{
+    position:absolute;
+    top:102px;
+    left:130px;
+    font-size:11px;
+    color:#99f2fb;
+    text-shadow:0 0 5px rgb(0,0,0);
+}
+
+#autoprevi-tr-t{
+    position:absolute;
+    top:55px;
+    left:20px;
+    font-size:28px;
+    text-shadow:1px 1px 1px black;
+}
+
+#autoprevi-svg{
+    width:223px;
+    height:72px;
+    position:absolute;
+    bottom:0px;
+    left:0;
+    right:0;
+}
+
+#autocam-container{
+    position:relative;
+    margin-top:4px;
+}
+
+#autocam-name{
+    position:absolute;
+    top:0;
+    right:0;
+    padding:0 3px;
+    border-bottom-left-radius:3px;
+}

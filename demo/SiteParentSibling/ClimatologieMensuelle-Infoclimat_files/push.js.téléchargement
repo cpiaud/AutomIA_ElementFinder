@@ -1,0 +1,2602 @@
+/**
+ * Copyright (C) 2010-2013 Wandenberg Peixoto <wandenberg@gmail.com>, Rogério Carvalho Schneider <stockrt@gmail.com>
+ * Authors: Wandenberg Peixoto <wandenberg@gmail.com>, Rogério Carvalho Schneider <stockrt@gmail.com>
+ */
+(function (window, document, undefined) {
+  "use strict";
+
+  /* prevent duplicate declaration */
+  if (window.PushStream) { return; }
+
+  var Utils = {};
+
+  var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  var valueToTwoDigits = function (value) {
+    return ((value < 10) ? '0' : '') + value;
+  };
+
+  Utils.dateToUTCString = function (date) {
+    var time = valueToTwoDigits(date.getUTCHours()) + ':' + valueToTwoDigits(date.getUTCMinutes()) + ':' + valueToTwoDigits(date.getUTCSeconds());
+    return days[date.getUTCDay()] + ', ' + valueToTwoDigits(date.getUTCDate()) + ' ' + months[date.getUTCMonth()] + ' ' + date.getUTCFullYear() + ' ' + time + ' GMT';
+  };
+
+  var extend = function () {
+    var object = arguments[0] || {};
+    for (var i = 0; i < arguments.length; i++) {
+      var settings = arguments[i];
+      for (var attr in settings) {
+        if (!settings.hasOwnProperty || settings.hasOwnProperty(attr)) {
+          object[attr] = settings[attr];
+        }
+      }
+    }
+    return object;
+  };
+
+  var validChars  = /^[\],:{}\s]*$/,
+      validEscape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+      validTokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+      validBraces = /(?:^|:|,)(?:\s*\[)+/g;
+
+  var trim = function(value) {
+    return value.replace(/^\s*/, "").replace(/\s*$/, "").replace(/\\'/g, "'");
+  };
+
+  Utils.parseJSON = function(data) {
+    if (!data || !isString(data)) {
+      return null;
+    }
+
+    //data = trim(data).replace(new RegExp("\'", "g"), "'");
+    //return jQuery.parseJSON(data);
+
+    // Make sure leading/trailing whitespace is removed (IE can't handle it)
+    data = trim(data);
+
+    // Attempt to parse using the native JSON parser first
+    if (window.JSON && window.JSON.parse) {
+      try {
+        //return window.JSON.parse( data );
+        return jQuery.parseJSON(data);
+      } catch(e) {
+        throw "Invalid JSON1: " + data;
+      }
+    }
+
+    // Make sure the incoming data is actual JSON
+    // Logic borrowed from http://json.org/json2.js
+    if (validChars.test(data.replace(validEscape, "@").replace( validTokens, "]").replace( validBraces, "")) ) {
+      return (new Function("return " + data))();
+    }
+
+    throw "Invalid JSON2: " + data;
+  };
+
+  var getControlParams = function(pushstream) {
+    var data = {};
+    data[pushstream.tagArgument] = "";
+    data[pushstream.timeArgument] = "";
+    data[pushstream.eventIdArgument] = "";
+    if (pushstream.messagesControlByArgument) {
+      data[pushstream.tagArgument] = Number(pushstream._etag);
+      if (pushstream._lastModified) {
+        data[pushstream.timeArgument] = pushstream._lastModified;
+      } else if (pushstream._lastEventId) {
+        data[pushstream.eventIdArgument] = pushstream._lastEventId;
+      }
+    }
+    return data;
+  };
+
+  var getTime = function() {
+    return (new Date()).getTime();
+  };
+
+  var currentTimestampParam = function() {
+    return { "_" : getTime() };
+  };
+
+  var objectToUrlParams = function(settings) {
+    var params = settings;
+    if (typeof(settings) === 'object') {
+      params = '';
+      for (var attr in settings) {
+        if (!settings.hasOwnProperty || settings.hasOwnProperty(attr)) {
+          params += '&' + attr + '=' + window.escape(settings[attr]);
+        }
+      }
+      params = params.substring(1);
+    }
+
+    return params || '';
+  };
+
+  var addParamsToUrl = function(url, params) {
+    return url + ((url.indexOf('?') < 0) ? '?' : '&') + objectToUrlParams(params);
+  };
+
+  var isArray = Array.isArray || function(obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]';
+  };
+
+  var isString = function(obj) {
+    return Object.prototype.toString.call(obj) === '[object String]';
+  };
+
+  var isDate = function(obj) {
+    return Object.prototype.toString.call(obj) === '[object Date]';
+  };
+
+  var Log4js = {
+    logger: null,
+    debug : function() { if  (PushStream.LOG_LEVEL === 'debug')                                         { Log4js._log.apply(Log4js._log, arguments); }},
+    info  : function() { if ((PushStream.LOG_LEVEL === 'info')  || (PushStream.LOG_LEVEL === 'debug'))  { Log4js._log.apply(Log4js._log, arguments); }},
+    error : function() {                                                                                  Log4js._log.apply(Log4js._log, arguments); },
+    _log  : function() {
+      if (!Log4js.logger) {
+        var console = window.console;
+        if (console && console.log) {
+          if (console.log.apply) {
+            Log4js.logger = console.log;
+          } else if ((typeof console.log === "object") && Function.prototype.bind) {
+            Log4js.logger = Function.prototype.bind.call(console.log, console);
+          } else if ((typeof console.log === "object") && Function.prototype.call) {
+            Log4js.logger = function() {
+              Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
+            };
+          }
+        }
+      }
+
+      if (Log4js.logger) {
+        Log4js.logger.apply(window.console, arguments);
+      }
+
+      var logElement = document.getElementById(PushStream.LOG_OUTPUT_ELEMENT_ID);
+      if (logElement) {
+        var str = '';
+        for (var i = 0; i < arguments.length; i++) {
+          str += arguments[i] + " ";
+        }
+        logElement.innerHTML += str + '\n';
+
+        var lines = logElement.innerHTML.split('\n');
+        if (lines.length > 100) {
+          logElement.innerHTML = lines.slice(-100).join('\n');
+        }
+      }
+    }
+  };
+
+  var Ajax = {
+    _getXHRObject : function() {
+      var xhr = false;
+      try { xhr = new window.XMLHttpRequest(); }
+      catch (e1) {
+        try { xhr = new window.XDomainRequest(); }
+        catch (e2) {
+          try { xhr = new window.ActiveXObject("Msxml2.XMLHTTP"); }
+          catch (e3) {
+            try { xhr = new window.ActiveXObject("Microsoft.XMLHTTP"); }
+            catch (e4) {
+              xhr = false;
+            }
+          }
+        }
+      }
+      return xhr;
+    },
+
+    _send : function(settings, post) {
+      settings = settings || {};
+      settings.timeout = settings.timeout || 30000;
+      var xhr = Ajax._getXHRObject();
+      if (!xhr||!settings.url) { return; }
+
+      Ajax.clear(settings);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          Ajax.clear(settings);
+          if (settings.afterReceive) { settings.afterReceive(xhr); }
+          if(xhr.status === 200) {
+            if (settings.success) { settings.success(xhr.responseText); }
+          } else {
+            if (settings.error) { settings.error(xhr.status); }
+          }
+        }
+      };
+
+      if (settings.beforeOpen) { settings.beforeOpen(xhr); }
+
+      var params = {};
+      var body = null;
+      var method = "GET";
+      if (post) {
+        body = objectToUrlParams(settings.data);
+        method = "POST";
+      } else {
+        params = settings.data || {};
+      }
+
+      xhr.open(method, addParamsToUrl(settings.url, extend({}, params, currentTimestampParam())), true);
+
+      if (settings.beforeSend) { settings.beforeSend(xhr); }
+
+      var onerror = function() {
+        try { xhr.abort(); } catch (e) { /* ignore error on closing */ }
+        Ajax.clear(settings);
+        settings.error(304);
+      };
+
+      if (post) {
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      } else {
+        settings.timeoutId = window.setTimeout(onerror, settings.timeout + 2000);
+      }
+
+      xhr.send(body);
+      return xhr;
+    },
+
+    _clear_script : function(script) {
+      // Handling memory leak in IE, removing and dereference the script
+      if (script) {
+        script.onerror = script.onload = script.onreadystatechange = null;
+        if (script.parentNode) { script.parentNode.removeChild(script); }
+      }
+    },
+
+    _clear_timeout : function(settings) {
+      settings.timeoutId = clearTimer(settings.timeoutId);
+    },
+
+    clear : function(settings) {
+      Ajax._clear_timeout(settings);
+      Ajax._clear_script(document.getElementById(settings.scriptId));
+    },
+
+    jsonp : function(settings) {
+      settings.timeout = settings.timeout || 30000;
+      Ajax.clear(settings);
+
+      var head = document.head || document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
+      var startTime = getTime();
+
+      var onerror = function() {
+        Ajax.clear(settings);
+        var callbackFunctionName = settings.data.callback;
+        if (callbackFunctionName) { window[callbackFunctionName] = function() { window[callbackFunctionName] = null; }; }
+        var endTime = getTime();
+        settings.error(((endTime - startTime) > settings.timeout/2) ? 304 : 0);
+      };
+
+      var onload = function() {
+        Ajax.clear(settings);
+        settings.load();
+      };
+
+      script.onerror = onerror;
+      script.onload = script.onreadystatechange = function(eventLoad) {
+        if (!script.readyState || /loaded|complete/.test(script.readyState)) {
+          onload();
+        }
+      };
+
+      if (settings.beforeOpen) { settings.beforeOpen({}); }
+      if (settings.beforeSend) { settings.beforeSend({}); }
+
+      settings.timeoutId = window.setTimeout(onerror, settings.timeout + 2000);
+      settings.scriptId = settings.scriptId || getTime();
+
+      var callbackFunctionName = settings.data.callback;
+      if (callbackFunctionName) { window[callbackFunctionName] = function() { window[callbackFunctionName] = null; }; }
+      settings.data.callback = settings.scriptId + "_onmessage_" + getTime();
+      window[settings.data.callback] = settings.success;
+
+      script.setAttribute("src", addParamsToUrl(settings.url, extend({}, settings.data, currentTimestampParam())));
+      script.setAttribute("async", "async");
+      script.setAttribute("id", settings.scriptId);
+
+      // Use insertBefore instead of appendChild to circumvent an IE6 bug.
+      head.insertBefore(script, head.firstChild);
+      return settings;
+    },
+
+    load : function(settings) {
+      return Ajax._send(settings, false);
+    },
+
+    post : function(settings) {
+      return Ajax._send(settings, true);
+    }
+  };
+
+  var escapeText = function(text) {
+    return (text) ? window.escape(text) : '';
+  };
+
+  var unescapeText = function(text) {
+    return (text) ? window.unescape(text) : '';
+  };
+
+  Utils.parseMessage = function(messageText, keys) {
+    var msg = messageText;
+    if (isString(messageText)) {
+      msg = Utils.parseJSON(messageText);
+    }
+
+    var message = {
+        id     : msg[keys.jsonIdKey],
+        channel: msg[keys.jsonChannelKey],
+        text   : isString(msg[keys.jsonTextKey]) ? unescapeText(msg[keys.jsonTextKey]) : msg[keys.jsonTextKey],
+        tag    : msg[keys.jsonTagKey],
+        time   : msg[keys.jsonTimeKey],
+        eventid: msg[keys.jsonEventIdKey] || ""
+    };
+
+    return message;
+  };
+
+  var getBacktrack = function(options) {
+    return (options.backtrack) ? ".b" + Number(options.backtrack) : "";
+  };
+
+  var getChannelsPath = function(channels, withBacktrack) {
+    var path = '';
+    for (var channelName in channels) {
+      if (!channels.hasOwnProperty || channels.hasOwnProperty(channelName)) {
+        path += "/" + channelName + (withBacktrack ? getBacktrack(channels[channelName]) : "");
+      }
+    }
+    return path;
+  };
+
+  var getSubscriberUrl = function(pushstream, prefix, extraParams, withBacktrack) {
+    var websocket = pushstream.wrapper.type === WebSocketWrapper.TYPE;
+    var useSSL = pushstream.useSSL;
+    var url = (websocket) ? ((useSSL) ? "wss://" : "ws://") : ((useSSL) ? "https://" : "http://");
+    url += pushstream.host;
+    url += ((!useSSL && pushstream.port === 80) || (useSSL && pushstream.port === 443)) ? "" : (":" + pushstream.port);
+    url += prefix;
+
+    var channels = getChannelsPath(pushstream.channels, withBacktrack);
+    if (pushstream.channelsByArgument) {
+      var channelParam = {};
+      channelParam[pushstream.channelsArgument] = channels.substring(1);
+      extraParams = extend({}, extraParams, channelParam);
+    } else {
+      url += channels;
+    }
+    return addParamsToUrl(url, extraParams);
+  };
+
+  var getPublisherUrl = function(pushstream) {
+    var channel = "";
+    var url = (pushstream.useSSL) ? "https://" : "http://";
+    url += pushstream.host;
+    url += ((pushstream.port !== 80) && (pushstream.port !== 443)) ? (":" + pushstream.port) : "";
+    url += pushstream.urlPrefixPublisher;
+    for (var channelName in pushstream.channels) {
+      if (!pushstream.channels.hasOwnProperty || pushstream.channels.hasOwnProperty(channelName)) {
+        channel = channelName;
+        break;
+      }
+    }
+    url += "?id=" + channel;
+    return url;
+  };
+
+  Utils.extract_xss_domain = function(domain) {
+    // if domain is an ip address return it, else return ate least the last two parts of it
+    if (domain.match(/^(\d{1,3}\.){3}\d{1,3}$/)) {
+      return domain;
+    }
+
+    var domainParts = domain.split('.');
+    // if the domain ends with 3 chars or 2 chars preceded by more than 4 chars,
+    // we can keep only 2 parts, else we have to keep at least 3 (or all domain name)
+    var keepNumber = Math.max(domainParts.length - 1, (domain.match(/(\w{4,}\.\w{2}|\.\w{3,})$/) ? 2 : 3));
+
+    return domainParts.slice(-1 * keepNumber).join('.');
+  };
+
+  var linker = function(method, instance) {
+    return function() {
+      return method.apply(instance, arguments);
+    };
+  };
+
+  var clearTimer = function(timer) {
+    if (timer) {
+      window.clearTimeout(timer);
+    }
+    return null;
+  };
+
+  /* common callbacks */
+  var onmessageCallback = function(event) {
+    Log4js.info("[" + this.type + "] message received", arguments);
+    var message = Utils.parseMessage(event.data, this.pushstream);
+    if (message.tag) { this.pushstream._etag = message.tag; }
+    if (message.time) { this.pushstream._lastModified = message.time; }
+    if (message.eventid) { this.pushstream._lastEventId = message.eventid; }
+    this.pushstream._onmessage(message.text, message.id, message.channel, message.eventid, true);
+  };
+
+  var onopenCallback = function() {
+    this.pushstream._onopen();
+    Log4js.info("[" + this.type + "] connection opened");
+  };
+
+  var onerrorCallback = function(event) {
+    Log4js.info("[" + this.type + "] error (disconnected by server):", event);
+    if ((this.pushstream.readyState === PushStream.OPEN) &&
+        (this.type === EventSourceWrapper.TYPE) &&
+        (event.type === 'error') &&
+        (this.connection.readyState === window.EventSource.CONNECTING)) {
+      // EventSource already has a reconnection function using the last-event-id header
+      return;
+    }
+    this._closeCurrentConnection();
+    this.pushstream._onerror({type: ((event && ((event.type === "load") || (event.type === "close"))) || (this.pushstream.readyState === PushStream.CONNECTING)) ? "load" : "timeout"});
+  };
+
+  /* wrappers */
+
+  var WebSocketWrapper = function(pushstream) {
+    if (!window.WebSocket && !window.MozWebSocket) { throw "WebSocket not supported"; }
+    this.type = WebSocketWrapper.TYPE;
+    this.pushstream = pushstream;
+    this.connection = null;
+  };
+
+  WebSocketWrapper.TYPE = "WebSocket";
+
+  WebSocketWrapper.prototype = {
+    connect: function() {
+      this._closeCurrentConnection();
+      var params = extend({}, this.pushstream.extraParams(), currentTimestampParam(), getControlParams(this.pushstream));
+      var url = getSubscriberUrl(this.pushstream, this.pushstream.urlPrefixWebsocket, params, !this.pushstream._useControlArguments());
+      this.connection = (window.WebSocket) ? new window.WebSocket(url) : new window.MozWebSocket(url);
+      this.connection.onerror   = linker(onerrorCallback, this);
+      this.connection.onclose   = linker(onerrorCallback, this);
+      this.connection.onopen    = linker(onopenCallback, this);
+      this.connection.onmessage = linker(onmessageCallback, this);
+      Log4js.info("[WebSocket] connecting to:", url);
+    },
+
+    disconnect: function() {
+      if (this.connection) {
+        Log4js.debug("[WebSocket] closing connection to:", this.connection.URL);
+        this.connection.onclose = null;
+        this._closeCurrentConnection();
+        this.pushstream._onclose();
+      }
+    },
+
+    _closeCurrentConnection: function() {
+      if (this.connection) {
+        try { this.connection.close(); } catch (e) { /* ignore error on closing */ }
+        this.connection = null;
+      }
+    },
+
+    sendMessage: function(message) {
+      if (this.connection) { this.connection.send(message); }
+    }
+  };
+
+  var EventSourceWrapper = function(pushstream) {
+    if (!window.EventSource) { throw "EventSource not supported"; }
+    this.type = EventSourceWrapper.TYPE;
+    this.pushstream = pushstream;
+    this.connection = null;
+  };
+
+  EventSourceWrapper.TYPE = "EventSource";
+
+  EventSourceWrapper.prototype = {
+    connect: function() {
+      this._closeCurrentConnection();
+      var params = extend({}, this.pushstream.extraParams(), currentTimestampParam(), getControlParams(this.pushstream));
+      var url = getSubscriberUrl(this.pushstream, this.pushstream.urlPrefixEventsource, params, !this.pushstream._useControlArguments());
+      this.connection = new window.EventSource(url);
+      this.connection.onerror   = linker(onerrorCallback, this);
+      this.connection.onopen    = linker(onopenCallback, this);
+      this.connection.onmessage = linker(onmessageCallback, this);
+      Log4js.info("[EventSource] connecting to:", url);
+    },
+
+    disconnect: function() {
+      if (this.connection) {
+        Log4js.debug("[EventSource] closing connection to:", this.connection.URL);
+        this.connection.onclose = null;
+        this._closeCurrentConnection();
+        this.pushstream._onclose();
+      }
+    },
+
+    _closeCurrentConnection: function() {
+      if (this.connection) {
+        try { this.connection.close(); } catch (e) { /* ignore error on closing */ }
+        this.connection = null;
+      }
+    }
+  };
+
+  var StreamWrapper = function(pushstream) {
+    this.type = StreamWrapper.TYPE;
+    this.pushstream = pushstream;
+    this.connection = null;
+    this.url = null;
+    this.frameloadtimer = null;
+    this.pingtimer = null;
+    this.iframeId = "PushStreamManager_" + pushstream.id;
+  };
+
+  StreamWrapper.TYPE = "Stream";
+
+  StreamWrapper.prototype = {
+    connect: function() {
+      this._closeCurrentConnection();
+      var domain = Utils.extract_xss_domain(this.pushstream.host);
+      try {
+        document.domain = domain;
+      } catch(e) {
+        Log4js.error("[Stream] (warning) problem setting document.domain = " + domain + " (OBS: IE8 does not support set IP numbers as domain)");
+      }
+      var params = extend({}, this.pushstream.extraParams(), currentTimestampParam(), {"streamid": this.pushstream.id}, getControlParams(this.pushstream));
+      this.url = getSubscriberUrl(this.pushstream, this.pushstream.urlPrefixStream, params, !this.pushstream._useControlArguments());
+      Log4js.debug("[Stream] connecting to:", this.url);
+      this.loadFrame(this.url);
+    },
+
+    disconnect: function() {
+      if (this.connection) {
+        Log4js.debug("[Stream] closing connection to:", this.url);
+        this._closeCurrentConnection();
+        this.pushstream._onclose();
+      }
+    },
+
+    _clear_iframe: function() {
+      var oldIframe = document.getElementById(this.iframeId);
+      if (oldIframe) {
+        oldIframe.onload = null;
+        oldIframe.src = "about:blank";
+        if (oldIframe.parentNode) { oldIframe.parentNode.removeChild(oldIframe); }
+      }
+    },
+
+    _closeCurrentConnection: function() {
+      this._clear_iframe();
+      if (this.connection) {
+        this.pingtimer = clearTimer(this.pingtimer);
+        this.frameloadtimer = clearTimer(this.frameloadtimer);
+        this.connection = null;
+        this.transferDoc = null;
+        if (typeof window.CollectGarbage === 'function') { window.CollectGarbage(); }
+      }
+    },
+
+    loadFrame: function(url) {
+      this._clear_iframe();
+      try {
+        var transferDoc = new window.ActiveXObject("htmlfile");
+        transferDoc.open();
+        transferDoc.write("<html><script>document.domain=\""+(document.domain)+"\";</script></html>");
+        transferDoc.parentWindow.PushStream = PushStream;
+        transferDoc.close();
+        var ifrDiv = transferDoc.createElement("div");
+        transferDoc.appendChild(ifrDiv);
+        ifrDiv.innerHTML = "<iframe src=\""+url+"\"></iframe>";
+        this.connection = ifrDiv.getElementsByTagName("IFRAME")[0];
+        this.connection.onload = linker(onerrorCallback, this);
+        this.transferDoc = transferDoc;
+      } catch (e) {
+        var ifr = document.createElement("IFRAME");
+        ifr.style.width = "1px";
+        ifr.style.height = "1px";
+        ifr.style.border = "none";
+        ifr.style.position = "absolute";
+        ifr.style.top = "-10px";
+        ifr.style.marginTop = "-10px";
+        ifr.style.zIndex = "-20";
+        ifr.PushStream = PushStream;
+        document.body.appendChild(ifr);
+        ifr.setAttribute("src", url);
+        ifr.onload = linker(onerrorCallback, this);
+        this.connection = ifr;
+      }
+      this.connection.setAttribute("id", this.iframeId);
+      this.frameloadtimer = window.setTimeout(linker(onerrorCallback, this), this.pushstream.timeout);
+    },
+
+    register: function(iframeWindow) {
+      this.frameloadtimer = clearTimer(this.frameloadtimer);
+      iframeWindow.p = linker(this.process, this);
+      this.connection.onload = linker(this._onframeloaded, this);
+      this.pushstream._onopen();
+      this.setPingTimer();
+      Log4js.info("[Stream] frame registered");
+    },
+
+    process: function(id, channel, text, eventid, time, tag) {
+      this.pingtimer = clearTimer(this.pingtimer);
+      Log4js.info("[Stream] message received", arguments);
+      if (id !== -1) {
+        if (tag) { this.pushstream._etag = tag; }
+        if (time) { this.pushstream._lastModified = time; }
+        if (eventid) { this.pushstream._lastEventId = eventid; }
+      }
+      this.pushstream._onmessage(unescapeText(text), id, channel, eventid || "", true);
+      this.setPingTimer();
+    },
+
+    _onframeloaded: function() {
+      Log4js.info("[Stream] frame loaded (disconnected by server)");
+      this.connection.onload = null;
+      this.disconnect();
+    },
+
+    setPingTimer: function() {
+      if (this.pingtimer) { clearTimer(this.pingtimer); }
+      this.pingtimer = window.setTimeout(linker(onerrorCallback, this), this.pushstream.pingtimeout);
+    }
+  };
+
+  var LongPollingWrapper = function(pushstream) {
+    this.type = LongPollingWrapper.TYPE;
+    this.pushstream = pushstream;
+    this.connection = null;
+    this.opentimer = null;
+    this.messagesQueue = [];
+    this._linkedInternalListen = linker(this._internalListen, this);
+    this.xhrSettings = {
+        timeout: this.pushstream.timeout,
+        data: {},
+        url: null,
+        success: linker(this.onmessage, this),
+        error: linker(this.onerror, this),
+        load: linker(this.onload, this),
+        beforeSend: linker(this.beforeSend, this),
+        afterReceive: linker(this.afterReceive, this)
+    };
+  };
+
+  LongPollingWrapper.TYPE = "LongPolling";
+
+  LongPollingWrapper.prototype = {
+    connect: function() {
+      this.messagesQueue = [];
+      this._closeCurrentConnection();
+      this.urlWithBacktrack = getSubscriberUrl(this.pushstream, this.pushstream.urlPrefixLongpolling, {}, true);
+      this.urlWithoutBacktrack = getSubscriberUrl(this.pushstream, this.pushstream.urlPrefixLongpolling, {}, false);
+      this.xhrSettings.url = this.urlWithBacktrack;
+      var domain = Utils.extract_xss_domain(this.pushstream.host);
+      var currentDomain = Utils.extract_xss_domain(window.location.hostname);
+      var port = this.pushstream.port;
+      var currentPort = window.location.port ? Number(window.location.port) : (this.pushstream.useSSL ? 443 : 80);
+      this.useJSONP = (domain !== currentDomain) || (port !== currentPort) || this.pushstream.useJSONP;
+      this.xhrSettings.scriptId = "PushStreamManager_" + this.pushstream.id;
+      if (this.useJSONP) {
+        this.pushstream.messagesControlByArgument = true;
+      }
+      this._internalListen();
+      this.opentimer = window.setTimeout(linker(onopenCallback, this), 100);
+      Log4js.info("[LongPolling] connecting to:", this.xhrSettings.url);
+    },
+
+    _listen: function() {
+      if (this._internalListenTimeout) { clearTimer(this._internalListenTimeout); }
+      this._internalListenTimeout = window.setTimeout(this._linkedInternalListen, 100);
+    },
+
+    _internalListen: function() {
+      if (this.pushstream._keepConnected) {
+        this.xhrSettings.url = this.pushstream._useControlArguments() ? this.urlWithoutBacktrack : this.urlWithBacktrack;
+        this.xhrSettings.data = extend({}, this.pushstream.extraParams(), this.xhrSettings.data, getControlParams(this.pushstream));
+        if (this.useJSONP) {
+          this.connection = Ajax.jsonp(this.xhrSettings);
+        } else if (!this.connection) {
+          this.connection = Ajax.load(this.xhrSettings);
+        }
+      }
+    },
+
+    disconnect: function() {
+      if (this.connection) {
+        Log4js.debug("[LongPolling] closing connection to:", this.xhrSettings.url);
+        this._closeCurrentConnection();
+        this.pushstream._onclose();
+      }
+    },
+
+    _closeCurrentConnection: function() {
+      this.opentimer = clearTimer(this.opentimer);
+      if (this.connection) {
+        try { this.connection.abort(); } catch (e) {
+          try { Ajax.clear(this.connection); } catch (e1) { /* ignore error on closing */ }
+        }
+        this.connection = null;
+        this.xhrSettings.url = null;
+      }
+    },
+
+    beforeSend: function(xhr) {
+      if (!this.pushstream.messagesControlByArgument) {
+        xhr.setRequestHeader("If-None-Match", this.pushstream._etag);
+        xhr.setRequestHeader("If-Modified-Since", this.pushstream._lastModified);
+      }
+    },
+
+    afterReceive: function(xhr) {
+      if (!this.pushstream.messagesControlByArgument) {
+        this.pushstream._etag = xhr.getResponseHeader('Etag');
+        this.pushstream._lastModified = xhr.getResponseHeader('Last-Modified');
+      }
+      this.connection = null;
+    },
+
+    onerror: function(status) {
+      if (this.pushstream._keepConnected) { /* abort(), called by disconnect(), call this callback, but should be ignored */
+        if (status === 304) {
+          this._listen();
+        } else {
+          Log4js.info("[LongPolling] error (disconnected by server):", status);
+          this._closeCurrentConnection();
+          this.pushstream._onerror({type: ((status === 403) || (this.pushstream.readyState === PushStream.CONNECTING)) ? "load" : "timeout"});
+        }
+      }
+    },
+
+    onload: function() {
+      this._listen();
+    },
+
+    onmessage: function(responseText) {
+      if (this._internalListenTimeout) { clearTimer(this._internalListenTimeout); }
+      Log4js.info("[LongPolling] message received", responseText);
+      var lastMessage = null;
+      var messages = isArray(responseText) ? responseText : responseText.replace(/\}\{/g, "}\r\n{").split("\r\n");
+      for (var i = 0; i < messages.length; i++) {
+        if (messages[i]) {
+          lastMessage = Utils.parseMessage(messages[i], this.pushstream);
+          this.messagesQueue.push(lastMessage);
+          if (this.pushstream.messagesControlByArgument && lastMessage.time) {
+            this.pushstream._etag = lastMessage.tag;
+            this.pushstream._lastModified = lastMessage.time;
+          }
+        }
+      }
+
+      this._listen();
+
+      while (this.messagesQueue.length > 0) {
+        var message = this.messagesQueue.shift();
+        this.pushstream._onmessage(message.text, message.id, message.channel, message.eventid, (this.messagesQueue.length === 0));
+      }
+    }
+  };
+
+  /* mains class */
+
+  var PushStreamManager = [];
+
+  var PushStream = function(settings) {
+    settings = settings || {};
+
+    this.id = PushStreamManager.push(this) - 1;
+
+    this.useSSL = settings.useSSL || false;
+    this.host = settings.host || window.location.hostname;
+    this.port = Number(settings.port || (this.useSSL ? 443 : 80));
+
+    this.timeout = settings.timeout || 30000;
+    this.pingtimeout = settings.pingtimeout || 30000;
+    this.reconnectOnTimeoutInterval = settings.reconnectOnTimeoutInterval || 3000;
+    this.reconnectOnChannelUnavailableInterval = settings.reconnectOnChannelUnavailableInterval || 60000;
+
+    this.lastEventId = settings.lastEventId || null;
+    this.messagesPublishedAfter = settings.messagesPublishedAfter;
+    this.messagesControlByArgument = settings.messagesControlByArgument || false;
+    this.tagArgument   = settings.tagArgument  || 'tag';
+    this.timeArgument  = settings.timeArgument || 'time';
+    this.eventIdArgument  = settings.eventIdArgument || 'eventid';
+    this.useJSONP      = settings.useJSONP     || false;
+
+    this._reconnecttimer = null;
+    this._etag = 0;
+    this._lastModified = null;
+    this._lastEventId = null;
+
+    this.urlPrefixPublisher   = settings.urlPrefixPublisher   || '/pub';
+    this.urlPrefixStream      = settings.urlPrefixStream      || '/sub';
+    this.urlPrefixEventsource = settings.urlPrefixEventsource || '/ev';
+    this.urlPrefixLongpolling = settings.urlPrefixLongpolling || '/lp';
+    this.urlPrefixWebsocket   = settings.urlPrefixWebsocket   || '/ws';
+
+    this.jsonIdKey      = settings.jsonIdKey      || 'id';
+    this.jsonChannelKey = settings.jsonChannelKey || 'channel';
+    this.jsonTextKey    = settings.jsonTextKey    || 'text';
+    this.jsonTagKey     = settings.jsonTagKey     || 'tag';
+    this.jsonTimeKey    = settings.jsonTimeKey    || 'time';
+    this.jsonEventIdKey = settings.jsonEventIdKey || 'eventid';
+
+    this.modes = (settings.modes || 'eventsource|websocket|stream|longpolling').split('|');
+    this.wrappers = [];
+    this.wrapper = null;
+
+    this.onchanneldeleted = settings.onchanneldeleted || null;
+    this.onmessage = settings.onmessage || null;
+    this.onerror = settings.onerror || null;
+    this.onstatuschange = settings.onstatuschange || null;
+    this.extraParams    = settings.extraParams    || function() { return {}; };
+
+    this.channels = {};
+    this.channelsCount = 0;
+    this.channelsByArgument   = settings.channelsByArgument   || false;
+    this.channelsArgument     = settings.channelsArgument     || 'channels';
+
+
+    for (var i = 0; i < this.modes.length; i++) {
+      try {
+        var wrapper = null;
+        switch (this.modes[i]) {
+        case "websocket"  : wrapper = new WebSocketWrapper(this);   break;
+        case "eventsource": wrapper = new EventSourceWrapper(this); break;
+        case "longpolling": wrapper = new LongPollingWrapper(this); break;
+        case "stream"     : wrapper = new StreamWrapper(this);      break;
+        }
+        this.wrappers[this.wrappers.length] = wrapper;
+      } catch(e) { Log4js.info(e); }
+    }
+
+    this.readyState = 0;
+  };
+
+  /* constants */
+  PushStream.LOG_LEVEL = 'error'; /* debug, info, error */
+  PushStream.LOG_OUTPUT_ELEMENT_ID = 'Log4jsLogOutput';
+
+  /* status codes */
+  PushStream.CLOSED        = 0;
+  PushStream.CONNECTING    = 1;
+  PushStream.OPEN          = 2;
+
+  /* main code */
+  PushStream.prototype = {
+    addChannel: function(channel, options) {
+      if (escapeText(channel) !== channel) {
+        throw "Invalid channel name! Channel has to be a set of [a-zA-Z0-9]";
+      }
+      Log4js.debug("entering addChannel");
+      if (typeof(this.channels[channel]) !== "undefined") { throw "Cannot add channel " + channel + ": already subscribed"; }
+      options = options || {};
+      Log4js.info("adding channel", channel, options);
+      this.channels[channel] = options;
+      this.channelsCount++;
+      if (this.readyState !== PushStream.CLOSED) { this.connect(); }
+      Log4js.debug("leaving addChannel");
+    },
+
+    removeChannel: function(channel) {
+      if (this.channels[channel]) {
+        Log4js.info("removing channel", channel);
+        delete this.channels[channel];
+        this.channelsCount--;
+      }
+    },
+
+    removeAllChannels: function() {
+      Log4js.info("removing all channels");
+      this.channels = {};
+      this.channelsCount = 0;
+    },
+
+    _setState: function(state) {
+      if (this.readyState !== state) {
+        Log4js.info("status changed", state);
+        this.readyState = state;
+        if (this.onstatuschange) {
+          this.onstatuschange(this.readyState);
+        }
+      }
+    },
+
+    connect: function() {
+      Log4js.debug("entering connect");
+      if (!this.host)                 { throw "PushStream host not specified"; }
+      if (isNaN(this.port))           { throw "PushStream port not specified"; }
+      if (!this.channelsCount)        { throw "No channels specified"; }
+      if (this.wrappers.length === 0) { throw "No available support for this browser"; }
+
+      this._keepConnected = true;
+      this._lastUsedMode = 0;
+      this._connect();
+
+      Log4js.debug("leaving connect");
+    },
+
+    disconnect: function() {
+      Log4js.debug("entering disconnect");
+      this._keepConnected = false;
+      this._disconnect();
+      this._setState(PushStream.CLOSED);
+      Log4js.info("disconnected");
+      Log4js.debug("leaving disconnect");
+    },
+
+    _useControlArguments :function() {
+      return this.messagesControlByArgument && ((this._lastModified !== null) || (this._lastEventId !== null));
+    },
+
+    _connect: function() {
+      if (this._lastEventId === null) {
+        this._lastEventId = this.lastEventId;
+      }
+      if (this._lastModified === null) {
+        var date = this.messagesPublishedAfter;
+        if (!isDate(date)) {
+          var messagesPublishedAfter = Number(this.messagesPublishedAfter);
+          if (messagesPublishedAfter > 0) {
+            date = new Date();
+            date.setTime(date.getTime() - (messagesPublishedAfter * 1000));
+          } else if (messagesPublishedAfter < 0) {
+            date = new Date(0);
+          }
+        }
+
+        if (isDate(date)) {
+          this._lastModified = Utils.dateToUTCString(date);
+        }
+      }
+
+      this._disconnect();
+      this._setState(PushStream.CONNECTING);
+      this.wrapper = this.wrappers[this._lastUsedMode++ % this.wrappers.length];
+
+      try {
+        this.wrapper.connect();
+      } catch (e) {
+        //each wrapper has a cleanup routine at disconnect method
+        if (this.wrapper) {
+          this.wrapper.disconnect();
+        }
+      }
+    },
+
+    _disconnect: function() {
+      this._reconnecttimer = clearTimer(this._reconnecttimer);
+      if (this.wrapper) {
+        this.wrapper.disconnect();
+      }
+    },
+
+    _onopen: function() {
+      this._reconnecttimer = clearTimer(this._reconnecttimer);
+      this._setState(PushStream.OPEN);
+      if (this._lastUsedMode > 0) {
+        this._lastUsedMode--; //use same mode on next connection
+      }
+    },
+
+    _onclose: function() {
+      this._reconnecttimer = clearTimer(this._reconnecttimer);
+      this._setState(PushStream.CLOSED);
+      this._reconnect(this.reconnectOnTimeoutInterval);
+    },
+
+    _onmessage: function(text, id, channel, eventid, isLastMessageFromBatch) {
+      Log4js.debug("message", text, id, channel, eventid, isLastMessageFromBatch);
+      if (id === -2) {
+        if (this.onchanneldeleted) { this.onchanneldeleted(channel); }
+      } else if (id > 0) {
+        if (this.onmessage) { this.onmessage(text, id, channel, eventid, isLastMessageFromBatch); }
+      }
+    },
+
+    _onerror: function(error) {
+      this._setState(PushStream.CLOSED);
+      this._reconnect((error.type === "timeout") ? this.reconnectOnTimeoutInterval : this.reconnectOnChannelUnavailableInterval);
+      if (this.onerror) { this.onerror(error); }
+    },
+
+    _reconnect: function(timeout) {
+      if (this._keepConnected && !this._reconnecttimer && (this.readyState !== PushStream.CONNECTING)) {
+        Log4js.info("trying to reconnect in", timeout);
+        this._reconnecttimer = window.setTimeout(linker(this._connect, this), timeout);
+      }
+    },
+
+    sendMessage: function(message, successCallback, errorCallback) {
+      message = escapeText(message);
+      if (this.wrapper.type === WebSocketWrapper.TYPE) {
+        this.wrapper.sendMessage(message);
+        if (successCallback) { successCallback(); }
+      } else {
+        Ajax.post({url: getPublisherUrl(this), data: message, success: successCallback, error: errorCallback});
+      }
+    }
+  };
+
+  PushStream.sendMessage = function(url, message, successCallback, errorCallback) {
+    Ajax.post({url: url, data: escapeText(message), success: successCallback, error: errorCallback});
+  };
+
+  // to make server header template more clear, it calls register and
+  // by a url parameter we find the stream wrapper instance
+  PushStream.register = function(iframe) {
+    var matcher = iframe.window.location.href.match(/streamid=([0-9]*)&?/);
+    if (matcher[1] && PushStreamManager[matcher[1]]) {
+      PushStreamManager[matcher[1]].wrapper.register(iframe);
+    }
+  };
+
+  PushStream.unload = function() {
+    for (var i = 0; i < PushStreamManager.length; i++) {
+      try { PushStreamManager[i].disconnect(); } catch(e){}
+    }
+  };
+
+  /* make class public */
+  window.PushStream = PushStream;
+  window.PushStreamManager = PushStreamManager;
+
+  if (window.attachEvent) { window.attachEvent("onunload", PushStream.unload); }
+  if (window.addEventListener) { window.addEventListener.call(window, "unload", PushStream.unload, false); }
+
+})(window, document);
+
+
+
+
+/***** notification plugin ******/
+/**
+ * noty - jQuery Notification Plugin v2.2.0
+ * Contributors: https://github.com/needim/noty/graphs/contributors
+ *
+ * Examples and Documentation - http://needim.github.com/noty/
+ *
+ * Licensed under the MIT licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ **/
+
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {
+        }
+
+        F.prototype = o;
+        return new F();
+    };
+}
+
+(function ($) {
+
+    var NotyObject = {
+
+        init:function (options) {
+
+            // Mix in the passed in options with the default options
+            this.options = $.extend({}, $.noty.defaults, options);
+
+            this.options.layout = (this.options.custom) ? $.noty.layouts['inline'] : $.noty.layouts[this.options.layout];
+
+			if ($.noty.themes[this.options.theme])
+            	this.options.theme = $.noty.themes[this.options.theme];
+			else
+				options.themeClassName = this.options.theme;
+
+            delete options.layout;
+            delete options.theme;
+
+            this.options = $.extend({}, this.options, this.options.layout.options);
+            this.options.id = 'noty_' + (new Date().getTime() * Math.floor(Math.random() * 1000000));
+
+            this.options = $.extend({}, this.options, options);
+
+            // Build the noty dom initial structure
+            this._build();
+
+            // return this so we can chain/use the bridge with less code.
+            return this;
+        }, // end init
+
+        _build:function () {
+
+            // Generating noty bar
+            var $bar = $('<div class="noty_bar noty_type_' + this.options.type + '"></div>').attr('id', this.options.id);
+            $bar.append(this.options.template).find('.noty_text').html(this.options.text);
+
+            this.$bar = (this.options.layout.parent.object !== null) ? $(this.options.layout.parent.object).css(this.options.layout.parent.css).append($bar) : $bar;
+
+			if (this.options.themeClassName)
+				this.$bar.addClass(this.options.themeClassName).addClass('noty_container_type_' + this.options.type);
+
+            // Set buttons if available
+            if (this.options.buttons) {
+
+                // If we have button disable closeWith & timeout options
+                this.options.closeWith = [];
+                this.options.timeout = false;
+
+                var $buttons = $('<div/>').addClass('noty_buttons');
+
+                (this.options.layout.parent.object !== null) ? this.$bar.find('.noty_bar').append($buttons) : this.$bar.append($buttons);
+
+                var self = this;
+
+                $.each(this.options.buttons, function (i, button) {
+                    var $button = $('<button/>').addClass((button.addClass) ? button.addClass : 'gray').html(button.text).attr('id', button.id ? button.id : 'button-' + i)
+                        .appendTo(self.$bar.find('.noty_buttons'))
+                        .bind('click', function () {
+                            if ($.isFunction(button.onClick)) {
+                                button.onClick.call($button, self);
+                            }
+                        });
+                });
+            }
+
+            // For easy access
+            this.$message = this.$bar.find('.noty_message');
+            this.$closeButton = this.$bar.find('.noty_close');
+            this.$buttons = this.$bar.find('.noty_buttons');
+
+            $.noty.store[this.options.id] = this; // store noty for api
+
+        }, // end _build
+
+        show:function () {
+
+            var self = this;
+
+			(self.options.custom) ? self.options.custom.find(self.options.layout.container.selector).append(self.$bar) : $(self.options.layout.container.selector).append(self.$bar);
+
+			if (self.options.theme && self.options.theme.style)
+            	self.options.theme.style.apply(self);
+
+            ($.type(self.options.layout.css) === 'function') ? this.options.layout.css.apply(self.$bar) : self.$bar.css(this.options.layout.css || {});
+
+            self.$bar.addClass(self.options.layout.addClass);
+
+            self.options.layout.container.style.apply($(self.options.layout.container.selector));
+
+            self.showing = true;
+
+			if (self.options.theme && self.options.theme.style)
+            	self.options.theme.callback.onShow.apply(this);
+
+            if ($.inArray('click', self.options.closeWith) > -1)
+                self.$bar.css('cursor', 'pointer').one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    if (self.options.callback.onCloseClick) {
+                        self.options.callback.onCloseClick.apply(self);
+                    }
+                    self.close();
+                });
+
+            if ($.inArray('hover', self.options.closeWith) > -1)
+                self.$bar.one('mouseenter', function () {
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) > -1)
+                self.$closeButton.one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) == -1)
+                self.$closeButton.remove();
+
+            if (self.options.callback.onShow)
+                self.options.callback.onShow.apply(self);
+
+            self.$bar.animate(
+                self.options.animation.open,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterShow) self.options.callback.afterShow.apply(self);
+                    self.showing = false;
+                    self.shown = true;
+                });
+
+            // If noty is have a timeout option
+            if (self.options.timeout)
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+
+            return this;
+
+        }, // end show
+
+        close:function () {
+
+            if (this.closed) return;
+            if (this.$bar && this.$bar.hasClass('i-am-closing-now')) return;
+
+            var self = this;
+
+            if (this.showing) {
+              self.$bar.queue(
+                function () {
+                  self.close.apply(self);
+                }
+              )
+              return;
+            }
+
+            if (!this.shown && !this.showing) { // If we are still waiting in the queue just delete from queue
+                var queue = [];
+                $.each($.noty.queue, function (i, n) {
+                    if (n.options.id != self.options.id) {
+                        queue.push(n);
+                    }
+                });
+                $.noty.queue = queue;
+                return;
+            }
+
+            self.$bar.addClass('i-am-closing-now');
+
+            if (self.options.callback.onClose) {
+                self.options.callback.onClose.apply(self);
+            }
+
+            self.$bar.clearQueue().stop().animate(
+                self.options.animation.close,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterClose) self.options.callback.afterClose.apply(self);
+                })
+                .promise().done(function () {
+
+                    // Modal Cleaning
+                    if (self.options.modal) {
+                        $.notyRenderer.setModalCount(-1);
+                        if ($.notyRenderer.getModalCount() == 0) $('.noty_modal').fadeOut('fast', function () {
+                            $(this).remove();
+                        });
+                    }
+
+                    // Layout Cleaning
+                    $.notyRenderer.setLayoutCountFor(self, -1);
+                    if ($.notyRenderer.getLayoutCountFor(self) == 0) $(self.options.layout.container.selector).remove();
+
+                    // Make sure self.$bar has not been removed before attempting to remove it
+                    if (typeof self.$bar !== 'undefined' && self.$bar !== null ) {
+                        self.$bar.remove();
+                        self.$bar = null;
+                        self.closed = true;
+                    }
+
+                    delete $.noty.store[self.options.id]; // deleting noty from store
+
+                    if(self.options.theme.callback && self.options.theme.callback.onClose) {
+                        self.options.theme.callback.onClose.apply(self);
+                    }
+
+                    if (!self.options.dismissQueue) {
+                        // Queue render
+                        $.noty.ontap = true;
+
+                        $.notyRenderer.render();
+                    }
+
+					if (self.options.maxVisible > 0 && self.options.dismissQueue) {
+						$.notyRenderer.render();
+					}
+                })
+
+        }, // end close
+
+        setText:function (text) {
+            if (!this.closed) {
+                this.options.text = text;
+                this.$bar.find('.noty_text').html(text);
+            }
+            return this;
+        },
+
+        setType:function (type) {
+            if (!this.closed) {
+                this.options.type = type;
+                this.options.theme.style.apply(this);
+                this.options.theme.callback.onShow.apply(this);
+            }
+            return this;
+        },
+
+        setTimeout:function (time) {
+            if (!this.closed) {
+                var self = this;
+                this.options.timeout = time;
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+            }
+            return this;
+        },
+
+        stopPropagation:function (evt) {
+            evt = evt || window.event;
+            if (typeof evt.stopPropagation !== "undefined") {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        },
+
+        closed:false,
+        showing:false,
+        shown:false
+
+    }; // end NotyObject
+
+    $.notyRenderer = {};
+
+    $.notyRenderer.init = function (options) {
+
+        // Renderer creates a new noty
+        var notification = Object.create(NotyObject).init(options);
+
+		if (notification.options.killer)
+			$.noty.closeAll();
+
+        (notification.options.force) ? $.noty.queue.unshift(notification) : $.noty.queue.push(notification);
+
+        $.notyRenderer.render();
+
+        return ($.noty.returns == 'object') ? notification : notification.options.id;
+    };
+
+    $.notyRenderer.render = function () {
+
+        var instance = $.noty.queue[0];
+
+        if ($.type(instance) === 'object') {
+            if (instance.options.dismissQueue) {
+				if (instance.options.maxVisible > 0) {
+					if ($(instance.options.layout.container.selector + ' li').length < instance.options.maxVisible) {
+						$.notyRenderer.show($.noty.queue.shift());
+					} else {
+
+					}
+				} else {
+					$.notyRenderer.show($.noty.queue.shift());
+				}
+            } else {
+                if ($.noty.ontap) {
+                    $.notyRenderer.show($.noty.queue.shift());
+                    $.noty.ontap = false;
+                }
+            }
+        } else {
+            $.noty.ontap = true; // Queue is over
+        }
+
+    };
+
+    $.notyRenderer.show = function (notification) {
+
+        if (notification.options.modal) {
+            $.notyRenderer.createModalFor(notification);
+            $.notyRenderer.setModalCount(+1);
+        }
+
+        // Where is the container?
+		if (notification.options.custom) {
+			if (notification.options.custom.find(notification.options.layout.container.selector).length == 0) {
+				notification.options.custom.append($(notification.options.layout.container.object).addClass('i-am-new'));
+			} else {
+				notification.options.custom.find(notification.options.layout.container.selector).removeClass('i-am-new');
+			}
+		} else {
+			if ($(notification.options.layout.container.selector).length == 0) {
+				$('body').append($(notification.options.layout.container.object).addClass('i-am-new'));
+			} else {
+				$(notification.options.layout.container.selector).removeClass('i-am-new');
+			}
+		}
+
+        $.notyRenderer.setLayoutCountFor(notification, +1);
+
+        notification.show();
+    };
+
+    $.notyRenderer.createModalFor = function (notification) {
+        if ($('.noty_modal').length == 0)
+            $('<div/>').addClass('noty_modal').data('noty_modal_count', 0).css(notification.options.theme.modal.css).prependTo($('body')).fadeIn('fast');
+    };
+
+    $.notyRenderer.getLayoutCountFor = function (notification) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count') || 0;
+    };
+
+    $.notyRenderer.setLayoutCountFor = function (notification, arg) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count', $.notyRenderer.getLayoutCountFor(notification) + arg);
+    };
+
+    $.notyRenderer.getModalCount = function () {
+        return $('.noty_modal').data('noty_modal_count') || 0;
+    };
+
+    $.notyRenderer.setModalCount = function (arg) {
+        return $('.noty_modal').data('noty_modal_count', $.notyRenderer.getModalCount() + arg);
+    };
+
+    // This is for custom container
+    $.fn.noty = function (options) {
+        options.custom = $(this);
+        return $.notyRenderer.init(options);
+    };
+
+    $.noty = {};
+    $.noty.queue = [];
+    $.noty.ontap = true;
+    $.noty.layouts = {};
+    $.noty.themes = {};
+    $.noty.returns = 'object';
+    $.noty.store = {};
+
+    $.noty.get = function (id) {
+        return $.noty.store.hasOwnProperty(id) ? $.noty.store[id] : false;
+    };
+
+    $.noty.close = function (id) {
+        return $.noty.get(id) ? $.noty.get(id).close() : false;
+    };
+
+    $.noty.setText = function (id, text) {
+        return $.noty.get(id) ? $.noty.get(id).setText(text) : false;
+    };
+
+    $.noty.setType = function (id, type) {
+        return $.noty.get(id) ? $.noty.get(id).setType(type) : false;
+    };
+
+    $.noty.clearQueue = function () {
+        $.noty.queue = [];
+    };
+
+    $.noty.closeAll = function () {
+        $.noty.clearQueue();
+        $.each($.noty.store, function (id, noty) {
+            noty.close();
+        });
+    };
+
+    var windowAlert = window.alert;
+
+    $.noty.consumeAlert = function (options) {
+        window.alert = function (text) {
+            if (options)
+                options.text = text;
+            else
+                options = {text:text};
+
+            $.notyRenderer.init(options);
+        };
+    };
+
+    $.noty.stopConsumeAlert = function () {
+        window.alert = windowAlert;
+    };
+
+    $.noty.defaults = {
+        layout:'top',
+        theme:'defaultTheme',
+        type:'alert',
+        text:'',
+        dismissQueue:true,
+        template:'<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+        animation:{
+            open:{height:'toggle'},
+            close:{height:'toggle'},
+            easing:'swing',
+            speed:500
+        },
+        timeout:false,
+        force:false,
+        modal:false,
+        maxVisible:5,
+		killer: false,
+        closeWith:['click'],
+        callback:{
+            onShow:function () {
+            },
+            afterShow:function () {
+            },
+            onClose:function () {
+            },
+            afterClose:function () {
+            },
+            onCloseClick:function () {
+            }
+        },
+        buttons:false
+    };
+
+    $(window).resize(function () {
+        $.each($.noty.layouts, function (index, layout) {
+            layout.container.style.apply($(layout.container.selector));
+        });
+    });
+
+})(jQuery);
+
+// Helpers
+window.noty = function noty(options) {
+    return jQuery.notyRenderer.init(options);
+};
+
+
+/**
+ * noty - jQuery Notification Plugin v2.2.0
+ * Contributors: https://github.com/needim/noty/graphs/contributors
+ *
+ * Examples and Documentation - http://needim.github.com/noty/
+ *
+ * Licensed under the MIT licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ **/
+
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {
+        }
+
+        F.prototype = o;
+        return new F();
+    };
+}
+
+(function ($) {
+
+    var NotyObject = {
+
+        init:function (options) {
+
+            // Mix in the passed in options with the default options
+            this.options = $.extend({}, $.noty.defaults, options);
+
+            this.options.layout = (this.options.custom) ? $.noty.layouts['inline'] : $.noty.layouts[this.options.layout];
+
+			if ($.noty.themes[this.options.theme])
+            	this.options.theme = $.noty.themes[this.options.theme];
+			else
+				options.themeClassName = this.options.theme;
+
+            delete options.layout;
+            delete options.theme;
+
+            this.options = $.extend({}, this.options, this.options.layout.options);
+            this.options.id = 'noty_' + (new Date().getTime() * Math.floor(Math.random() * 1000000));
+
+            this.options = $.extend({}, this.options, options);
+
+            // Build the noty dom initial structure
+            this._build();
+
+            // return this so we can chain/use the bridge with less code.
+            return this;
+        }, // end init
+
+        _build:function () {
+
+            // Generating noty bar
+            var $bar = $('<div class="noty_bar noty_type_' + this.options.type + '"></div>').attr('id', this.options.id);
+            $bar.append(this.options.template).find('.noty_text').html(this.options.text);
+
+            this.$bar = (this.options.layout.parent.object !== null) ? $(this.options.layout.parent.object).css(this.options.layout.parent.css).append($bar) : $bar;
+
+			if (this.options.themeClassName)
+				this.$bar.addClass(this.options.themeClassName).addClass('noty_container_type_' + this.options.type);
+
+            // Set buttons if available
+            if (this.options.buttons) {
+
+                // If we have button disable closeWith & timeout options
+                this.options.closeWith = [];
+                this.options.timeout = false;
+
+                var $buttons = $('<div/>').addClass('noty_buttons');
+
+                (this.options.layout.parent.object !== null) ? this.$bar.find('.noty_bar').append($buttons) : this.$bar.append($buttons);
+
+                var self = this;
+
+                $.each(this.options.buttons, function (i, button) {
+                    var $button = $('<button/>').addClass((button.addClass) ? button.addClass : 'gray').html(button.text).attr('id', button.id ? button.id : 'button-' + i)
+                        .appendTo(self.$bar.find('.noty_buttons'))
+                        .bind('click', function () {
+                            if ($.isFunction(button.onClick)) {
+                                button.onClick.call($button, self);
+                            }
+                        });
+                });
+            }
+
+            // For easy access
+            this.$message = this.$bar.find('.noty_message');
+            this.$closeButton = this.$bar.find('.noty_close');
+            this.$buttons = this.$bar.find('.noty_buttons');
+
+            $.noty.store[this.options.id] = this; // store noty for api
+
+        }, // end _build
+
+        show:function () {
+
+            var self = this;
+
+			(self.options.custom) ? self.options.custom.find(self.options.layout.container.selector).append(self.$bar) : $(self.options.layout.container.selector).append(self.$bar);
+
+			if (self.options.theme && self.options.theme.style)
+            	self.options.theme.style.apply(self);
+
+            ($.type(self.options.layout.css) === 'function') ? this.options.layout.css.apply(self.$bar) : self.$bar.css(this.options.layout.css || {});
+
+            self.$bar.addClass(self.options.layout.addClass);
+
+            self.options.layout.container.style.apply($(self.options.layout.container.selector));
+
+            self.showing = true;
+
+			if (self.options.theme && self.options.theme.style)
+            	self.options.theme.callback.onShow.apply(this);
+
+            if ($.inArray('click', self.options.closeWith) > -1)
+                self.$bar.css('cursor', 'pointer').one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    if (self.options.callback.onCloseClick) {
+                        self.options.callback.onCloseClick.apply(self);
+                    }
+                    self.close();
+                });
+
+            if ($.inArray('hover', self.options.closeWith) > -1)
+                self.$bar.one('mouseenter', function () {
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) > -1)
+                self.$closeButton.one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) == -1)
+                self.$closeButton.remove();
+
+            if (self.options.callback.onShow)
+                self.options.callback.onShow.apply(self);
+
+            self.$bar.animate(
+                self.options.animation.open,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterShow) self.options.callback.afterShow.apply(self);
+                    self.showing = false;
+                    self.shown = true;
+                });
+
+            // If noty is have a timeout option
+            if (self.options.timeout)
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+
+            return this;
+
+        }, // end show
+
+        close:function () {
+
+            if (this.closed) return;
+            if (this.$bar && this.$bar.hasClass('i-am-closing-now')) return;
+
+            var self = this;
+
+            if (this.showing) {
+              self.$bar.queue(
+                function () {
+                  self.close.apply(self);
+                }
+              )
+              return;
+            }
+
+            if (!this.shown && !this.showing) { // If we are still waiting in the queue just delete from queue
+                var queue = [];
+                $.each($.noty.queue, function (i, n) {
+                    if (n.options.id != self.options.id) {
+                        queue.push(n);
+                    }
+                });
+                $.noty.queue = queue;
+                return;
+            }
+
+            self.$bar.addClass('i-am-closing-now');
+
+            if (self.options.callback.onClose) {
+                self.options.callback.onClose.apply(self);
+            }
+
+            self.$bar.clearQueue().stop().animate(
+                self.options.animation.close,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterClose) self.options.callback.afterClose.apply(self);
+                })
+                .promise().done(function () {
+
+                    // Modal Cleaning
+                    if (self.options.modal) {
+                        $.notyRenderer.setModalCount(-1);
+                        if ($.notyRenderer.getModalCount() == 0) $('.noty_modal').fadeOut('fast', function () {
+                            $(this).remove();
+                        });
+                    }
+
+                    // Layout Cleaning
+                    $.notyRenderer.setLayoutCountFor(self, -1);
+                    if ($.notyRenderer.getLayoutCountFor(self) == 0) $(self.options.layout.container.selector).remove();
+
+                    // Make sure self.$bar has not been removed before attempting to remove it
+                    if (typeof self.$bar !== 'undefined' && self.$bar !== null ) {
+                        self.$bar.remove();
+                        self.$bar = null;
+                        self.closed = true;
+                    }
+
+                    delete $.noty.store[self.options.id]; // deleting noty from store
+
+                    if(self.options.theme.callback && self.options.theme.callback.onClose) {
+                        self.options.theme.callback.onClose.apply(self);
+                    }
+
+                    if (!self.options.dismissQueue) {
+                        // Queue render
+                        $.noty.ontap = true;
+
+                        $.notyRenderer.render();
+                    }
+
+					if (self.options.maxVisible > 0 && self.options.dismissQueue) {
+						$.notyRenderer.render();
+					}
+                })
+
+        }, // end close
+
+        setText:function (text) {
+            if (!this.closed) {
+                this.options.text = text;
+                this.$bar.find('.noty_text').html(text);
+            }
+            return this;
+        },
+
+        setType:function (type) {
+            if (!this.closed) {
+                this.options.type = type;
+                this.options.theme.style.apply(this);
+                this.options.theme.callback.onShow.apply(this);
+            }
+            return this;
+        },
+
+        setTimeout:function (time) {
+            if (!this.closed) {
+                var self = this;
+                this.options.timeout = time;
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+            }
+            return this;
+        },
+
+        stopPropagation:function (evt) {
+            evt = evt || window.event;
+            if (typeof evt.stopPropagation !== "undefined") {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        },
+
+        closed:false,
+        showing:false,
+        shown:false
+
+    }; // end NotyObject
+
+    $.notyRenderer = {};
+
+    $.notyRenderer.init = function (options) {
+
+        // Renderer creates a new noty
+        var notification = Object.create(NotyObject).init(options);
+
+		if (notification.options.killer)
+			$.noty.closeAll();
+
+        (notification.options.force) ? $.noty.queue.unshift(notification) : $.noty.queue.push(notification);
+
+        $.notyRenderer.render();
+
+        return ($.noty.returns == 'object') ? notification : notification.options.id;
+    };
+
+    $.notyRenderer.render = function () {
+
+        var instance = $.noty.queue[0];
+
+        if ($.type(instance) === 'object') {
+            if (instance.options.dismissQueue) {
+				if (instance.options.maxVisible > 0) {
+					if ($(instance.options.layout.container.selector + ' li').length < instance.options.maxVisible) {
+						$.notyRenderer.show($.noty.queue.shift());
+					} else {
+
+					}
+				} else {
+					$.notyRenderer.show($.noty.queue.shift());
+				}
+            } else {
+                if ($.noty.ontap) {
+                    $.notyRenderer.show($.noty.queue.shift());
+                    $.noty.ontap = false;
+                }
+            }
+        } else {
+            $.noty.ontap = true; // Queue is over
+        }
+
+    };
+
+    $.notyRenderer.show = function (notification) {
+
+        if (notification.options.modal) {
+            $.notyRenderer.createModalFor(notification);
+            $.notyRenderer.setModalCount(+1);
+        }
+
+        // Where is the container?
+		if (notification.options.custom) {
+			if (notification.options.custom.find(notification.options.layout.container.selector).length == 0) {
+				notification.options.custom.append($(notification.options.layout.container.object).addClass('i-am-new'));
+			} else {
+				notification.options.custom.find(notification.options.layout.container.selector).removeClass('i-am-new');
+			}
+		} else {
+			if ($(notification.options.layout.container.selector).length == 0) {
+				$('body').append($(notification.options.layout.container.object).addClass('i-am-new'));
+			} else {
+				$(notification.options.layout.container.selector).removeClass('i-am-new');
+			}
+		}
+
+        $.notyRenderer.setLayoutCountFor(notification, +1);
+
+        notification.show();
+    };
+
+    $.notyRenderer.createModalFor = function (notification) {
+        if ($('.noty_modal').length == 0)
+            $('<div/>').addClass('noty_modal').data('noty_modal_count', 0).css(notification.options.theme.modal.css).prependTo($('body')).fadeIn('fast');
+    };
+
+    $.notyRenderer.getLayoutCountFor = function (notification) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count') || 0;
+    };
+
+    $.notyRenderer.setLayoutCountFor = function (notification, arg) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count', $.notyRenderer.getLayoutCountFor(notification) + arg);
+    };
+
+    $.notyRenderer.getModalCount = function () {
+        return $('.noty_modal').data('noty_modal_count') || 0;
+    };
+
+    $.notyRenderer.setModalCount = function (arg) {
+        return $('.noty_modal').data('noty_modal_count', $.notyRenderer.getModalCount() + arg);
+    };
+
+    // This is for custom container
+    $.fn.noty = function (options) {
+        options.custom = $(this);
+        return $.notyRenderer.init(options);
+    };
+
+    $.noty = {};
+    $.noty.queue = [];
+    $.noty.ontap = true;
+    $.noty.layouts = {};
+    $.noty.themes = {};
+    $.noty.returns = 'object';
+    $.noty.store = {};
+
+    $.noty.get = function (id) {
+        return $.noty.store.hasOwnProperty(id) ? $.noty.store[id] : false;
+    };
+
+    $.noty.close = function (id) {
+        return $.noty.get(id) ? $.noty.get(id).close() : false;
+    };
+
+    $.noty.setText = function (id, text) {
+        return $.noty.get(id) ? $.noty.get(id).setText(text) : false;
+    };
+
+    $.noty.setType = function (id, type) {
+        return $.noty.get(id) ? $.noty.get(id).setType(type) : false;
+    };
+
+    $.noty.clearQueue = function () {
+        $.noty.queue = [];
+    };
+
+    $.noty.closeAll = function () {
+        $.noty.clearQueue();
+        $.each($.noty.store, function (id, noty) {
+            noty.close();
+        });
+    };
+
+    var windowAlert = window.alert;
+
+    $.noty.consumeAlert = function (options) {
+        window.alert = function (text) {
+            if (options)
+                options.text = text;
+            else
+                options = {text:text};
+
+            $.notyRenderer.init(options);
+        };
+    };
+
+    $.noty.stopConsumeAlert = function () {
+        window.alert = windowAlert;
+    };
+
+    $.noty.defaults = {
+        layout:'top',
+        theme:'defaultTheme',
+        type:'alert',
+        text:'',
+        dismissQueue:true,
+        template:'<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+        animation:{
+            open:{height:'toggle'},
+            close:{height:'toggle'},
+            easing:'swing',
+            speed:500
+        },
+        timeout:false,
+        force:false,
+        modal:false,
+        maxVisible:5,
+		killer: false,
+        closeWith:['click'],
+        callback:{
+            onShow:function () {
+            },
+            afterShow:function () {
+            },
+            onClose:function () {
+            },
+            afterClose:function () {
+            },
+            onCloseClick:function () {
+            }
+        },
+        buttons:false
+    };
+
+    $(window).resize(function () {
+        $.each($.noty.layouts, function (index, layout) {
+            layout.container.style.apply($(layout.container.selector));
+        });
+    });
+
+})(jQuery);
+
+// Helpers
+window.noty = function noty(options) {
+    return jQuery.notyRenderer.init(options);
+};
+
+(function($) {
+
+	$.noty.layouts.bottom = {
+		name: 'bottom',
+		options: {},
+		container: {
+			object: '<ul id="noty_bottom_layout_container" />',
+			selector: 'ul#noty_bottom_layout_container',
+			style: function() {
+				$(this).css({
+					bottom: 0,
+					left: '5%',
+					position: 'fixed',
+					width: '90%',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 9999999
+				});
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+(function($) {
+
+	$.noty.layouts.bottomCenter = {
+		name: 'bottomCenter',
+		options: { // overrides options
+
+		},
+		container: {
+			object: '<ul id="noty_bottomCenter_layout_container" />',
+			selector: 'ul#noty_bottomCenter_layout_container',
+			style: function() {
+				$(this).css({
+					bottom: 20,
+					left: 0,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				$(this).css({
+					left: ($(window).width() - $(this).outerWidth(false)) / 2 + 'px'
+				});
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+
+(function($) {
+
+	$.noty.layouts.bottomLeft = {
+		name: 'bottomLeft',
+		options: { // overrides options
+			
+		},
+		container: {
+			object: '<ul id="noty_bottomLeft_layout_container" />',
+			selector: 'ul#noty_bottomLeft_layout_container',
+			style: function() {
+				$(this).css({
+					bottom: 20,
+					left: 20,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				if (window.innerWidth < 600) {
+					$(this).css({
+						left: 5
+					});
+				}
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+(function($) {
+
+	$.noty.layouts.bottomRight = {
+		name: 'bottomRight',
+		options: { // overrides options
+			
+		},
+		container: {
+			object: '<ul id="noty_bottomRight_layout_container" />',
+			selector: 'ul#noty_bottomRight_layout_container',
+			style: function() {
+				$(this).css({
+					bottom: 20,
+					right: 20,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				if (window.innerWidth < 600) {
+					$(this).css({
+						right: 5
+					});
+				}
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+(function($) {
+
+	$.noty.layouts.center = {
+		name: 'center',
+		options: { // overrides options
+			
+		},
+		container: {
+			object: '<ul id="noty_center_layout_container" />',
+			selector: 'ul#noty_center_layout_container',
+			style: function() {
+				$(this).css({
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				// getting hidden height
+				var dupe = $(this).clone().css({visibility:"hidden", display:"block", position:"absolute", top: 0, left: 0}).attr('id', 'dupe');
+				$("body").append(dupe);
+				dupe.find('.i-am-closing-now').remove();
+				dupe.find('li').css('display', 'block');
+				var actual_height = dupe.height();
+				dupe.remove();
+
+				if ($(this).hasClass('i-am-new')) {
+					$(this).css({
+						left: ($(window).width() - $(this).outerWidth(false)) / 2 + 'px',
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					});
+				} else {
+					$(this).animate({
+						left: ($(window).width() - $(this).outerWidth(false)) / 2 + 'px',
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					}, 500);
+				}
+				
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+(function($) {
+
+	$.noty.layouts.centerLeft = {
+		name: 'centerLeft',
+		options: { // overrides options
+
+		},
+		container: {
+			object: '<ul id="noty_centerLeft_layout_container" />',
+			selector: 'ul#noty_centerLeft_layout_container',
+			style: function() {
+				$(this).css({
+					left: 20,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				// getting hidden height
+				var dupe = $(this).clone().css({visibility:"hidden", display:"block", position:"absolute", top: 0, left: 0}).attr('id', 'dupe');
+				$("body").append(dupe);
+				dupe.find('.i-am-closing-now').remove();
+				dupe.find('li').css('display', 'block');
+				var actual_height = dupe.height();
+				dupe.remove();
+
+				if ($(this).hasClass('i-am-new')) {
+					$(this).css({
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					});
+				} else {
+					$(this).animate({
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					}, 500);
+				}
+
+				if (window.innerWidth < 600) {
+					$(this).css({
+						left: 5
+					});
+				}
+
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+
+(function($) {
+
+	$.noty.layouts.centerRight = {
+		name: 'centerRight',
+		options: { // overrides options
+
+		},
+		container: {
+			object: '<ul id="noty_centerRight_layout_container" />',
+			selector: 'ul#noty_centerRight_layout_container',
+			style: function() {
+				$(this).css({
+					right: 20,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				// getting hidden height
+				var dupe = $(this).clone().css({visibility:"hidden", display:"block", position:"absolute", top: 0, left: 0}).attr('id', 'dupe');
+				$("body").append(dupe);
+				dupe.find('.i-am-closing-now').remove();
+				dupe.find('li').css('display', 'block');
+				var actual_height = dupe.height();
+				dupe.remove();
+
+				if ($(this).hasClass('i-am-new')) {
+					$(this).css({
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					});
+				} else {
+					$(this).animate({
+						top: ($(window).height() - actual_height) / 2 + 'px'
+					}, 500);
+				}
+
+				if (window.innerWidth < 600) {
+					$(this).css({
+						right: 5
+					});
+				}
+
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+
+(function($) {
+
+	$.noty.layouts.inline = {
+		name: 'inline',
+		options: {},
+		container: {
+			object: '<ul class="noty_inline_layout_container" />',
+			selector: 'ul.noty_inline_layout_container',
+			style: function() {
+				$(this).css({
+					width: '100%',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 9999999
+				});
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+
+(function($) {
+
+	$.noty.layouts.topRight = {
+		name: 'topRight',
+		options: { // overrides options
+			
+		},
+		container: {
+			object: '<ul id="noty_topRight_layout_container" />',
+			selector: 'ul#noty_topRight_layout_container',
+			style: function() {
+				$(this).css({
+					top: 40,
+					right: 20,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				if (window.innerWidth < 600) {
+					$(this).css({
+						right: 5
+					});
+				}
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
+(function($) {
+
+	$.noty.themes.defaultTheme = {
+		name: 'defaultTheme',
+		helpers: {
+			borderFix: function() {
+				if (this.options.dismissQueue) {
+					var selector = this.options.layout.container.selector + ' ' + this.options.layout.parent.selector;
+					switch (this.options.layout.name) {
+						case 'top':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).last().css({borderRadius: '0px 0px 0px 0px'}); break;
+						case 'topCenter': case 'topLeft': case 'topRight':
+						case 'bottomCenter': case 'bottomLeft': case 'bottomRight':
+						case 'center': case 'centerLeft': case 'centerRight': case 'inline':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).first().css({'border-top-left-radius': '0px', 'border-top-right-radius': '0px'});
+							$(selector).last().css({'border-bottom-left-radius': '0px', 'border-bottom-right-radius': '0px'}); break;
+						case 'bottom':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).first().css({borderRadius: '0px 0px 0px 0px'}); break;
+						default: break;
+					}
+				}
+			}
+		},
+		modal: {
+			css: {
+				position: 'fixed',
+				width: '100%',
+				height: '100%',
+				backgroundColor: '#000',
+				zIndex: 10000,
+				opacity: 0.6,
+				display: 'none',
+				left: 0,
+				top: 0
+			}
+		},
+		style: function() {
+
+			this.$bar.css({
+				overflow: 'hidden',
+			});
+
+			this.$message.css({
+				fontSize: '13px',
+				lineHeight: '16px',
+				textAlign: 'center',
+				padding: '8px 10px 9px',
+				width: 'auto',
+				position: 'relative'
+			});
+
+			this.$closeButton.css({
+				position: 'absolute',
+				top: 4, right: 4,
+				width: 10, height: 10,
+				background: "url(data:image/png;base64,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)",
+				display: 'none',
+				cursor: 'pointer'
+			});
+
+			this.$buttons.css({
+				padding: 5,
+				textAlign: 'right',
+				borderTop: '1px solid #ccc',
+				backgroundColor: '#fff'
+			});
+
+			this.$buttons.find('button').css({
+				marginLeft: 5
+			});
+
+			this.$buttons.find('button:first').css({
+				marginLeft: 0
+			});
+
+			this.$bar.bind({
+				mouseenter: function() { $(this).find('.noty_close').stop().fadeTo('normal',1); },
+				mouseleave: function() { $(this).find('.noty_close').stop().fadeTo('normal',0); }
+			});
+
+			switch (this.options.layout.name) {
+				case 'top':
+					this.$bar.css({
+						borderRadius: '0px 0px 0px 0px',
+						borderBottom: '2px solid #eee',
+						borderLeft: 'none',
+						borderRight: 'none',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+				case 'topCenter': case 'center': case 'bottomCenter': case 'inline':
+					this.$bar.css({
+						borderRadius: '0',
+						border: 'none',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+					this.$message.css({fontSize: '13px', textAlign: 'center'});
+				break;
+				case 'topLeft': case 'topRight':
+				case 'bottomLeft': case 'bottomRight':
+				case 'centerLeft': case 'centerRight':
+					this.$bar.css({
+						borderRadius: '0',
+						border: 'none',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+					this.$message.css({fontSize: '13px', textAlign: 'left'});
+				break;
+				case 'bottom':
+					this.$bar.css({
+						borderRadius: '5px 5px 0px 0px',
+						borderTop: '2px solid #eee',
+						borderLeft: '2px solid #eee',
+						borderRight: '2px solid #eee',
+						boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+				default:
+					this.$bar.css({
+						border: 'none',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+			}
+
+			switch (this.options.type) {
+				case 'alert': case 'notification':
+					this.$bar.css({marginTop:'5px', boxShadow:'0 0 3px black, 0 0 25px white inset',
+						    backgroundColor: 'rgba(255,255,255,0.7)', borderColor: '#CCC', color: '#222'}); break;
+				case 'warning':
+					this.$bar.css({backgroundColor: '#FFEAA8', borderColor: '#FFC237', color: '#826200'});
+					this.$buttons.css({borderTop: '1px solid #FFC237'}); break;
+				case 'error':
+					this.$bar.css({backgroundColor: 'red', borderColor: 'darkred', color: '#FFF'});
+					this.$message.css({fontWeight: 'bold'});
+					this.$buttons.css({borderTop: '1px solid darkred'}); break;
+				case 'information':
+					this.$bar.css({backgroundColor: '#57B7E2', borderColor: '#0B90C4', color: '#FFF'});
+					this.$buttons.css({borderTop: '1px solid #0B90C4'}); break;
+				case 'success':
+					this.$bar.css({backgroundColor: 'lightgreen', borderColor: '#50C24E', color: 'darkgreen'});
+					this.$buttons.css({borderTop: '1px solid #50C24E'});break;
+				default:
+					this.$bar.css({backgroundColor: '#FFF', borderColor: '#CCC', color: '#444'}); break;
+			}
+		},
+		callback: {
+			onShow: function() { $.noty.themes.defaultTheme.helpers.borderFix.apply(this); },
+			onClose: function() { $.noty.themes.defaultTheme.helpers.borderFix.apply(this); }
+		}
+	};
+
+})(jQuery);
+
+
+/**** Own notification system ***/

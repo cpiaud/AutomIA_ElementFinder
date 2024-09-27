@@ -1,0 +1,953 @@
+if ( !Date.prototype.toISOString ) {
+
+    ( function() {
+
+        function pad(number) {
+            var r = String(number);
+            if ( r.length === 1 ) {
+                r = '0' + r;
+            }
+            return r;
+        }
+
+        Date.prototype.toISOString = function() {
+            return this.getUTCFullYear()
+                + '-' + pad( this.getUTCMonth() + 1 )
+                + '-' + pad( this.getUTCDate() )
+                + 'T' + pad( this.getUTCHours() )
+                + ':' + pad( this.getUTCMinutes() )
+                + ':' + pad( this.getUTCSeconds() )
+                + '.' + String( (this.getUTCMilliseconds()/1000).toFixed(3) ).slice( 2, 5 )
+                + 'Z';
+        };
+
+    }() );
+}
+
+/* LSCACHE library */
+!function(a,b){"function"==typeof define&&define.amd?define([],b):"undefined"!=typeof module&&module.exports?module.exports=b():a.lscache=b()}(this,function(){function a(){var a="__lscachetest__",b=a;if(void 0!==i)return i;try{f(a,b),g(a),i=!0}catch(c){i=!1}return i}function b(){return void 0===j&&(j=null!=window.JSON),j}function c(a){return a+l}function d(){return Math.floor((new Date).getTime()/n)}function e(a){return localStorage.getItem(k+p+a)}function f(a,b){localStorage.removeItem(k+p+a),localStorage.setItem(k+p+a,b)}function g(a){localStorage.removeItem(k+p+a)}function h(a,b){q&&"console"in window&&"function"==typeof window.console.warn&&(window.console.warn("lscache - "+a),b&&window.console.warn("lscache - The error was: "+b.message))}var i,j,k="lscache-",l="-cacheexpiration",m=10,n=6e4,o=Math.floor(864e13/n),p="",q=!1,r={set:function(i,j,n){if(a()){if("string"!=typeof j){if(!b())return;try{j=JSON.stringify(j)}catch(q){return}}try{f(i,j)}catch(q){if("QUOTA_EXCEEDED_ERR"!==q.name&&"NS_ERROR_DOM_QUOTA_REACHED"!==q.name&&"QuotaExceededError"!==q.name)return void h("Could not add item with key '"+i+"'",q);for(var r,s=[],t=0;t<localStorage.length;t++)if(r=localStorage.key(t),0===r.indexOf(k+p)&&r.indexOf(l)<0){var u=r.substr((k+p).length),v=c(u),w=e(v);w=w?parseInt(w,m):o,s.push({key:u,size:(e(u)||"").length,expiration:w})}s.sort(function(a,b){return b.expiration-a.expiration});for(var x=(j||"").length;s.length&&x>0;)r=s.pop(),h("Cache is full, removing item with key '"+i+"'"),g(r.key),g(c(r.key)),x-=r.size;try{f(i,j)}catch(q){return void h("Could not add item with key '"+i+"', perhaps it's too big?",q)}}n?f(c(i),(d()+n).toString(m)):g(c(i))}},get:function(f){if(!a())return null;var h=c(f),i=e(h);if(i){var j=parseInt(i,m);if(d()>=j)return g(f),g(h),null}var k=e(f);if(!k||!b())return k;try{return JSON.parse(k)}catch(l){return k}},remove:function(b){return a()?(g(b),void g(c(b))):null},supported:function(){return a()},flush:function(){if(a())for(var b=localStorage.length-1;b>=0;--b){var c=localStorage.key(b);0===c.indexOf(k+p)&&localStorage.removeItem(c)}},setBucket:function(a){p=a},resetBucket:function(){p=""},enableWarnings:function(a){q=a}};return r});
+
+
+var _index  = 0;
+var _w	    = -1;
+var _lastdh = -1;
+var _e1	    = null;
+var _show   = true;
+var _lastsort = new Date().getTime();
+var _lastviewed = -1;
+
+var _ICMESSAGE = {fr_FR:{
+    CANICULE: "fortes chaleurs",
+	    tCANICULE: "tr&egrave;s fortes chaleurs",
+    FROID: "fortes gel&eacute;es",
+    ORAGE1:"orage faible",
+    ORAGE2:"orage mod&eacute;r&eacute;",
+    ORAGE3:"orage fort",
+    BROUILLARD:"brouillard",
+    BROUILLARDG:"brouillard givrant",
+    PLUIENEIGE:"pluie/neige m&ecirc;l&eacute;es",
+    NEIGEB:"fortes averses de neige",
+    NEIGE1:"neige faible",
+    NEIGE2:"neige mod&eacute;r&eacute;e",
+    NEIGE3:"neige forte",
+    FOUDREFRQ:"foudre tr&egrave;s fr&eacute;quente",
+    FOUDRE:"foudre",
+    BRUINEFORTE:"bruine forte",
+    AVERSE:"fortes averses de pluie",
+    PLUIE1:"pluie mod&eacute;r&eacute;e",
+    PLUIE2:"pluie forte",
+    PRECIPABOND:"pr&eacute;cip. abondantes",
+    INONDATION:"inondation",
+    GRELE:"gr&ecirc;le",
+    GRAINS:"ligne de grains",
+    FUNNEL:"tuba",
+    TORNADE:"tornade",
+    VERGLASS:"verglas au sol",
+    VERGLAS:"pr&eacute;cipitations vergla&ccedil;antes",
+    GRESIL:"gr&eacute;sil",
+    VENTFORT:"vent fort",
+    
+    VAGUES:"fortes vagues"
+}};
+
+var _ICMTPIC = {
+    CANICULE:"temperaturec",
+	    tCANICULE: "temperaturec35",
+    FROID:"temperaturef",
+    ORAGE1:"orage_faible",
+    ORAGE2:"orage_modere",
+    ORAGE3:"orage_fort",
+    BROUILLARD:"brouillard",
+    BROUILLARDG:"brouillardg",
+    PLUIENEIGE:"neige_fond",
+    NEIGEB:"bneige",
+    NEIGE1:"neige_faible",
+    NEIGE2:"neige_moderee",
+    NEIGE3:"neige_forte",
+    FOUDREFRQ:"orage_fort",
+    FOUDRE:"orage_faible",
+    BRUINEFORTE:"bruine_forte",
+    AVERSE:"averses",
+    PLUIE1:"pluie_moderee",
+    PLUIE2:"pluie_forte",
+    PRECIPABOND:"pcabond",
+    INONDATION:"inondation",
+    GRELE:"grele",
+    GRAINS:"ligne_grains",
+    FUNNEL:"tuba",
+    TORNADE:"tornade",
+    VERGLASS:"verglas_route",
+    VERGLAS:"verglas",
+    GRESIL:"gresil",
+    VENTFORT:"vent",
+    
+    VAGUES:"inondation"
+};
+
+var _ROUTENIV = {
+    fr_FR:[
+	"",
+	"d&eacute;gag&eacute;es",
+	"partiellement enneig&eacute;es",
+	"partiellement glac&eacute;es",
+	"", //4
+	"enneig&eacute;es",
+	"glac&eacute;es",
+	"", //7
+	"mouill&eacute;es",
+	"accumulation d'eau",
+	"inond&eacute;es",
+	""
+    ]
+};
+
+function IC_realtime_scroller()
+{
+    var scroll = $('#infoclimat-livestream-slider').scrollTop();
+    if(scroll > 32){
+	// l'utilisateur est en bas
+	$('#infoclimat-livestream-scrollup').fadeIn(800);
+    }
+}
+
+function IC_realtime_parse(data, values)
+{    
+    var string = []; var i = 0;
+    jQuery.each(data, function(k,v){
+	
+	if(v=='CANICULE' && values.MVALUETMP && values.MVALUETMP >= 34.5){
+	    v = 'tCANICULE';
+	}
+	var _msgtxt = (_ICMESSAGE["fr_FR"][v]) ? _ICMESSAGE["fr_FR"][v] : v;
+	var _tmp = '<span class="livestream-etiq-wrapper" title="'+_msgtxt+'">'
+		+'<span class="livestream-etiq-img" style="background-image:url(//static.infoclimat.net/images/pictos/20_20_1/'+_ICMTPIC[v]+'_01.png)"></span>';
+	
+	if(i<2)
+	    _tmp += '<span class="livestream-etiq-desc">'+_msgtxt+"</span>";
+	
+	if(v=='NEIGE1' || v=='NEIGE2' || v=='NEIGE3' || v=='NEIGEB'){
+	    if(values && values.MVALUENEIGE){
+		_tmp += '<span class="livestream-etiq-value">'+Math.round(values.MVALUENEIGE) + "cm</span>";
+	    }
+	}
+	else if(v=='CANICULE' || v== 'tCANICULE' || v=='FROID'){
+	    if(values && values.MVALUETMP){
+		_tmp += '<span class="livestream-etiq-value">'+Math.round(values.MVALUETMP) + "&deg;C</span>";
+	    }
+	}
+	else if(v=='VENTFORT'){
+	    if(values && values.MVALUEVENT && values.TYPEVENT==2){ // rafales
+		_tmp += '<span class="livestream-etiq-value">'+Math.round(values.MVALUEVENT) + "km/h</span>";
+	    }
+	}
+	else if(v=='PRECIPABOND'){
+	    if(values && values.MVALUEPLUVIO){
+		_tmp += '<span class="livestream-etiq-value">'+Math.round(values.MVALUEPLUVIO) + "mm</span>";
+	    }
+	}
+	else if(v=='VAGUES'){
+	    if(values && values.HVAGUE){
+		_tmp += '<span class="livestream-etiq-value">'+Math.round(values.HVAGUE) + "m</span>";
+	    }
+	}
+	
+	_tmp += "</span>";
+	
+	string.push(_tmp);
+	i++;
+	
+    });
+    return string.join(" ");
+}
+
+function IC_realtime_like_obs(id, type, unlike)
+{
+    if(_myid==-1 || !_myid)
+    {
+	open_box_ms('Merci de vous connecter ou de vous inscrire pour acc&eacute;der &agrave; cette fonctionnalit&eacute;.',
+	    "Connexion", null, null, "Connexion",null,function(){
+		document.location = '/include/connexion.php';
+	    });
+	return false;
+    }
+    
+    $.getJSON('/meteoalerte/like.php', {
+	obsid:id,
+	type:type,
+	idc:_myid,
+	dt:Math.round(new Date().getTime()/1000),
+	unlike:unlike
+    }, function(d){
+	
+	if(d.status !== false){
+	    
+	    if(d.like === 'OK'){
+		// OK
+		var e = $('#like-counter'+type+id);
+		e.html(d.count);
+		if(d.count > 0){
+		    e.css('backgroundColor','rgba(255,0,0,0.7)');
+		}else{
+		    e.css('backgroundColor','rgba(0,0,0,0.7)');
+		}
+	    }else{
+		open_box_ms("Vous aimez d&eacute;j&agrave; cette observation. Souhaitez-vous arr&ecirc;ter d'aimer ?",
+		    "Aimer une observation", null, null, "Je n'aime plus", "J'aime toujours",
+		    function(){
+			IC_realtime_like_obs(id, type, 1);
+			close_box_ms();
+		    }, function(){
+			close_box_ms();
+		    });
+	    }
+	    
+	}else{
+	    alert('Une erreur est survenue.');
+	}
+	
+    });
+    
+    return false;
+}
+
+// from APNS and GCM
+_seenKeys = {};
+_noty_elements = {};
+function IC_realtime_sendCustomNotification(data, id)
+{
+    /*try{
+	var data = jQuery.parseJSON(data);
+    }catch (e){
+	return false;
+    }
+    if(!data) return false;*/
+    
+    //removing closed notifications
+    if(lscache.get(id)) return false;
+    
+    //checking for duplicates
+    if(data._vkey in _seenKeys){
+        return false;
+    }
+    _seenKeys[data._vkey] = true;
+    
+    var d = new Date();
+    if(data.type === 'vigi')
+    {
+        _noty_elements[id] = noty({
+            text: "<img src='/vigi/current.png?"+id+"' alt='vigilance' style='float:left;width:40px;margin-right:5px' />"
+                    +data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='/vigi'>Voir le d&eacute;tail &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === 'foudre')
+    {
+        _noty_elements[id] = noty({
+            text: data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='/'>Voir la carte &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === 'radar')
+    {
+        _noty_elements[id] = noty({
+            text: data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='/cartes-meteo-temps-reel-images-satellites-infrarouge-visible-haute-resolution.html?i=radar'>Voir la carte &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === "mp")
+    {
+        _noty_elements[id] = noty({
+            text: data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='/mon-compte-infoclimat-messagerie-privee.html'>Lire le message &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === "station")
+    {
+        _noty_elements[id] = noty({
+            text: '<b>[Alerte temps r&eacute;el]</b> '+data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='#' onclick='return IC_realtime_getStationDetails("+data.id+","+id+");'>Voir le d&eacute;tail &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === "bs")
+    {
+        _noty_elements[id] = noty({
+            text: "<b>"+data.aps.alert+"</b><div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='/bulletin-special-"+data.idbs+"-archive.html'>Lire le suivi &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+    else if(data.type === "prev")
+    {
+        _noty_elements[id] = noty({
+            text: '<b>[Pr&eacute;vision]</b> '+data.aps.alert+"<div class='IC_realtime_container'><abbr class='timeago IC_realtime_date'>"+d.toTimeString()+"</abbr>"
+                            +"<a class='IC_realtime_link' href='#' onclick='return IC_realtime_getPrevDetails("+data.id+","+id+");'>Voir le d&eacute;tail &raquo;</a></div>",
+            layout: "topRight",
+            closeWith:["button"],
+            callback:{
+                afterClose: function(){
+                    IC_realtime_closeNotification(id);
+                }
+            }
+        });
+    }
+}
+
+function IC_realtime_getStationDetails(id, id_websocket)
+{
+    _noty_elements[id_websocket].close();
+    
+    jQuery.getJSON("http://mobile-api.infoclimat.fr/v1.0/internal/-/get/push/get?callback=?", {
+        id: id,
+        deviceuid: "web",
+        unique_token: _mytoken_bypass
+    }, function(data){
+        
+        if(data.DATA.success){
+            
+            var html = '<ul class="better-lists">';
+            jQuery.each(data.DATA.notification, function(k,v){
+                html += '<li><a href="/s/'+v.station+'">'+v.staname+'</a></li>';
+            });
+            html += '</ul>';
+            
+            open_box_ms(html, "Notifications", null, null, "Fermer", null, function(){
+                close_box_ms();
+            }, null);
+        }else{
+            alert('Une erreur est survenue.');
+        }
+        
+        
+    });
+    return false;
+}
+
+function IC_realtime_getPrevDetails(id, id_websocket)
+{
+    _noty_elements[id_websocket].close();
+    
+    jQuery.getJSON("http://mobile-api.infoclimat.fr/v1.0/internal/-/get/push/get?callback=?", {
+        id: id,
+        deviceuid: "web",
+        unique_token: _mytoken_bypass
+    }, function(data){
+        
+        if(data.DATA.success){
+            
+            var html = '<ul class="better-lists">';
+            jQuery.each(data.DATA.notification, function(k,v){
+                html += '<li><a href="/previsions-meteo/details/'+v.geoid+'/redirect.html">'+v.name+'</a></li>';
+            });
+            html += '</ul>';
+            
+            open_box_ms(html, "Notifications", null, null, "Fermer", null, function(){
+                close_box_ms();
+            }, null);
+        }else{
+            alert('Une erreur est survenue.');
+        }
+        
+        
+    });
+    return false;
+}
+
+function IC_realtime_closeNotification(id)
+{
+    lscache.set(id, true, 24*60);
+}
+
+var __NEWMSGTEMPLATE = '<li data-timestamp="{{DH}}" class="other" id="{{ID}}">\
+    <div class="avatar">\
+        <div class="avatar-img" style="background-image:url({{AVATAR_IMG}})"></div>\
+        <a class="avatar-pseudo" href="{{MEMBERLINK}}">{{NICKNAME}}</a>\
+    </div>\
+    <div class="messages">\
+        <div class="message-header">{{MA_HEADER}} <span class="message-hour">{{HOUR}}</span></div>\
+        {{PL_HEADER}}\
+        <p class="message-ma-text"{{CONTENTEDITABLE}}>{{TEXT}}</p>\
+        <a href="#" title="J\'aime" id="like-counter{{TYPEID}}" onclick="return IC_realtime_like_obs({{IDINT}},\'MA\',0)"\
+		 class="livestream-like-button" style="color:#DDD">0</a>\
+        <span class="message-location"><span class="location-pin"></span>{{PLACE}}</span>\
+    </div>\
+</li>';
+
+function MA_removeliveObs(type, id)
+{
+    $.getJSON('/meteoalerte/hideObs.php?type='+type+'&id='+id, function(data){
+        if(data['status'] == 'OK'){
+            alert('OK !');
+        }
+    });
+    
+    return false;
+}
+
+function MA_editliveObs(type, id)
+{
+    var textelm = $('#livestream-element'+type+id).find('p.message-ma-text').text();
+    $.post('/meteoalerte/editObs.php?type='+type+'&id='+id, {
+        newText: textelm
+    }, function(data){
+        alert('OK !');
+    });
+    
+    return false;
+}
+
+var MAobsModerated = [];
+function IC_realtime_messageReceived(text, id, channel)
+{
+    try{
+	var data = jQuery.parseJSON(text.replace("\n"," ").replace(/\\'/g, "'"));
+    }catch (e){
+	return false;
+    }
+    
+    if(channel !== "meteoalerte_users"){
+        // internal notifications
+        console.log(data);
+        IC_realtime_sendCustomNotification(data, id);
+        return false;
+    }
+    
+    var d = new Date(data.dh*1000);
+    
+    if(d < _lasteventid) return false;
+    
+    var m = d.getMinutes();
+    if(m<10) m = "0"+m+"";
+
+    if(_myid == data.idc){
+	var color = '#ffffda';
+    }else if(_index%2 == 0){
+	var color = '#fff';
+    }else{
+	var color = '#eee';
+    }
+
+    if(data.dh>_lastdh)
+    {
+    	$('#infoclimat-livestream-timestamp').html('<i>mis &agrave; jour &agrave; '+d.getHours()+'h'+m+'</i>');
+    	_lastdh = data.dh;
+    }
+    
+    if(data.type=='PL')
+    {
+    	var texte = "<div style='font-size:9px'>"+data.val.INFOS+"</div>";
+
+        var _addtext = __NEWMSGTEMPLATE
+            .replace("{{DH}}", data.dh)
+            .replace("{{ID}}", "livestream-element"+data.type + data.id)
+            .replace("{{AVATAR_IMG}}", "/passionnes/getPic.php?size=2x&id="+data.idc)
+            .replace("{{HOUR}}", d.getHours() + 'h' + m)
+            .replace("{{NICKNAME}}", data.pseudo)
+            .replace("{{MEMBERLINK}}", "/profil-membre-" + data.idc + "-0.html")
+            .replace("{{MA_HEADER}}", data.val.tit)
+            .replace("{{PL_HEADER}}", '<div class="message-photo"><a href="/photolive-photos-meteo-'+data.id+'-a.html">'
+                                            +'<img src="/passionnes/getPhotolive.php?id='+data.id+'" /></a></div>')
+            .replace("{{TEXT}}", texte)
+            .replace("{{PLACE}}", '<a href="#">'+data.v + " ("+data.dpt+")</a>")
+            .replace('{{CONTENTEDITABLE}}', "");
+
+    	_index++;
+    }
+    else if(data.type=='BU')
+    {
+        var _addtext = __NEWMSGTEMPLATE
+            .replace("{{DH}}", data.dh)
+            .replace("{{ID}}", "livestream-element"+data.type + data.id)
+            .replace("{{AVATAR_IMG}}", "//static.infoclimat.net/images/v5.1/icones_menus/bateaubouee.png")
+            .replace("{{NICKNAME}}", data.staname)
+            .replace("{{MEMBERLINK}}", "/mer/bouees.php?id="+data.stid)
+            .replace("{{MA_HEADER}}", IC_realtime_parse(data.obs, data.val))
+            .replace("{{PL_HEADER}}", "")
+            .replace("{{TEXT}}", "")
+            .replace("{{HOUR}}", d.getHours() + 'h' + m)
+            .replace("{{PLACE}}", (Math.round(data.lat*10)/10)+'&deg;N, '+(Math.round(data.lon*10)/10)+'&deg;E</a>')
+            .replace('{{CONTENTEDITABLE}}', '');
+
+    	_index++;
+    }
+    else if(data.type == 'hideObs')
+    {
+        var obskey = "#livestream-element"+data.subtype + data.id;
+        console.log('modo of obs: '+obskey);
+        $(obskey).remove();
+        MAobsModerated.push(parseInt(data.id, 10));
+        if(window.markers && window.MAmarkersAssoc){
+            var found_obs = MAmarkersAssoc.indexOf(data.id);
+            if(found_obs !== -1){
+                // obs modérée
+                if(map){
+                    map.removeLayer(markers[found_obs]);
+                    console.log('removing obs from map');
+                }
+            }
+        }
+    } 
+    else if(data.type == 'editObs')
+    {
+        var obskey = "#livestream-element"+data.subtype + data.id;
+        console.log('modo edit of obs: '+obskey);
+        $(obskey).find('p.message-ma-text').html(data.newtext);
+    }   
+    else if(data.type=='MA')
+    {
+    	if(data.val && data.val.INFOS){
+    	    var texte = data.val.INFOS
+    		    .replace('Envoy\351 depuis Android', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="Android" />')
+    		    .replace('Envoy&eacute; depuis Android', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="Android" />')
+    		    .replace("Envoy&eacute; depuis l'appli mobile", '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" />')
+    		    .replace('Envoy\351 depuis un iPhone', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="iPhone" />')
+    		    .replace('Envoy\351 depuis un iPad', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="iPad" />')
+    		    .replace('Envoy&eacute; depuis un iPhone', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="iPhone" />')
+    		    .replace('Envoy&eacute; depuis un iPad', '<img src="//static.infoclimat.net/images/smartphone.png" style="float:left; margin-left:-4px" alt="" title="iPad" />');
+    	}else{
+    	    var texte = "";
+    	}
+    	
+    	var addtexts = [];
+    	if(data.val)
+    	{
+    	    if(data.val.ROUTENIV>0){
+    		addtexts.push("<span style='font-size:10px'><i>Routes : "+_ROUTENIV["fr_FR"][data.val.ROUTENIV]+"</i></span>");
+    	    }
+    	    if(data.val.ROUTETXT && data.val.ROUTETXT.length>0){
+    		addtexts.push("<span style='font-size:9px'>"+data.val.ROUTETXT+"</span>");
+    	    }
+    	    if(data.val.MVALUENEIGES){
+    		addtexts.push("<span style='font-size:10px;'><i>neige au sol "+Math.round(data.val.MVALUENEIGES)+"cm</i></span>");
+    	    }
+    	    if(data.val.MVALUEVISI){
+    		addtexts.push("<span style='font-size:10px;'><i>visibilit&eacute; "+Math.round(data.val.MVALUEVISI)+"m</i></span>");
+    	    }
+    	    if(data.val.MVALUEVENT && data.val.TYPEVENT==1){
+    		addtexts.push("<span style='font-size:10px;'><i>vent moyen "+Math.round(data.val.MVALUEVENT)+"km/h</i></span>");
+    	    }
+    	}
+    	
+    	if(addtexts.length>0)
+    	    texte += "<div>"+addtexts.join(' &bull; ')+"</div>";
+    	
+    	if(data.idp){
+    	    var _photo  = '<img onerror="this.style.display=\'none\';" src="/passionnes/getPhotolive.php?id='+data.idp+'" alt="" class="livestream-image-photolive" />';
+    	    var add_css = ' min-height:68px; ';
+    	}else{
+    	    var _photo  = '';
+    	    var add_css = '';
+    	}
+
+        var hour_text = d.getHours() + 'h' + m;
+        if(_myaccount_is_MAmod)
+        {
+            hour_text += ' <a href="#" onclick="return MA_removeliveObs(\''+data.type+'\', '+data.id+');" style="text-decoration:none" class="tipsy-trigger" title="Masquer du flux live"><img style="border:0;" src="//static.infoclimat.net/images/delete.png" style="height:12px;"></a> <a href="#" class="tipsy-trigger" title="Sauver les modifications du texte" onclick="return MA_editliveObs(\''+data.type+'\', '+data.id+')" style="text-decoration:none"><img style="border:0" src="//static.infoclimat.net/images/disk.png" style="height:12px;"></a>';
+        }
+        
+        var contenteditable = _myaccount_is_MAmod ? ' contenteditable=""' : '';
+        if(data.val){
+            if(!data.val.INFOS || (data.val.INFOS && data.val.INFOS.trim() == "")){
+                contenteditable += " style='height:5px'";
+            }
+        }
+        
+        var _addtext = __NEWMSGTEMPLATE
+            .replace("{{DH}}", data.dh)
+            .replace("{{ID}}", "livestream-element"+data.type + data.id)
+            .replace("{{IDINT}}", data.id)
+            .replace("{{TYPEID}}", data.type+data.id)
+            .replace("{{AVATAR_IMG}}", "/passionnes/getPic.php?size=2x&id="+data.idc)
+            .replace("{{NICKNAME}}", data.pseudo)
+            .replace("{{MEMBERLINK}}", "/profil-membre-" + data.idc + "-0.html")
+            .replace("{{MA_HEADER}}", IC_realtime_parse(data.obs, data.val))
+            .replace("{{PL_HEADER}}", _photo)
+            .replace("{{TEXT}}", texte)
+            .replace("{{HOUR}}", hour_text)
+            .replace("{{PLACE}}", '<a href="#" onmouseover="if(\'circleMarker\' in window) circleMarker(\''+data.lat+'\',\''+data.lng+'\');" onmouseout="uncircleMarker();">'+data.v + " ("+data.dpt+")</a>")
+            .replace('{{CONTENTEDITABLE}}', contenteditable);
+        
+    	_index++;
+    }
+    else if(data.type=='like')
+    {
+	var e = $('#like-counter'+data.etype+data.eid);
+	e.html(data.total);
+	if(data.total > 0){
+	    e.css('backgroundColor','rgba(255,0,0,0.7)');
+	}else{
+	    e.css('backgroundColor','rgba(0,0,0,0.7)');
+	}
+	return false;
+    }
+    else
+    {
+	return false;
+    }
+    
+    // calcul de la taille
+    if(_w==-1)
+    {
+	_w = parseInt($('#livestream-default-element').width(), 10);
+	$('#livestream-default-element').remove();
+    }
+    
+    // maj d'un élément
+    if($('#livestream-element'+data.type+data.id).length > 0)
+	$('#livestream-element'+data.type+data.id).remove();
+    
+    var newelm = $(_addtext);
+    newelm.css({width:"auto", display:"flex"});
+    //$('#infoclimat-livestream-slider ul').prepend(  newelm.show('slide', {}, 500)  );
+    $('#infoclimat-livestream-slider ol').prepend(  newelm.fadeIn(500)  );
+    
+    var nelements = $('#infoclimat-livestream-slider ol').find('li').length;
+    var _maxel = 50;
+    if(nelements>_maxel)
+    {
+	$('#infoclimat-livestream-slider ol').find("li:nth-last-child(-n+"+(nelements-_maxel)+")").remove();
+    }
+    
+    IC_realtime_scroller();
+    IC_realtime_sortElements();
+    $('#alwaysontop-self').parent().prepend($('#alwaysontop-self'));
+    
+    if(window.localStorage)
+    {
+	$cond = data.dh > parseInt(localStorage.getItem("infoclimat-livestream-lastshowed")+0, 10);
+    }
+    else
+    {
+	$cond = true;
+    }
+    
+    if(!_show && _e1==null && $cond)
+    {
+	_e1 = IC_realtime_blinkLed("#livestream-status", "orange", "verte", 100, 1200);
+    }
+    
+    return false;
+}
+
+function IC_realtime_blinkLed(id, fromColor, toColor, blinkTime, interval)
+{
+    var _u = $(id);
+    _u.removeClass('led-'+fromColor).addClass('led-'+toColor);
+    
+    return setInterval(function(){
+	_u.removeClass('led-'+toColor).addClass('led-'+fromColor);
+	setTimeout(function(){
+	    _u.removeClass('led-'+fromColor).addClass('led-'+toColor);
+	}, blinkTime);
+    }, interval);
+}
+
+function IC_realtime_hidebar()
+{
+    if(_show)
+    {
+	$('#infoclimat-livestream-slider').hide(0);
+	if(window.localStorage)
+	    localStorage.setItem("infoclimat-livestream-hide", "true");
+    }
+    else
+    {
+	$('#infoclimat-livestream-slider').show(0).css('width','auto');
+	$('#infoclimat-livestream-slider ul li').css({
+	    width:'auto'
+	});
+	
+	if(_e1!==null) {
+	    
+	    if(window.localStorage)
+		localStorage.setItem("infoclimat-livestream-lastshowed", new Date().getTime()/1000);
+	    
+	    clearInterval(_e1);
+	}
+	
+	if(window.localStorage)
+	    localStorage.setItem("infoclimat-livestream-hide", "false");
+    }
+    
+    _show = !_show;
+    return false;
+}
+
+function IC_realtime_detach(force)
+{
+    var wsize = $(document).width();
+    var csize = $('#corps').width();
+    var reste = (wsize-csize)/2-20;
+    
+    if(force===true)
+    {
+	var width = 400;
+	if(reste>400) width = reste;
+	$('#infoclimat-livestream').css({
+	    position: 'fixed',
+	    bottom:0,
+	    right:7,
+	    width:width,
+	    boxShadow:'0 0 3px black'
+	});
+	
+	$('#infoclimat-livestream-slider').css({
+	    maxHeight:350,
+	    height: 'auto',
+	    width: 'auto',
+	    display:'block'
+	});
+	
+	$('#infoclimat-livestream-slider ul li').css({
+	    width:'auto'
+	});
+	
+	$('#livestream-hide').show(0);
+	
+	if(window.localStorage)
+	    localStorage.setItem("infoclimat-livestream-detach", "true");
+	
+	$('#livestream-expand').on('click', function(){
+	    IC_realtime_detach(false);
+	    $(this).off('click'); return false;
+	}).attr('title', 'R&eacute;duire')
+	.find('img').attr('src', '/images/collapse12.png');
+	
+    }
+    else if(force===false)
+    {
+	$('#infoclimat-livestream').css({
+	    position: 'static',
+	    margin:'0 auto',
+	    width:630,
+	    height:'auto',
+	    boxShadow:'none',
+	    display:'block',
+	    bottom:'auto',
+	    right:'auto'
+	});
+	
+	$('#infoclimat-livestream-slider').css({
+	    height:140
+	});
+	
+	$('#infoclimat-livestream-slider ul li').css({
+	    width:'auto'
+	});
+	
+	$('#livestream-hide').hide(0);
+	
+	if(window.localStorage)
+	    localStorage.setItem("infoclimat-livestream-detach", "false");
+	
+	$('#livestream-expand').on('click', function(){
+	    IC_realtime_detach(true);
+	    $(this).off('click'); return false;
+	}).attr('title', 'Rendre toujours visible')
+		.find('img').attr('src', '/images/expand12.png');
+    }
+    else if((wsize-csize)/2 > 420)
+    {
+	$('#infoclimat-livestream').css({
+	    position: 'fixed',
+	    bottom:0,
+	    right:7,
+	    width:reste,
+	    boxShadow:'0 0 3px black'
+	});
+	
+	$('#infoclimat-livestream-slider').css({
+	    maxHeight:350,
+	    height:'auto'
+	});
+	
+	$('#infoclimat-livestream-slider ul li').css({
+	    width:'auto'
+	});
+	
+	$('#livestream-hide').show(0);
+	
+	$('#livestream-expand').one('click', function(){
+	    IC_realtime_detach(false);
+	    $(this).off('click'); return false;
+	}).attr('title', 'R&eacute;duire')
+		.find('img').attr('src', '/images/collapse12.png');
+    }
+    return false;
+}
+
+function IC_realtime_sortElements()
+{
+    var now = new Date().getTime();
+    if(now-_lastsort < 5) return false;
+    
+    // tri des éléments par date
+    var ul = $('#infoclimat-livestream-slider ul');
+    var li = ul.children('li');
+    li.detach().sort(function(a,b) {
+        return $(b).data('timestamp') - $(a).data('timestamp');  
+    });
+    ul.append(li);
+    
+}
+
+function IC_realtime_statusChanged(status)
+{
+    if(status==PushStream.OPEN){
+	$('#livestream-status').removeClass().addClass('led-verte');
+	$('#infoclimat-livestream-timestamp').html('<i>connect&eacute;</i>');
+    }else if(status==PushStream.CONNECTING){
+	$('#livestream-status').removeClass().addClass('led-orange');
+	$('#infoclimat-livestream-timestamp').html('<i>connexion</i>');
+    }else if(status==PushStream.CLOSED){
+	//$('#livestream-status').removeClass().addClass('led-rouge');
+	//$('#infoclimat-livestream-timestamp').html('<i>connexion perdue</i>');
+    }
+}
+
+// event handlers
+$('#infoclimat-livestream-scrollup').live('click', function(){
+    $('#infoclimat-livestream-slider').animate({scrollTop:0}, 500);
+    $(this).css('display','none');
+});
+
+if(document.location.pathname == "/")
+{
+    $('#infoclimat-livestream').appendTo('#livestream-index-container');
+}
+
+var _launch = false;
+// is detached by default?
+/*if(window.localStorage && localStorage.getItem("infoclimat-livestream-detach")==null)
+{
+    // params non saisis
+    IC_realtime_detach(true);
+    
+    // hidden by default
+    $('#infoclimat-livestream-slider').hide(0);
+    _show = false;
+    _launch = true;
+    if(window.localStorage) localStorage.setItem("infoclimat-livestream-hide", "true");
+}
+else*/ if((window.localStorage && localStorage.getItem('infoclimat-livestream-detach')=="true"))
+{
+    IC_realtime_detach(true);
+    _launch = true;    
+}
+else if((document.location.pathname == "/" && document.location.hostname=="www.infoclimat.fr") || _IC_realtime_display===true)
+{
+    if(_show)
+    {
+	$('#infoclimat-livestream-slider').show(0).css('width','auto');
+	$('#infoclimat-livestream-slider ul li').css({
+	    width:'auto',
+	    display:'block',
+	    height:'auto'
+	});
+	if(window.localStorage) localStorage.setItem("infoclimat-livestream-hide", "false");
+    }
+    
+    _launch = true;
+    _show   = true;
+}
+else
+{
+    $('#infoclimat-livestream').remove();
+}
+
+// is shown by default ?
+if(window.localStorage && localStorage.getItem("infoclimat-livestream-hide")=="true")
+{
+    $('#infoclimat-livestream-slider').hide(0);
+    _show = false;
+}
+
+if(_launch || (_myid && _mytoken && _mytoken.length>0))
+{
+    var pushstream = new PushStream({
+	host: 'tempsreel.infoclimat.net',
+	//port:"80",
+	modes: "websocket|stream",
+	urlPrefixLongpolling: "/push-subscribe/lp",
+	urlPrefixEventsource: "/push-subscribe/ev",
+	urlPrefixWebsocket: "/push-subscribe/ws",
+	urlPrefixStream: "/push-subscribe/sub",
+	messagesPublishedAfter:_lasteventid,
+	messagesControlByArgument:true,
+	
+	useJSONP: true,
+	timeout: 30000,
+	useSSL: true
+    });
+
+    pushstream.onmessage = IC_realtime_messageReceived;
+    pushstream.onstatuschange = IC_realtime_statusChanged;
+    
+    pushstream.addChannel("meteoalerte_users");
+    if(_myid && _mytoken && _mytoken.length>0)
+    {
+        pushstream.addChannel(_mytoken);
+    }
+    
+    pushstream.connect();
+}
