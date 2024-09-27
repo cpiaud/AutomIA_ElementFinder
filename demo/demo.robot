@@ -4,6 +4,7 @@ Library    SeleniumLibrary
 
 
 *** Variables ***
+${BROWSER}    chrome
 ${siteDemo}    SiteDemoOriginal  # "SiteDemoOriginal" or "SiteDemoEvoTexte" or "SiteDemoEvoTech" or "SiteDemoRefonte"
 ${username}     myUsername
 ${password}     myPassword
@@ -35,7 +36,7 @@ TestClassicRobotFramework
     [Tags]  Classic
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
-    Open Browser        ${loginpageurl}     chrome
+    Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
     Log to Console  login
     Wait Until Element Is Visible   name:email
@@ -65,7 +66,7 @@ TestAvecAutomIA
     Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
     Log    New url: ${loginpageurl}
-    Open Browser        ${loginpageurl}     chrome
+    Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
     Log to Console  login
     Wait Until Element Is Visible       FindElementsByIA:login_username
@@ -88,4 +89,17 @@ TestAvecAutomIA
     Click Element  FindElementsByIA:JobApp_ApplyButton
     Wait Until Element Is Visible       FindElementsByIA:JobApplicationForm_SuccessfullySubmittedMsg
     Log to Console  Job application complete
+    Close Browser
+
+TestParentSibling
+    [Documentation]    Ce test ouvre une page web et récupère le contenu texte d'une cellule spécifique d'un tableau.
+    [Tags]  AutomIA
+    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteParentSibling/ClimatologieMensuelle-Infoclimat.html
+    Log    New url: ${loginpageurl}
+    Open Browser        ${loginpageurl}     ${BROWSER}
+    Maximize Browser Window
+    Wait Until Page Contains Element    FindElementsByIA:table_StationMeteo    timeout=30s
+    ${cell_text}=    Get Text    FindElementsByIA:cell_AIGUES-MORTES_TXM
+    Log    Le texte de la cellule est: ${cell_text}
     Close Browser

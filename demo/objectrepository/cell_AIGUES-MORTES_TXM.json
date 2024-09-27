@@ -1,0 +1,86 @@
+{
+  "tagName": "td",
+  "parents": [
+    {
+      "tagName": "tr",
+      "style": "background-color:rgb(240,240,240)",
+      "textContent": "AIGUES-MORTES (30)18.2le 2622.127.332.536.2le 1018.8"
+    },
+    {
+      "tagName": "tbody",
+      "textContent": "Station  TNN   TNM  TMM  TXM  TXX  RR  ENS  Rafale  Abbeville (80)11.1le 2515.119.624.233.8le 1246.669.1Abbeville - centre  (80)11.8le 2615.419.924.333.7le 1246.637ACHERES (78)8le 2614.52127.538.3le 1238.9ADAST (65)9.2le 2215.62126.536.1le 1175.8Agde - Le Grau (34)15.4le 2720.325.73138.8le 910.8292.762.8Agen - La Garenne (47)9.2le 2716.422.929.537.7le 1123.3263.461.2AICIRITS (64)11.7le 1917.522.82839.6le 11110.8Aigrefeuille-d'Aunis (17)9.6le 2515.721.126.238.2le 1114.464.4AIGUES-MORTES (30)18.2le 2622.127.332.536.2le 1018.8Aiguilles (05)7le 249.517.625.830.9le 1010.849.9Aillon-le-Vieux (73)9.5le 2713.919.825.731le 12101.241.8AIX EN PROVENCE (13)14le 2219.126.734.338.9le 113.5Aix-en-Provence (13)16.1le 2735.4le 3143.7Aix-les-Bains (73)11.9le 2317.423.930.336le 1263248.848.3Aix-les-Bains (Capitainerie d'Aix Grand Lac) (73)14.3le 221921.529.534.7le 12Aizenay (85)11le 2215.520.124.735.8le 1164.637Ajaccio - Campo dell'Oro (2A)18.3le 2620.726.331.835.7le 107.9345.555.1Albertville (73)14.1le 2218.224.230.335.3le 1263.853.1Albi-Le Séquestre (81)10.9le 2717.223.830.637.2le 1145.7314.475.6ALBON (26)8.9le 2216.323.931.437.9le 1125.9Alençon - Valframbert (61)7.8le 2213.419.124.734.3le 1234.9236.564.8Alenya - Mas Blanc (66)5221.6Allos (04)8.9le 1811.41824.728.8le 1040.4159.740.2Almenêches (61)6.8le 2113.218.724.233.6le 123033.8ALPE-D'HUEZ (38)7.1le 191116.221.426.1le 1246.1292.1ALPUECH (12)6.1le 2612.618.223.729.4le 1175.7Alvignac (46)10.5le 2616.722.728.737.8le 1126.429Ambérieu (01)8.8le 2215.923.43137.7le 1253.8330.182.8Ambérieu-en-Bugey (01)9.5le 2215.822.829.836.6le 1161.8AMBERT (63)3.5le 2712.120.528.936.1le 1126Amiens - Dury (80)9.8le 2614.420.125.836.1le 1237.8179.722.5Amiens - Fossé Noyon (80)8.1le 261419.825.635.7le 12Amiens - Hortillonnages (80)9.3le 2614.420.125.835.4le 12Amiens - Saint-Roch (80)9le 2613.9202635.7le 1235.9Amiens - UPJV Citadelle (80)11.1le 2615.218.725.636.1le 1231189.137Amiens - UPJV St-Leu (80)11.3le 2615.820.725.636.2le 1236.2188.741.8AMIENS-GLISY…"
+    },
+    {
+      "tagName": "table",
+      "id": "tableau-releves",
+      "style": "font-family: sans-serif; outline: none;",
+      "textContent": "Station  TNN   TNM  TMM  TXM  TXX  RR  ENS  Rafale  Abbeville (80)11.1le 2515.119.624.233.8le 1246.669.1Abbeville - centre  (80)11.8le 2615.419.924.333.7le 1246.637ACHERES (78)8le 2614.52127.538.3le 1238.9ADAST (65)9.2le 2215.62126.536.1le 1175.8Agde - Le Grau (34)15.4le 2720.325.73138.8le 910.8292.762.8Agen - La Garenne (47)9.2le 2716.422.929.537.7le 1123.3263.461.2AICIRITS (64)11.7le 1917.522.82839.6le 11110.8Aigrefeuille-d'Aunis (17)9.6le 2515.721.126.238.2le 1114.464.4AIGUES-MORTES (30)18.2le 2622.127.332.536.2le 1018.8Aiguilles (05)7le 249.517.625.830.9le 1010.849.9Aillon-le-Vieux (73)9.5le 2713.919.825.731le 12101.241.8AIX EN PROVENCE (13)14le 2219.126.734.338.9le 113.5Aix-en-Provence (13)16.1le 2735.4le 3143.7Aix-les-Bains (73)11.9le 2317.423.930.336le 1263248.848.3Aix-les-Bains (Capitainerie d'Aix Grand Lac) (73)14.3le 221921.529.534.7le 12Aizenay (85)11le 2215.520.124.735.8le 1164.637Ajaccio - Campo dell'Oro (2A)18.3le 2620.726.331.835.7le 107.9345.555.1Albertville (73)14.1le 2218.224.230.335.3le 1263.853.1Albi-Le Séquestre (81)10.9le 2717.223.830.637.2le 1145.7314.475.6ALBON (26)8.9le 2216.323.931.437.9le 1125.9Alençon - Valframbert (61)7.8le 2213.419.124.734.3le 1234.9236.564.8Alenya - Mas Blanc (66)5221.6Allos (04)8.9le 1811.41824.728.8le 1040.4159.740.2Almenêches (61)6.8le 2113.218.724.233.6le 123033.8ALPE-D'HUEZ (38)7.1le 191116.221.426.1le 1246.1292.1ALPUECH (12)6.1le 2612.618.223.729.4le 1175.7Alvignac (46)10.5le 2616.722.728.737.8le 1126.429Ambérieu (01)8.8le 2215.923.43137.7le 1253.8330.182.8Ambérieu-en-Bugey (01)9.5le 2215.822.829.836.6le 1161.8AMBERT (63)3.5le 2712.120.528.936.1le 1126Amiens - Dury (80)9.8le 2614.420.125.836.1le 1237.8179.722.5Amiens - Fossé Noyon (80)8.1le 261419.825.635.7le 12Amiens - Hortillonnages (80)9.3le 2614.420.125.835.4le 12Amiens - Saint-Roch (80)9le 2613.9202635.7le 1235.9Amiens - UPJV Citadelle (80)11.1le 2615.218.725.636.1le 1231189.137Amiens - UPJV St-Leu (80)11.3le 2615.820.725.636.2le 1236.2188.741.8AMIENS-GLISY…"
+    },
+    {
+      "tagName": "div",
+      "id": "centre",
+      "textContent": "Climatologie mensuelle\n\n\n    \n\tChoisissez une station dans la liste ...\n\tAttention, seules les stations de grandes villes sont disponibles avant 1999.\n\tStation :   Abbeville (80)Abriès-Ristolas - nivose (05)Agen - La Garenne (47)Aix Les Milles (FR)Ajaccio - Campo dell'Oro (2A)Ajaccio - La Parata (2A)Albi-Le Séquestre (81)ALBI/LE SEQUESTRE & (FR)Alençon - Valframbert (61)Alenya - Mas Blanc (66)ALERIA RADAR (FR)Ambérieu (01)Amiens-Glisy (FR)Angers - Marcé (49)Angers-Beaucouzé (49)Angoulême - Brie-Champnier (16)Annecy-Meythet (74)ANNECY-MEYTHET (FR)Anse Bertrand Hippodrome (Guadeloupe) (971)Anse d'Arlet (Martinique) (972)Antibes - La Garoupe (06)ANTIFER (FR)Apt St. Christol (FR)ARCIS SUR AUBE (FR)Arêches - Nivose (73)Arette La Pierre-Saint-Martin - nivose (64)Artouste - nivose (64)Asco-Stagnu - nivose (20)Ascou Pailheres - nivose (09)Atuona (987)Aubenas-Vals (Lanas) (07)AUCH-IN-ARMAGNAC (FR)Auch-Lamothe (32)Audinghen - Cap Gris-Nez (62)Aurillac (15)AURILLAC CITY (FR)Auris en Oisans - Nivose (38)Auron - nivose (06)Auxerre (89)Auxerre-Perrigny (89)Auzeville-Tolosane - Borde-Rouge (31)AVESNES RADAR (FR)Avignon (84)Avignon - Saint-Paul (84)Avord (18)Avoriaz - Nivose (74)Ax Bonascre - nivose (09)Bagnères-de-Luchon (31)Bâle-Mulhouse (68)Ballots (FR)BAR LE DUC (FR)Barèges - nivose (65)Barneville - Carteret (50)Bastelica - nivose (20)Bastia - Poretta (2B)Beauvais-Tille (60)Beille - nivose (09)Belfort - Dorans (90)Belfort - Fontaine (90)Belle Ile-Le Talut (56)Bellevue/Bras-Panon (974)BERGERAC          & (FR)Bergerac-Roumaniere (24)BERGERAC/ROUMANIERE (FR)Bergheim - Burlenberg (68)Bernex - Nivose (74)Besançon - Thise (25)Bessans - nivose (73)Béziers-Vias (34)Biarritz-Anglet (64)Biscarrosse (40)BLAISY HAUT RADAR (FR)Blois-Le Breuil (41)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS SOV…"
+    },
+    {
+      "tagName": "div",
+      "id": "corps",
+      "textContent": "Climatologie mensuelle\n\n\n    \n\tChoisissez une station dans la liste ...\n\tAttention, seules les stations de grandes villes sont disponibles avant 1999.\n\tStation :   Abbeville (80)Abriès-Ristolas - nivose (05)Agen - La Garenne (47)Aix Les Milles (FR)Ajaccio - Campo dell'Oro (2A)Ajaccio - La Parata (2A)Albi-Le Séquestre (81)ALBI/LE SEQUESTRE & (FR)Alençon - Valframbert (61)Alenya - Mas Blanc (66)ALERIA RADAR (FR)Ambérieu (01)Amiens-Glisy (FR)Angers - Marcé (49)Angers-Beaucouzé (49)Angoulême - Brie-Champnier (16)Annecy-Meythet (74)ANNECY-MEYTHET (FR)Anse Bertrand Hippodrome (Guadeloupe) (971)Anse d'Arlet (Martinique) (972)Antibes - La Garoupe (06)ANTIFER (FR)Apt St. Christol (FR)ARCIS SUR AUBE (FR)Arêches - Nivose (73)Arette La Pierre-Saint-Martin - nivose (64)Artouste - nivose (64)Asco-Stagnu - nivose (20)Ascou Pailheres - nivose (09)Atuona (987)Aubenas-Vals (Lanas) (07)AUCH-IN-ARMAGNAC (FR)Auch-Lamothe (32)Audinghen - Cap Gris-Nez (62)Aurillac (15)AURILLAC CITY (FR)Auris en Oisans - Nivose (38)Auron - nivose (06)Auxerre (89)Auxerre-Perrigny (89)Auzeville-Tolosane - Borde-Rouge (31)AVESNES RADAR (FR)Avignon (84)Avignon - Saint-Paul (84)Avord (18)Avoriaz - Nivose (74)Ax Bonascre - nivose (09)Bagnères-de-Luchon (31)Bâle-Mulhouse (68)Ballots (FR)BAR LE DUC (FR)Barèges - nivose (65)Barneville - Carteret (50)Bastelica - nivose (20)Bastia - Poretta (2B)Beauvais-Tille (60)Beille - nivose (09)Belfort - Dorans (90)Belfort - Fontaine (90)Belle Ile-Le Talut (56)Bellevue/Bras-Panon (974)BERGERAC          & (FR)Bergerac-Roumaniere (24)BERGERAC/ROUMANIERE (FR)Bergheim - Burlenberg (68)Bernex - Nivose (74)Besançon - Thise (25)Bessans - nivose (73)Béziers-Vias (34)Biarritz-Anglet (64)Biscarrosse (40)BLAISY HAUT RADAR (FR)Blois-Le Breuil (41)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS FRENCH (FR)BOGUS SOV…"
+    },
+    {
+      "tagName": "div",
+      "id": "page",
+      "textContent": "#user-login-pad {\n                position:absolute;\n                top:0px;\n                right:0px;\n                color:white;\n                line-height:30px;\n                cursor:pointer;\n                height:35px;\n                padding:5px;\n            }\n            #user-login-pad:hover{\n                background:rgba(0,0,0, 0.4);\n                box-shadow:0 0 5px rgba(0,0,0,0.4) inset;\n            }\n            .user-connected {\n                background-size:40px;\n                width:30px;\n                height:30px;\n                border-radius:50%;\n                background-position:50% 50%;  \n                float:left;    \n                margin-right:5px; \n                box-shadow: 0 0 2px black;     \n            }\n            .menu_parent_ouvert, .menu_parent_ouvert:hover{\n                background:rgba(0,0,0,0.8);\n            }\n            \n            .user-connected-more {\n                font-size: 1.2em;\n            }\n            \n            /* responsive block for ident icon */\n            @media screen and (max-width:1024px){\n                .user-connected-more {\n                    display:none;\n                }\n            }\n            \n            /* search panel */\n            #user-search-pad {\n                position: absolute;\n                top:0;\n                left:0;\n                padding:5px;\n                z-index: 2000;\n            }\n            #user-search-pad input {\n                width: 100px; /* 140 */\n                box-sizing: border-box;\n                border: 2px solid #ccc;\n                border-radius: 4px;\n                font-size: 13px;\n                line-height:13px;\n                background-color: rgba(255,255,255,0.7);\n                background-image: url('//static.infoclimat.net/images/v5.2/search16.png');\n                background-position: right 5px center; \n                background-repeat: no-repeat;\n                padding: 4px 25px 4px 5px;\n                -webki…"
+    },
+    {
+      "tagName": "body"
+    },
+    {
+      "tagName": "html",
+      "xmlns": "http://www.w3.org/1999/xhtml",
+      "katalonextensionid": "ljdobmomdgdljniojadhoplhkpialdid"
+    }
+  ],
+  "siblings": [
+    {
+      "tagName": "td",
+      "style": "outline: none;",
+      "textContent": "AIGUES-MORTES (30)"
+    },
+    {
+      "tagName": "td",
+      "style": "outline: none;",
+      "textContent": "18.2le 26"
+    },
+    {
+      "tagName": "td",
+      "style": "line-height:38px",
+      "textContent": "22.1"
+    },
+    {
+      "tagName": "td",
+      "style": "line-height:38px",
+      "textContent": "27.3"
+    },
+    {
+      "tagName": "td",
+      "style": "outline: none;",
+      "textContent": "36.2le 10"
+    },
+    {
+      "tagName": "td",
+      "style": "line-height:38px",
+      "textContent": "18.8"
+    },
+    {
+      "tagName": "td",
+      "style": "line-height:38px",
+      "textContent": ""
+    },
+    {
+      "tagName": "td",
+      "style": "line-height:38px",
+      "textContent": ""
+    }
+  ],
+  "style": "line-height: 38px; outline: red solid 2px;"
+}
