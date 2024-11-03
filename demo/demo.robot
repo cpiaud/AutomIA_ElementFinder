@@ -69,7 +69,7 @@ TestAvecAutomIA
     Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
     Log to Console  login
-    Wait Until Element Is Visible       FindElementsByIA:login_username
+    Wait Until Element Is Visible       FindElementsByIA:login_username|textContent:User Name|index:6
     Input Text      FindElementsByIA:login_username  ${username}
     Input Text      FindElementsByIA:login_password  ${password}
     Click Element   FindElementsByIA:login_ConnexionButton

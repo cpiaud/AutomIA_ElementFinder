@@ -1,8 +1,9 @@
+from collections import Counter
+import time
 from bs4 import BeautifulSoup
 from robot.libraries.BuiltIn import BuiltIn
-
 from selenium.webdriver.common.by import By
-
+from selenium.webdriver.remote.webelement import WebElement
 from AutomIAlib import AutomIAlib
 
 class FindWebElements:
@@ -220,7 +221,119 @@ class FindWebElements:
         web_elm_xpath = self.create_xpath_for_soup_element(soupElms[0])
         return selenium_lib.driver.find_elements(By.XPATH, web_elm_xpath)
 
+
+    def match_count(self, element_siblings, siblings_properties):
+        """
+        Compte le nombre de correspondances entre les propriétés des siblings d'un élément
+        et la liste des propriétés spécifiées dans siblings_properties.
+
+        Arguments:
+        - element_siblings: Liste de WebElement représentant les siblings d'un élément.
+        - siblings_properties: Liste de dictionnaires contenant les propriétés à matcher.
+
+        Retourne:
+        - Nombre d'éléments correspondants dans element_siblings.
+        """
+        count = 0
+        for sibling, prop in zip(element_siblings, siblings_properties):
+            # Vérifie les correspondances des propriétés
+            if (
+                sibling.tag_name == prop["tagName"] and
+                sibling.text.strip() == prop["textContent"]
+            ):
+                count += 1
+        return count
+
     
+    def find_best_element_with_siblings(self, attributes_way_result, siblings):
+        """
+        Trouve l'élément de attributes_way_result ayant le plus de siblings correspondant
+        aux propriétés spécifiées dans la liste siblings.
+
+        Arguments:
+        - attributes_way_result: Liste d'éléments WebElement trouvés par Selenium.
+        - siblings: Liste de dictionnaires représentant les propriétés des siblings d'un élément.
+
+        Retourne:
+        - L'élément WebElement de attributes_way_result ayant le plus de correspondances avec siblings.
+        """
+
+        # Initialisation des variables pour suivre le meilleur élément
+        best_element = None
+        max_matches = 0
+        elem = 0
+
+        # Parcours de chaque élément pour trouver celui avec le maximum de correspondances
+        for element in attributes_way_result:
+            # Obtenez tous les siblings de l'élément
+            element_siblings = element.find_elements(By.XPATH, "following-sibling::*")
+            
+            # Appel de match_count pour calculer le nombre de correspondances avec siblings
+            matches = self.match_count(element_siblings, siblings)
+            elem = elem + 1
+            print(f"Elements {elem} a {matches} frères en commun avec l'élément cherché")
+
+            # Met à jour le meilleur élément si un nombre plus élevé de correspondances est trouvé
+            if matches > max_matches:
+                max_matches = matches
+                best_element = element
+
+        return best_element
+
+
+    # Fonction pour faire clignoter l'élément
+    def blink_element(self, element, duration=3, interval=0.3):
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        # Faire défiler pour amener l'élément dans la vue
+        selenium_lib.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+        time.sleep(0.5)  # Pause pour s'assurer que le défilement est terminé
+
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            # Changer la couleur de fond en jaune
+            selenium_lib.driver.execute_script("arguments[0].style.backgroundColor = 'blue'", element)
+            time.sleep(interval)
+            
+            # Remettre la couleur de fond d'origine
+            selenium_lib.driver.execute_script("arguments[0].style.backgroundColor = ''", element)
+            time.sleep(interval)
+
+
+    def find_most_frequent_element_by_siblings(self, json_sibling_properties):
+        """
+        Trouve l'élément web ayant le plus de correspondances de siblings selon les propriétés du JSON.
+        
+        Arguments:
+        - driver: Instance de WebDriver de Selenium.
+        - json_sibling_properties: Liste de dictionnaires contenant les propriétés des siblings.
+
+        Retourne:
+        - L'élément WebElement apparaissant le plus souvent dans les listes fusionnées.
+        """
+
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        # Initialiser la liste fusionnée pour tous les éléments trouvés
+        all_elements = []
+
+        # Parcourir chaque groupe de propriétés de sibling dans le JSON
+        for sibling_props in json_sibling_properties:
+            # Construire un XPath basé sur les propriétés pour identifier les siblings
+            xpath = f"{sibling_props['tagName']}[contains(., '{sibling_props['textContent']}')]"
+            # Rechercher les éléments ayant des siblings correspondant à ce XPath
+            matching_elements = selenium_lib.driver.find_elements(By.XPATH, f"//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
+            # Ajouter les éléments trouvés à la liste fusionnée
+            all_elements.extend(matching_elements)
+
+        # Utiliser Counter pour compter les occurrences de chaque élément
+        element_counts = Counter(all_elements)
+
+        # Trouver l'élément apparaissant le plus souvent dans la liste fusionnée
+        most_frequent_element = element_counts.most_common(1)[0][0] if element_counts else None
+        self.blink_element(most_frequent_element)
+
+        return most_frequent_element
+
+
     def find_elements_by_ia_with_driver(self, scanned_element_json_name:str) -> any:
         """
         Find elements by IA using Selenium WebDriver.
@@ -236,6 +349,12 @@ class FindWebElements:
         attributes_way_result = self.get_by_attributes(scanned_element_json)
         
         # TODO reinforce the error handling
-        if (len(attributes_way_result) != 1):
-            return self.get_by_siblings_and_parents(scanned_element_json)
+        if (len(attributes_way_result) > 1):
+            print(f"nombre d'élements encore en lice : {len(attributes_way_result)}")
+#            return self.get_by_siblings_and_parents(scanned_element_json)
+#            print(f"Elements toujours en lice : {attributes_way_result}")
+#            print(f"propriétés des frères de l'élément cherché : {scanned_element_json["siblings"]}")
+ #           return self.find_best_element_with_siblings(attributes_way_result, scanned_element_json["siblings"])
+            return self.find_most_frequent_element_by_siblings(scanned_element_json["siblings"])
+
         return attributes_way_result
