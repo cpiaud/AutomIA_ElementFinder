@@ -69,7 +69,7 @@ TestAvecAutomIA
     Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
     Log to Console  login
-    Wait Until Element Is Visible       FindElementsByIA:login_username|textContent:User Name|index:6
+    Wait Until Element Is Visible       FindElementsByIA:login_username
     Input Text      FindElementsByIA:login_username  ${username}
     Input Text      FindElementsByIA:login_password  ${password}
     Click Element   FindElementsByIA:login_ConnexionButton
@@ -102,4 +102,19 @@ TestParentSibling
     Wait Until Page Contains Element    FindElementsByIA:table_StationMeteo    timeout=30s
     ${cell_text}=    Get Text    FindElementsByIA:cell_AIGUES-MORTES_TXM
     Log    Le texte de la cellule est: ${cell_text}
+    Close Browser
+
+TestDynamicAttributAutomIA
+    [Tags]  AutomIA
+    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
+    Log    New url: ${loginpageurl}
+    Open Browser        ${loginpageurl}     ${BROWSER}
+    Maximize Browser Window
+    Log to Console  login
+    Wait Until Element Is Visible       FindElementsByIA:login_username_var|textContent:User Name|index:6
+    Input Text      FindElementsByIA:login_username_var  ${username}
+    Input Text      FindElementsByIA:login_password  ${password}
+    Click Element   FindElementsByIA:login_ConnexionButton
+    Log to Console  job application form
     Close Browser
