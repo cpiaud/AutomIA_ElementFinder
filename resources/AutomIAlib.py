@@ -66,6 +66,10 @@ class AutomIAlib:
         with open(file_path, 'r', encoding="utf8") as file:
             json_data = json.load(file)
 
+        # Check if json_data is None
+        if json_data is None:
+            raise ValueError("The JSON data could not be loaded or is empty.")
+        
         # Update or add the key-value pair
         json_data[key] = value
 
