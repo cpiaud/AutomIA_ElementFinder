@@ -6,11 +6,7 @@ Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strate
 
 
 *** Variables ***
-<<<<<<< HEAD
-=======
-${BROWSER}    chrome
-${siteDemo}    SiteDemoOriginal  # "SiteDemoOriginal" or "SiteDemoEvoTexte" or "SiteDemoEvoTech" or "SiteDemoRefonte"
->>>>>>> 13c5e5c (add Test for ParentSibling research)
+${BROWSER}    edge
 ${username}     myUsername
 ${password}     myPassword
 ${firstnamevalue}     myFirstname
@@ -130,19 +126,4 @@ TestParentSibling
     Wait Until Page Contains Element    FindElementsByIA:table_StationMeteo    timeout=30s
     ${cell_text}=    Get Text    FindElementsByIA:cell_AIGUES-MORTES_TXM
     Log    Le texte de la cellule est: ${cell_text}
-    Close Browser
-
-TestDynamicAttributAutomIA
-    [Tags]  AutomIA
-    Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}
-    ${loginpageurl}=    Set Variable    file:///${CURDIR}/${siteDemo}/Login.html
-    Log    New url: ${loginpageurl}
-    Open Browser        ${loginpageurl}     ${BROWSER}
-    Maximize Browser Window
-    Log to Console  login
-    Wait Until Element Is Visible       FindElementsByIA:login_username_var|textContent:User Name|index:6
-    Input Text      FindElementsByIA:login_username_var  ${username}
-    Input Text      FindElementsByIA:login_password  ${password}
-    Click Element   FindElementsByIA:login_ConnexionButton
-    Log to Console  job application form
     Close Browser
