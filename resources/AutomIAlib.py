@@ -1,57 +1,11 @@
-import json
-
 from robot.api.deco import keyword
+import json
 
 
 class AutomIAlib:
 
     @staticmethod
-    def generate_locators(json_data):
-        locators = []
-
-        # Extract information from JSON data
-        tag_name = json_data.get('tagName')
-        id_ = json_data.get('id')
-        class_ = json_data.get('class')
-        text_content = json_data.get('textContent')
-
-        # Generate locators based on extracted information
-        if id_:
-            locators.append(f"id:{id_}")
-
-        if class_:
-            classes = class_.split()
-            for class_name in classes:
-                locators.append(f"class:{class_name}")
-
-        if tag_name:
-            locators.append(f"tag:{tag_name}")
-
-        if text_content:
-            locators.append(f"text:{text_content}")
-
-        # Extract possible locators from parent elements
-        parents = json_data.get('parents', [])
-        parent_locators = []
-        for parent in parents:
-            parent_locators.extend(AutomIAlib.generate_locators(parent))
-
-        # Add parent locators as a separate dictionary key within locators
-        locators.append({'parent_locators': parent_locators})
-
-        for locator in locators:
-            print("Generated Locators:", locator)
-
-        return locators
-
-    @keyword
-    def process_json_file_and_generate_locators(self, file_path):
-        json_data = self.read_json_file(file_path)
-        locators = self.generate_locators(json_data)
-        return locators
-
-    @staticmethod
-    def read_json_file(file_path):
+    def read_json_file(file_path:str) -> any:
         """
         Reads the content of a JSON file and returns it as a dictionary.
 
@@ -62,11 +16,11 @@ class AutomIAlib:
         - A dictionary containing the JSON data.
         """
         with open(file_path, 'r', encoding="utf8") as file:
-            json_data = json.load(file)
+            json_data:any = json.load(file)
         return json_data
 
     @staticmethod
-    def read_properties_file(file_path):
+    def read_properties_file(file_path:str) -> list[str]:
         with open(file_path, 'r') as file:
             # Read lines from the file
             lines = file.readlines()
@@ -92,3 +46,33 @@ class AutomIAlib:
 
         # Return sorted properties
         return properties
+
+    @staticmethod
+    def update_json_file(file_path: str, key_value: str):
+        """
+        Updates a JSON file by adding or modifying a key-value pair at the root level.
+
+        Arguments:
+        - file_path: Path to the JSON file to be modified.
+        - key_value: String representing the key-value pair in the format "key:value".
+        """
+        # Split the key_value string into key and value
+        key, value = key_value.split(':', 1)
+        # Convert value to int if it's numeric, otherwise keep it as a string
+        value = int(value) if value.isdigit() else value
+
+        # Load the existing JSON data
+        file_path = file_path + ".json"
+        with open(file_path, 'r', encoding="utf8") as file:
+            json_data = json.load(file)
+
+        # Check if json_data is None
+        if json_data is None:
+            raise ValueError("The JSON data could not be loaded or is empty.")
+        
+        # Update or add the key-value pair
+        json_data[key] = value
+
+        # Write the modified JSON data back to the file
+        with open(file_path, 'w', encoding="utf8") as file:
+            json.dump(json_data, file, ensure_ascii=False, indent=4)

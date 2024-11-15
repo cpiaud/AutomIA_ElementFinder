@@ -1,0 +1,120 @@
+_aURL = '//static.infoclimat.net/observations/observationsV2/jour/';
+_bURL = '.png';
+function getPrevi(data, entropy)
+{
+    var h = $('#autoprevi-status');
+    h.html('T&eacute;l&eacute;chargement des donn&eacute;es...');
+    $.getJSON('/api/previ/'+data+'/get', {u:entropy}, function(d){
+	if(d.state=='error'){
+	    h.html('<br /><br />Les pr&eacute;visions ne sont pas disponibles pour votre localit&eacute;.');
+	    return false;
+	}
+	
+	h.css({display:'none'});
+	$('#autoprevi-name').html(d.name+' '+d.dy);
+	$('#autoprevi-maj').html('Actualis&eacute; &agrave; '+d.updated+'h&nbsp;');
+	for(var i=0; i<=3; i++)
+	{
+	    if(!d[i]) continue;
+	    
+	    $('#autoprevi-d'+i+'-p').attr('src', _aURL+d[i].p.k+_bURL);
+	    $('#autoprevi-d'+i+'-dc').html(d[i].p.v);
+	    $('#autoprevi-d'+i+'-day').html(d[i].day);
+	    $('#autoprevi-d'+i+'-tn').html(Math.round(d[i].tmin)).css({color:'#35dbff',textShadow:'0 0 1px black',fontWeight:'bold'});
+	    $('#autoprevi-d'+i+'-tx').html(Math.round(d[i].tmax)).css({color:'#ff3838',textShadow:'0 0 1px black',fontWeight:'bold'});
+	    $('#autoprevi-d'+i+'-rr').html(Math.round(d[i].rr));
+	    $('#autoprevi-d'+i+'-press').html(d[i].press);
+	    $('#autoprevi-d'+i+'-raf').html(Math.round(d[i].raf));
+	    if(d[i].dir!=null) $('#autoprevi-d'+i+'-dir').attr('src','//static.infoclimat.net/images/pictos_vent/'+d[i].dir+'.png').css('marginBottom',-2);
+	    $('#autoprevi-d'+i+'-vdir').html(d[i].vdir);
+	}
+	//$('#autoprevi-graph').attr('src', 'data:image/'+d.f64+';base64,'+d.b64);
+	$('#div-tempsreel-previ').click(function(){
+	    document.location = '/previsions-meteo/details/'+d.vkey+'/'+d.seo+'.html';
+	});
+	$('#link_previ_locales').attr('href', '/previsions-meteo/details/'+d.vkey+'/'+d.seo+'.html').html(d.name);
+	document.getElementById('autoprevi-graph').src = 'data:image/'+d.f64+';base64,'+d.b64;
+	
+	return true;
+    });
+}
+
+function getLive(data, entropy)
+{
+    $.getJSON('/api/temps-reel/'+data, {u:entropy}, function(d){
+	$('#autoprevi-tr-name').html(d.name);
+	$('#autoprevi-tr-t').html(d.t+'&deg;C');
+	$('#autoprevi-tr-dh').html(d.d);
+	$('#autoprevi-tr-p').html(Math.round(d.p)+'hPa');
+	if(d.r!=null) $('#autoprevi-tr-r').html('<img src="//static.infoclimat.net/images/v5.2/Umbrella.png" alt="pluie" style="margin-bottom:-1px" /> '+d.r+'mm');
+	//if(d.n!=null && d.n>0) $('#autoprevi-tr-n').html('&#10052; '+d.n+'cm');
+	if(d.h!=null) $('#autoprevi-tr-h').html(d.h+'%');
+	//if(d.e!=null) $('#autoprevi-tr-e').html('<br />&#9728; '+d.e+'min');
+	//if(d.s!=null) $('#autoprevi-tr-s').html('<br />sol '+Math.round(d.s)+'&deg;C');
+	$('#autoprevi-tr-raf').html('raf. '+Math.round(d.raf)+' km/h');
+	$('#autoprevi-tr-moy').html(Math.round(d.moy)+' km/h');
+	//if(d.dir!=null) $('#autoprevi-tr-dir').attr('src', '//static.infoclimat.net/images/pictos_vent/'+d.dir+'.png');
+	
+	if(d.pic[0]!=null) $('#autoprevi-tr-pic').attr('src', d.pic[0]);
+	
+	var esvg = document.getElementById('autoprevi-svg');
+	if(esvg) esvg.src = '/stations-meteo/api_svg.php?u='+d.key;
+	
+	$('#autocam-name').html(d.cam_name);
+	$('#div-tempsreel-tempsreel').css({
+	    'backgroundImage':'url('+d.bg+')'
+	});
+	
+	if(document.getElementById('autocam-image'))
+	    document.getElementById('autocam-image').src = d.cam;
+	$('#autocam-link').attr('href', "https://www.infoclimat.fr/annuaire-webcams-meteo.html#" + d['camid']);
+	
+	$('#div-tempsreel-tempsreel').append(
+	    '<span id="autoprevi-desc-h">HR</span>'
+	    +'<span id="autoprevi-desc-p">Pression</span>'
+	    +'<span id="autoprevi-desc-r">Pluie 1h</span>'
+	    );
+	
+	$('#div-tempsreel-tempsreel').css('cursor','pointer').click(function(){
+	    document.location = '/s/'+d.stid;
+	});
+    });
+}
+
+_geoacc = false;
+function getGeoTicket(lat, lon, accuracy)
+{
+    $('#autoprevi-status').html('Autorisation en cours...');
+    $.getJSON('/api/previ/'+lat+';'+lon+';'+accuracy+'/ticket', {}, function(d){
+	getPrevi(d[3], d[4]);
+	getLive (d[3], d[4]);
+	_geoacc = true;
+    });
+}
+
+$('#ICMENU-previ,#ICMENU-temps_reel').click(function(){
+    if(_geoacc===false){
+	getGeoTicket();
+    }
+    return true;
+});
+
+_assoload = false;
+$('#ICMENU-asso').click(function(){
+    
+    if(_assoload === false){
+	_assoload = true;
+	
+	var output = ''; var i2 = 0;
+	$.get('/tchat/rss2.php', {}, function(r){
+	    $(r).find('item').each(function(){
+
+		output += '<a style="margin-top:4px" class="pchref" href="'+ $(this).find('link').text() +'" target="_blank">'+$(this).find('title').text()+'</a>';
+		if(i2>6){return false;}
+		i2++;
+	    });
+	    $('#link-forum-rss').after(output);
+	}, 'xml');
+    }
+    
+});

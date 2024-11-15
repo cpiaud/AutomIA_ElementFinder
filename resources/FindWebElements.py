@@ -1,240 +1,94 @@
+from collections import Counter
+import time
 from robot.libraries.BuiltIn import BuiltIn
-from bs4 import BeautifulSoup
-import json
-
 from selenium.webdriver.common.by import By
-
+from selenium.webdriver.remote.webelement import WebElement
 from AutomIAlib import AutomIAlib
 
-
 class FindWebElements:
+    
+    # Path to the attributes weight definition file
+    attributes_weight_file_path = "resources/attributesWeight.properties"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.AutomIAlib = AutomIAlib()
 
-    @staticmethod
-    def get_current_url():
+
+    def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
         """
-        Return the current URL of the browser.
+        Filter elements by tag name using Selenium WebDriver.
+
+        Args:
+            tag_name (str): tag name of the scanned element JSON file.
 
         Returns:
-            str: The current URL of the browser.
+            list: A list of DOM elements.
         """
-        # Retrieve the SeleniumLibrary instance from Robot Framework
-        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
-
-        # Get the current URL from the Selenium WebDriver
-        url = selenium_lib.driver.current_url
-        print(f"The current url is: {url}")
-        return url
-
-    @staticmethod
-    def get_elements_from_url():
-        """
-        Retrieve all DOM elements from the current page.
-
-        Returns:
-            str: A JSON string representation of all DOM elements.
-        """        
         # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        # Get DOM elements by tag name
+        script = f"return document.getElementsByTagName('{tag_name}')"
+        dom_elements = selenium_lib.driver.execute_script(script)
 
-        # Get the page source HTML
-        page_source = selenium_lib.driver.page_source
+        return dom_elements
 
-        # Parse the HTML using BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
 
-        # Find all elements in the HTML
-        elements = soup.find_all()
-
-        # Convert elements to JSON format
-        elements_json = []
-        for element in elements:
-            element_json = {
-                'tag_name': element.name,
-                'attributes': dict(element.attrs),
-                'text': element.text.strip()
-            }
-            elements_json.append(element_json)
-
-        # Serialize the list of dictionaries to JSON format
-        return json.dumps(elements_json)
-
-    def filter_elements_by_tag_name(self, json_file_content):
+    def get_element_attributes(self, scanned_element_json:any) -> list[any]:
         """
-        Filter elements by tag name specified in the JSON file.
+        Get all the attributes and their weight of the scanned_element_json.
+        if one of the found attribute has no weight define in the attributes_weight file, is default weight will be 10
 
         Args:
-            json_file_content (str): Path to the JSON file containing the tag name.
-
+            scanned_element_json (json): scanned element JSON data.
+        
         Returns:
-            list: A list of filtered elements.
-        """
-        # Get all DOM elements from the current page
-        dom_elements = json.loads(self.get_elements_from_url())
-
-        # Extract tag name from JSON file
-        tag_name = self.AutomIAlib.read_json_file(json_file_content).get("tagName")
-
-        # Filter elements based on tag name
-        filtered_elements = [element for element in dom_elements if element.get("tag_name") == tag_name]
-
-        # Return the filtered elements list
-        return filtered_elements
-
-    def extract_values(self, scanned_element_json, attribute_weight):
-        """
-        Extract values from JSON based on attribute weights.
-
-        Args:
-            scanned_element_json (str): Path to the scanned element JSON file.
-            attribute_weight (str): Path to the attribute weight properties file.
-
-        Returns:
-            list: A list of tuples containing attribute and its value.
+            list[(key, value, weight)]: A list of tuples containing this attribute key is value and is weight.
         """
         # Read the attribute weight properties file
-        sorted_list = self.AutomIAlib.read_properties_file(attribute_weight)
-
-        # Read the scanned element JSON file
-        json_data = self.AutomIAlib.read_json_file(scanned_element_json)
-
+        file_attributes = self.AutomIAlib.read_properties_file(self.attributes_weight_file_path)
         # Extract values based on the sorted attribute list
-        extracted_values = []
-        for key, _ in sorted_list:
-            if key in json_data:
-                extracted_values.append((key, json_data[key]))
+        attributes = []
 
-        return extracted_values
+        for attr in scanned_element_json:
+            in_attributes_weight_file = False
 
-    def filter_elements_by_attributes(self, scanned_element_json, attribute_weight):
+            if attr in ['parents', 'siblings']: # special case
+                continue
+            for key, weight in file_attributes:
+                if attr == key:
+                    in_attributes_weight_file = True
+                    attributes.append((attr, scanned_element_json[attr], weight))
+                    break
+            if not in_attributes_weight_file:
+                attributes.append((attr, scanned_element_json[attr], 10))
+
+        return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
+
+
+    def get_by_attributes(self, scanned_element_json:any) -> list[any]:
         """
-        Filter elements by attributes using weights.
+        Get all corresponding elements with the attributes of the scanned element.
 
         Args:
-            scanned_element_json (str): Path to the scanned element JSON file.
-            attribute_weight (str): Path to the attribute weight properties file.
+            scanned_element_json (json): scanned element JSON data.
 
         Returns:
             list: A list of filtered elements.
         """
-        # Get the initial list of elements filtered by tag name
-        starting_list = self.filter_elements_by_tag_name(scanned_element_json)
-
-        # Extract attribute values sorted by weight
-        sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight)
-        
-        current_cached_list = starting_list
-        filtered_elements = []
-
-        # Filter elements based on tag name
-        for attribute_name, value in sorted_tag_list:
-            # Iterate through the current list of cached elements
-            for element in current_cached_list:
-                 # Check if the current element has the current attribute and if the attribute value matches
-                if attribute_name in element['attributes'] and element['attributes'][attribute_name] == value:
-                    # If the attribute matches, add the element to the filtered elements list
-                    filtered_elements.append(element)
-
-            # If only one element is found after filtering by the current tag name
-            if len(filtered_elements) == 1:
-                # Update the current cached list to only contain this unique element
-                current_cached_list = filtered_elements
-                print("Element found")
-                break # Exit the loop early since a unique element is found
-            elif len(filtered_elements) > 1:
-                # If multiple elements are found, check if the filtered list is smaller than the current cached list
-                if len(filtered_elements) < len(current_cached_list):
-                     # Update the current cached list to the new filtered list
-                    current_cached_list = filtered_elements
-                else:
-                    # If the new filtered list is not smaller, retain the current cached list
-                    filtered_elements = current_cached_list
-                    print("Multiple Elements found")
-            else:
-                # If no elements are found, print a message indicating no matches
-                print("No Element found")
-
-        return current_cached_list
-
-    def find_elements_by_IA(self, scanned_element_json_name):
-        """
-        Find elements by IA.
-
-        Args:
-            scanned_element_json_name (str): Name of the scanned element JSON file.
-
-        Returns:
-            str: XPath of the unique element found.
-        """
-
-        attribute_weight = "resources/selectorWeight.properties"
-        scanned_element_path_name = f'{scanned_element_json_name}.json'
-        unique_element = self.filter_elements_by_attributes(scanned_element_path_name, attribute_weight)
-        print(self.build_xpath(unique_element[0]))
-
-        return self.build_xpath(unique_element[0])
-
-    @staticmethod
-    def build_xpath(element_dict):
-        """
-        Build XPath from element dictionary.
-
-        Args:
-            element_dict (dict): Dictionary containing element information.
-
-        Returns:
-            str: XPath of the element.
-        """
-        tag_name = element_dict['tag_name']
-        attributes = element_dict['attributes']
-        text_value = element_dict['text']
-
-        xpath = f"//{tag_name}"
-
-        # Generate attribute strings with 'and' between them
-        attribute_strings = []
-        for key, value in attributes.items():
-            if isinstance(value, list):
-                # Convert list to string with single value
-                value = value[0]
-            attribute_strings.append(f"@{key}='{value}'")
-        attribute_string = ' and '.join(attribute_strings)
-
-        # Add attribute string to XPath if it's not empty
-        if attribute_string:
-            xpath += f"[{attribute_string}]"
-
-        # Add text attribute if it is not empty
-        if text_value:
-            xpath += f"[text()='{text_value}']"
-
-        # formatted_xpath = 'xpath:' + xpath
-
-        return xpath
-
-# Method 2 of getting web elements and filtering by driver
-
-    def filter_elements_by_attributes_by_driver(self, scanned_element_json, attribute_weight):
-        """
-        Filter elements by attributes using Selenium WebDriver.
-
-        Args:
-            scanned_element_json (str): Path to the scanned element JSON file.
-            attribute_weight (str): Path to the attribute weight properties file.
-
-        Returns:
-            list: A list of filtered elements.
-        """
+        # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
-        tag_name = self.AutomIAlib.read_json_file(scanned_element_json).get("tagName")
-        starting_list = self.filter_elements_by_tag_name_by_driver(scanned_element_json)
-        sorted_tag_list = self.extract_values(scanned_element_json, attribute_weight)
+        # Get the tagName of the element to retrieve in the DOM
+        tag_name = scanned_element_json.get("tagName")
+        # Get all the DOM elements possible for the element to find
+        starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
+        # Get all the attribute and their value to begin the search
+        sorted_tag_list = self.get_element_attributes(scanned_element_json)
+        # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list
-
+        # The list of possible elements found by the current attribute
         filtered_elements = []
-        for attribute_name, value in sorted_tag_list:
+
+        for attribute_name, value, _ in sorted_tag_list:
             if attribute_name == "textContent":
                 xpath = f"//{tag_name}[contains(., '{value}')]"
             else:
@@ -242,40 +96,80 @@ class FindWebElements:
 
             filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
 
-            if len(filtered_elements) == 1:
+            if len(filtered_elements) == 1: # Element found
                 current_cached_list = filtered_elements
-                print("Element found")
                 break
-            elif len(filtered_elements) > 1:
+            elif len(filtered_elements) > 1: # Multiple elements found
                 if len(filtered_elements) < len(current_cached_list):
                     current_cached_list = filtered_elements
                 else:
                     filtered_elements = current_cached_list
-                    print("Multiple Elements found")
-            else:
-                print("No Element found")
 
         return current_cached_list
 
-    def filter_elements_by_tag_name_by_driver(self, json_scanned_element_content):
-        """
-        Filter elements by tag name using Selenium WebDriver.
 
-        Args:
-            json_scanned_element_content (str): Path to the scanned element JSON file.
+    # Function to make the element blink
+    def blink_element(self, element, duration=4, interval=0.3):
+        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        
+        # Scroll to bring the element into view
+        selenium_lib.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+        time.sleep(0.5)  # Pause to ensure the scroll is complete
+        
+        # Retrieve the original background color of the element
+        original_bg_color = selenium_lib.driver.execute_script("return arguments[0].style.backgroundColor;", element)
+        
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            # Change the background color to blue
+            selenium_lib.driver.execute_script("arguments[0].style.backgroundColor = 'blue'", element)
+            time.sleep(interval)
+            
+            # Revert to the original background color
+            selenium_lib.driver.execute_script(f"arguments[0].style.backgroundColor = '{original_bg_color}'", element)
+            time.sleep(interval)
+        
+        # Ensure the original background color is restored after blinking
+        selenium_lib.driver.execute_script(f"arguments[0].style.backgroundColor = '{original_bg_color}'", element)
+
+
+
+    def find_most_frequent_element_by_siblings(self, json_sibling_properties):
+        """
+        Finds the web element with the most sibling matches based on JSON properties.
+
+        Arguments:
+        - driver: Instance of Selenium's WebDriver.
+        - json_sibling_properties: List of dictionaries containing sibling properties.
 
         Returns:
-            list: A list of DOM elements.
+        - The WebElement that appears most frequently in the merged lists.
         """
+
         selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        # Initialize the merged list for all found elements
+        all_elements = []
 
-        # Extract tag name from JSON file
-        tag_name = self.AutomIAlib.read_json_file(json_scanned_element_content).get("tagName")
-        script = f"return document.getElementsByTagName('{tag_name}')"
-        dom_elements = selenium_lib.driver.execute_script(script)
-        return dom_elements
+        # Iterate through each sibling property group in the JSON
+        for sibling_props in json_sibling_properties:
+            # Build an XPath based on properties to identify siblings
+            xpath = f"{sibling_props['tagName']}[contains(., '{sibling_props['textContent']}')]"
+            # Find elements with siblings matching this XPath
+            matching_elements = selenium_lib.driver.find_elements(By.XPATH, f"//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
+            # Add the found elements to the merged list
+            all_elements.extend(matching_elements)
 
-    def find_elements_by_ia_with_driver(self, scanned_element_json_name):
+        # Use Counter to count occurrences of each element
+        element_counts = Counter(all_elements)
+
+        # Find the element that appears most frequently in the merged list
+        most_frequent_element = element_counts.most_common(1)[0][0] if element_counts else None
+        self.blink_element(most_frequent_element)
+
+        return most_frequent_element
+
+
+    def find_elements_by_ia_with_driver(self, scanned_element_json_name:str) -> any:
         """
         Find elements by IA using Selenium WebDriver.
 
@@ -285,7 +179,15 @@ class FindWebElements:
         Returns:
             list: A list of unique elements found.
         """
-        attribute_weight = "resources/selectorWeight.properties"
-        scanned_element_path_name = f'{scanned_element_json_name}.json'
-        unique_element = self.filter_elements_by_attributes_by_driver(scanned_element_path_name, attribute_weight)
-        return unique_element
+        # Get the data of the element json file
+        scanned_element_json = self.AutomIAlib.read_json_file(f'{scanned_element_json_name}.json')
+        attributes_way_result = self.get_by_attributes(scanned_element_json)
+        
+        # TODO reinforce the error handling
+        if (len(attributes_way_result) > 1):
+            print(f"nombre d'élements encore en lice : {len(attributes_way_result)}")
+#            print(f"Elements toujours en lice : {attributes_way_result}")
+#            print(f"propriétés des frères de l'élément cherché : {scanned_element_json["siblings"]}")
+            return self.find_most_frequent_element_by_siblings(scanned_element_json["siblings"])
+
+        return attributes_way_result
