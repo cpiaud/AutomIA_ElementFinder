@@ -64,6 +64,20 @@ TestParentSibling
     Log    Le texte de la cellule est: ${cell_text}
     Close Browser
 
+TestDynamicAttributAutomIA
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteDemoOriginal/Login.html
+    Log    New url: ${loginpageurl}
+    Open Browser        ${loginpageurl}     ${BROWSER}
+    Maximize Browser Window
+    Log to Console  login
+    Wait Until Element Is Visible       FindElementsByIA:login_username_var|textContent:User Name|index:6
+    Input Text      FindElementsByIA:login_username_var  ${username}
+    Input Text      FindElementsByIA:login_password  ${password}
+    Click Element   FindElementsByIA:login_ConnexionButton
+    Log to Console  job application form
+    Close Browser
+
 *** Keywords ***
 TestClassic
     [Arguments]  ${siteDemo}
