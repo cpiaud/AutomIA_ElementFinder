@@ -164,7 +164,7 @@ class FindWebElements:
 
         # Find the element that appears most frequently in the merged list
         most_frequent_element = element_counts.most_common(1)[0][0] if element_counts else None
-        self.blink_element(most_frequent_element)
+        # self.blink_element(most_frequent_element)
 
         return most_frequent_element
 
