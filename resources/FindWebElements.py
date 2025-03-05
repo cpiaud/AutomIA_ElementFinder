@@ -1,18 +1,22 @@
 from collections import Counter
 import time
+import yaml
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from AutomIAlib import AutomIAlib
+from pathlib import Path
 
 class FindWebElements:
     
     # Path to the attributes weight definition file
-    attributes_weight_file_path = "resources/attributesWeight.properties"
+    attributes_weight_file_path = Path(__file__).parent / "attributesWeight.properties"
+    seleniumInstanceName = "SeleniumLibrary"
 
     def __init__(self) -> None:
         self.AutomIAlib = AutomIAlib()
-
+        config = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
+        self.seleniumInstanceName = config["SeleniumLibraryInstanceName"]
 
     def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
         """
@@ -25,7 +29,7 @@ class FindWebElements:
             list: A list of DOM elements.
         """
         # Initialize a SeleniumLibrary instance
-        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         # Get DOM elements by tag name
         script = f"return document.getElementsByTagName('{tag_name}')"
         dom_elements = selenium_lib.driver.execute_script(script)
@@ -76,7 +80,7 @@ class FindWebElements:
             list: A list of filtered elements.
         """
         # Initialize a SeleniumLibrary instance
-        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         # Get the tagName of the element to retrieve in the DOM
         tag_name = scanned_element_json.get("tagName")
         # Get all the DOM elements possible for the element to find
@@ -90,14 +94,22 @@ class FindWebElements:
 
         for attribute_name, value, _ in sorted_tag_list:
             if attribute_name == "textContent":
-                xpath = f"//{tag_name}[contains(., '{value}')]"
+                sanitized_value = value.replace("'", "\\'")
+                xpath = f"//{tag_name}[contains(., '{sanitized_value}')]"
+                xpathStrict = f"//{tag_name}[.='{sanitized_value}']"
             else:
                 xpath = f"//{tag_name}[@{attribute_name}='{value}']"
 
             filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
 
+            # For text content check by strict equality, if only one element match, keeps it
+            if attribute_name == "textContent":
+                strict_filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpathStrict)
+                if len(strict_filtered_elements) == 1:
+                    filtered_elements = strict_filtered_elements         
+
             if len(filtered_elements) == 1: # Element found
-                current_cached_list = filtered_elements
+                current_cached_list = filtered_elements    
                 break
             elif len(filtered_elements) > 1: # Multiple elements found
                 if len(filtered_elements) < len(current_cached_list):
@@ -110,7 +122,7 @@ class FindWebElements:
 
     # Function to make the element blink
     def blink_element(self, element, duration=4, interval=0.3):
-        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         
         # Scroll to bring the element into view
         selenium_lib.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
@@ -146,7 +158,7 @@ class FindWebElements:
         - The WebElement that appears most frequently in the merged lists.
         """
 
-        selenium_lib = BuiltIn().get_library_instance('SeleniumLibrary')
+        selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         # Initialize the merged list for all found elements
         all_elements = []
 

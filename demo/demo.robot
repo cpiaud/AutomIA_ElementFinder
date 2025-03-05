@@ -1,6 +1,5 @@
 *** Settings ***
 Resource   ../resources/CustomKeywords.robot
-Library    SeleniumLibrary
 Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}  
 
 
