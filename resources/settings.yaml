@@ -1,0 +1,17 @@
+# Fichier de configuration du projet
+# Exemples : https://wiki.python.org/moin/ConfigParserExamples
+
+# How to use in .robot file :
+# ${SeleniumLibraryInstanceName}
+
+# How to use in .py file : 
+# config = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
+# seleniumInstanceName = config["SeleniumLibraryInstanceName"]
+
+
+# name change according to import in your project: 
+# import SeleniumLibrary WITH NAME sel -> SeleniumLibraryInstanceName: sel
+SeleniumLibraryInstanceName: SeleniumLibrary
+
+# Relative path to your root project
+ObjectRepositoryPath: /demo/objectrepository/

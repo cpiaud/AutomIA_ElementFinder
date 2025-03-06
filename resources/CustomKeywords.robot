@@ -4,12 +4,10 @@ Library    FindWebElements.py
 Library    SeleniumLibrary
 Library    String
 
-*** Variables ***
-${ObjectRepositoryPath}   /demo/objectrepository/
-
 *** Keywords ***
 AutomIA Locator Strategy
     [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
+    Import Variables    ./resources/settings.yaml
     ${locator_parts}=    Split String    ${locator}    |
     ${nbProperties}=    Get length    ${locator_parts}
     ${objFile}=    Set Variable    ${locator_parts[0]}
