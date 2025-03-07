@@ -55,12 +55,12 @@ class FindWebElements:
 
         for attr in scanned_element_json:
             in_attributes_weight_file = False
-
-            if attr in ['parents', 'siblings']: # special case
+            if attr in ['parents', 'siblings', 'tagName']: # special case + tagName is not added to the list, the filter by tag is done separately to create the basic list of eligible elements
                 continue
             for key, weight in file_attributes:
                 if attr == key:
                     in_attributes_weight_file = True
+                    print("Attibut traité : " + attr)
                     attributes.append((attr, scanned_element_json[attr], weight))
                     break
             if not in_attributes_weight_file:
@@ -85,26 +85,41 @@ class FindWebElements:
         tag_name = scanned_element_json.get("tagName")
         # Get all the DOM elements possible for the element to find
         starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
+        print("Nombre d'élement avec le TagName : " + tag_name + " = " + str(len(starting_list)))
         # Get all the attribute and their value to begin the search
         sorted_tag_list = self.get_element_attributes(scanned_element_json)
+        print("Sorted Tag List : " + str(sorted_tag_list))
         # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list
-        # The list of possible elements found by the current attribute
-        filtered_elements = []
 
         for attribute_name, value, _ in sorted_tag_list:
+            # The list of possible elements found by the current attribute
+            filtered_elements = []
             if attribute_name == "textContent":
-                sanitized_value = value.replace("'", "\\'")
-                xpath = f"//{tag_name}[contains(., '{sanitized_value}')]"
-                xpathStrict = f"//{tag_name}[.='{sanitized_value}']"
-            else:
-                xpath = f"//{tag_name}[@{attribute_name}='{value}']"
+                # Faire une recherche sur le Xpath contains le texte souhaité
+                # --> garder la liste dans filtered_elements
+                    # Si la taille de la liste est > 1
+                    #   faire une recherche strict
+                    #   Si le résultat de la liste est > 0 --> garder la liste dans filtered_elements
+                    # algo à revoir pour introduire 
 
-            filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpath)
+
+                sanitized_value = value.replace("'", "\\'")    # CPD TODO:Tester si la sanitization est efficace en mélangeant quote et double quote
+                xpath = f"self::node()[contains(text(), '{sanitized_value}')]"
+                xpathStrict = f"self::node()[text()='{sanitized_value}']"
+            else:    # self:: --> forces the search to be carried out on the element itself
+                if "'" in value:    # avoid mixing single and double quotes in Xpath
+                    xpath = f'self::*[@{attribute_name}="{value}"]'
+                    
+                else: 
+                    xpath = f"self::*[@{attribute_name}='{value}']"
+
+            filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpath)]     # alternative : if element.get_attribute(attribute_name) == value
+            print("Nombre d'élement avec le Xpath : " + xpath + " = " + str(len(filtered_elements)))
 
             # For text content check by strict equality, if only one element match, keeps it
             if attribute_name == "textContent":
-                strict_filtered_elements = selenium_lib.driver.find_elements(By.XPATH, xpathStrict)
+                strict_filtered_elements = [element for element in filtered_elements if element.find_elements(By.XPATH, xpathStrict)]
                 if len(strict_filtered_elements) == 1:
                     filtered_elements = strict_filtered_elements         
 

@@ -1,0 +1,43 @@
+{
+    "tagName": "li",
+    "parents": [
+        {
+            "tagName": "ul",
+            "style": "outline: none;",
+            "textContent": "Pomme - 2.50€/kg\n        Banane - 1.80€/kg\n        Orange - 3.00€/kg\n        Fraise - 5.50€/kg"
+        },
+        {
+            "tagName": "body",
+            "style": "outline: none;"
+        },
+        {
+            "tagName": "html",
+            "lang": "fr"
+        }
+    ],
+    "siblings": [
+        {
+            "tagName": "li",
+            "class": "fruit",
+            "onclick": "ajouterAuPanier('Banane - 1.80€/kg')",
+            "style": "outline: none;",
+            "textContent": "Banane - 1.80€/kg"
+        },
+        {
+            "tagName": "li",
+            "class": "fruit",
+            "onclick": "ajouterAuPanier('Orange - 3.00€/kg')",
+            "textContent": "Orange - 3.00€/kg"
+        },
+        {
+            "tagName": "li",
+            "class": "fruit",
+            "onclick": "ajouterAuPanier('Fraise - 5.50€/kg')",
+            "textContent": "Fraise - 5.50€/kg"
+        }
+    ],
+    "class": "fruit",
+    "onclick": "ajouterAuPanier('Pomme - 2.50€/kg')",
+    "style": "outline: red solid 2px;",
+    "textContent": "Pomme"
+}

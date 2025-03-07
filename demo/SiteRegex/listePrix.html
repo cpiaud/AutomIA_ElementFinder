@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Fruits et Légumes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        h2 {
+            color: green;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .fruit {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .legume {
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        #panier {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fruits et Légumes</h1>
+    
+    <h2>Fruits</h2>
+    <ul>
+        <li class="fruit" onclick="ajouterAuPanier('Pomme - 2.50€/kg')">Pomme - 2.50€/kg</li>
+        <li class="fruit" onclick="ajouterAuPanier('Banane - 1.80€/kg')">Banane - 1.80€/kg</li>
+        <li class="fruit" onclick="ajouterAuPanier('Orange - 3.00€/kg')">Orange - 3.00€/kg</li>
+        <li class="fruit" onclick="ajouterAuPanier('Fraise - 5.50€/kg')">Fraise - 5.50€/kg</li>
+    </ul>
+    
+    <h2>Légumes</h2>
+    <ul>
+        <li class="legume" onclick="ajouterAuPanier('Carotte - 1.20€/kg')">Carotte - 1.20€/kg</li>
+        <li class="legume" onclick="ajouterAuPanier('Tomate - 2.80€/kg')">Tomate - 2.80€/kg</li>
+        <li class="legume" onclick="ajouterAuPanier('Pomme de terre - 1.50€/kg')">Pomme de terre - 1.50€/kg</li>
+        <li class="legume" onclick="ajouterAuPanier('Courgette - 2.00€/kg')">Courgette - 2.00€/kg</li>
+    </ul>
+    
+    <h2>Panier</h2>
+    <div id="panier">
+        <ul id="listePanier"></ul>
+    </div>
+    
+    <script>
+        function ajouterAuPanier(item) {
+            let listePanier = document.getElementById("listePanier");
+            let nouvelElement = document.createElement("li");
+            nouvelElement.textContent = item;
+            listePanier.appendChild(nouvelElement);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "tagName": "li",
+  "parents": [
+    {
+      "tagName": "ul",
+      "style": "outline: none;",
+      "textContent": "Carotte - 1.20€/kg\n        Tomate - 2.80€/kg\n        Pomme de terre - 1.50€/kg\n        Courgette - 2.00€/kg"
+    },
+    {
+      "tagName": "body",
+      "style": "outline: none;"
+    },
+    {
+      "tagName": "html",
+      "lang": "fr"
+    }
+  ],
+  "siblings": [
+    {
+      "tagName": "li",
+      "class": "legume",
+      "onclick": "ajouterAuPanier('Carotte - 1.20€/kg')",
+      "style": "outline: none;",
+      "textContent": "Carotte - 1.20€/kg"
+    },
+    {
+      "tagName": "li",
+      "class": "legume",
+      "onclick": "ajouterAuPanier('Pomme de terre - 1.50€/kg')",
+      "textContent": "Pomme de terre - 1.50€/kg"
+    },
+    {
+      "tagName": "li",
+      "class": "legume",
+      "onclick": "ajouterAuPanier('Courgette - 2.00€/kg')",
+      "style": "outline: none;",
+      "textContent": "Courgette - 2.00€/kg"
+    }
+  ],
+  "class": "legume",
+  "onclick": "ajouterAuPanier('Tomate - 2.80€/kg')",
+  "style": "outline: red solid 2px;",
+  "textContent": "Tomate - 2.80€/kg"
+}

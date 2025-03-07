@@ -77,6 +77,19 @@ TestDynamicAttributAutomIA
     Log to Console  job application form
     Close Browser
 
+Ajouter Banane Et Tomate Au Panier
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
+    Open Browser    ${loginpageurl}    ${BROWSER}
+#    Click Element    FindElementsByIA:li_Banane|textContent:Banane - (\d+\.\d{1,2})€/kg
+    Click Element    FindElementsByIA:li_Pomme|textContent:Pomme
+    Click Element    FindElementsByIA:li_Tomate
+    ${panier}    Get Text    FindElementsByIA:div_Panier
+    Should Contain    ${panier}    Pomme - 2.50€/kg
+    Should Contain    ${panier}    Tomate - 2.80€/kg
+    Close Browser
+
+
 *** Keywords ***
 TestClassic
     [Arguments]  ${siteDemo}
