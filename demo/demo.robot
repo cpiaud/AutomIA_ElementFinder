@@ -77,16 +77,30 @@ TestDynamicAttributAutomIA
     Log to Console  job application form
     Close Browser
 
-Ajouter Banane Et Tomate Au Panier
+Ajouter Banane Et Tomate Au Panier avec Regex
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
     Open Browser    ${loginpageurl}    ${BROWSER}
-#    Click Element    FindElementsByIA:li_Banane|textContent:Banane - (\d+\.\d{1,2})€/kg
-    Click Element    FindElementsByIA:li_Pomme|textContent:Pomme
+    Click Element    FindElementsByIA:li_Banane|textContent:Banane - (\\\\d+\\\\.\\\\d{1,2})€\\\\/kg|index:1   # for regex in automIA via robot, 4 "\" are required to protect a character not only double.
+    Click Element    FindElementsByIA:li_Pomme|textContent:"Pomme"
     Click Element    FindElementsByIA:li_Tomate
     ${panier}    Get Text    FindElementsByIA:div_Panier
     Should Contain    ${panier}    Pomme - 2.50€/kg
     Should Contain    ${panier}    Tomate - 2.80€/kg
+    Should Match Regexp    ${panier}    Banane - (\\d+\\.\\d{1,2})€\\/kg
+    Close Browser
+
+Ajouter Banane Et Tomate Au Panier avec les principe de similarité
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
+    Open Browser    ${loginpageurl}    ${BROWSER}
+    Click Element    FindElementsByIA:li_Orange
+    Click Element    FindElementsByIA:li_Fraise
+    Click Element    FindElementsByIA:li_Courgette
+    ${panier}    Get Text    FindElementsByIA:div_Panier
+    Should Contain    ${panier}    Orange
+    Should Contain    ${panier}    Fraise
+    Should Match Regexp    ${panier}    Courgette - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
 
 

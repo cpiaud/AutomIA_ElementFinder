@@ -1,6 +1,11 @@
 from collections import Counter
 import time
 import yaml
+import re
+import Levenshtein
+from difflib import SequenceMatcher
+from collections import Counter
+from math import sqrt
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -17,6 +22,8 @@ class FindWebElements:
         self.AutomIAlib = AutomIAlib()
         config = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
         self.seleniumInstanceName = config["SeleniumLibraryInstanceName"]
+        self.SimilarityCoeffcientMin = config["SimilarityCoeffcientMin"]
+
 
     def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
         """
@@ -95,34 +102,64 @@ class FindWebElements:
         for attribute_name, value, _ in sorted_tag_list:
             # The list of possible elements found by the current attribute
             filtered_elements = []
+
             if attribute_name == "textContent":
-                # Faire une recherche sur le Xpath contains le texte souhaité
-                # --> garder la liste dans filtered_elements
-                    # Si la taille de la liste est > 1
-                    #   faire une recherche strict
-                    #   Si le résultat de la liste est > 0 --> garder la liste dans filtered_elements
-                    # algo à revoir pour introduire 
+                # Search the Element contains the desired text
+                if "'" in value:    # avoid mixing single and double quotes in Xpath
+                    xpathContains = f'self::node()[contains(text(), "{value}")]'               
+                else: 
+                    xpathContains = f"self::node()[contains(text(), '{value}')]"
+                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpathContains)]
+                # Search the Element with strict content text
+                if len(filtered_elements) > 1:
+                    if "'" in value:    # avoid mixing single and double quotes in Xpath
+                        xpathStrict = f'self::node()[text()="{value}"]'              
+                    else: 
+                        xpathStrict = f"self::node()[text()='{value}']"                    
+                    strict_filtered_elements = [element for element in filtered_elements if element.find_elements(By.XPATH, xpathStrict)]
+                    if (len(strict_filtered_elements) > 0) and (len(strict_filtered_elements) < len(filtered_elements)):
+                        filtered_elements = strict_filtered_elements
+                # Search the Element with regEx on content text
+                if len(filtered_elements) == 0:
+                    # If no element found, try to search using regex
+                    if self.is_a_regex(value):
+                        pattern = re.compile(value)
+                        # Checks each element in current_cached_list to see if it matches the regex
+                        for element in current_cached_list:
+                            visible_text = element.text
+                            if pattern.search(visible_text):
+                                # Add the element to the filtered list
+                                filtered_elements.append(element)
+                # Search the Element with similarity on content text
+                if len(filtered_elements) != 1:
+                    # get the good list of element between filtered_elements and current_cached_list
+                    if len(filtered_elements) > 1:
+                        list_we_search_for = filtered_elements
+                    else:
+                        list_we_search_for = current_cached_list
+                    similarity_old = 0
+                    # evaluate the similarity between the text element and the value in reference
+                    for element in list_we_search_for:
+                        visible_text = element.text
+                        similarity = similarity_coefficient(visible_text, value)
+                        # insert the element in the list if similarity > at the SimilarityCoeffcientMin parameter in settings.yaml
+                        if similarity > self.SimilarityCoeffcientMin:
+                            # the element with the maximun similarity in the first place of the list
+                            if similarity > similarity_old:
+                                similarity_old = similarity
+                                filtered_elements.insert(0, element)
+                            else:
+                                filtered_elements.append(element)
 
-
-                sanitized_value = value.replace("'", "\\'")    # CPD TODO:Tester si la sanitization est efficace en mélangeant quote et double quote
-                xpath = f"self::node()[contains(text(), '{sanitized_value}')]"
-                xpathStrict = f"self::node()[text()='{sanitized_value}']"
             else:    # self:: --> forces the search to be carried out on the element itself
                 if "'" in value:    # avoid mixing single and double quotes in Xpath
-                    xpath = f'self::*[@{attribute_name}="{value}"]'
-                    
+                    xpath = f'self::*[@{attribute_name}="{value}"]'                
                 else: 
                     xpath = f"self::*[@{attribute_name}='{value}']"
+                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpath)]     # alternative : if element.get_attribute(attribute_name) == value
+                print("Nombre d'élement avec le Xpath : " + xpath + " = " + str(len(filtered_elements)))
 
-            filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpath)]     # alternative : if element.get_attribute(attribute_name) == value
-            print("Nombre d'élement avec le Xpath : " + xpath + " = " + str(len(filtered_elements)))
-
-            # For text content check by strict equality, if only one element match, keeps it
-            if attribute_name == "textContent":
-                strict_filtered_elements = [element for element in filtered_elements if element.find_elements(By.XPATH, xpathStrict)]
-                if len(strict_filtered_elements) == 1:
-                    filtered_elements = strict_filtered_elements         
-
+            # Determines whether you have found the item you are looking for or whether you need to continue
             if len(filtered_elements) == 1: # Element found
                 current_cached_list = filtered_elements    
                 break
@@ -218,3 +255,56 @@ class FindWebElements:
             return self.find_most_frequent_element_by_siblings(scanned_element_json["siblings"])
 
         return attributes_way_result
+
+
+    def is_a_regex(self, pattern):
+        """
+         Verify if a string is a valid regex.
+         Args:
+             string to verify.
+         Returns:
+             True if it's a valid regex, false if not.
+         """
+        try:
+            re.compile(pattern)     # Try compiling the pattern
+            return True      # If it passes, it's a valid regex
+        except re.error:
+            return False     # Error = this is not a valid regex
+
+
+def similarity_coefficient(s1, s2):
+    # Calculating the similarity coefficient with SequenceMatcher
+    seq_match_coeff = SequenceMatcher(None, s1, s2).ratio()
+    print(f"With Sequence Matcher, similarity coefficient is : {seq_match_coeff}")
+
+    # Calculating the similarity coefficient with Levenshtein
+    levenshtein_coeff = Levenshtein.ratio(s1, s2)
+    print(f"With Levenshtein, similarity coefficient is : {levenshtein_coeff}")
+
+    # Calculating the similarity coefficient with Jaccard
+    set1, set2 = set(s1), set(s2)
+    jaccard_coeff = len(set1 & set2) / len(set1 | set2)
+    print(f"With Jaccard, similarity coefficient is : {jaccard_coeff}")
+
+    # Calculating the similarity coefficient with Cosine
+    vec1, vec2 = Counter(s1), Counter(s2)
+    dot_product = sum(vec1[ch] * vec2[ch] for ch in vec1)
+    magnitude1 = sqrt(sum(count ** 2 for count in vec1.values()))
+    magnitude2 = sqrt(sum(count ** 2 for count in vec2.values()))
+    cosine_coeff = dot_product / (magnitude1 * magnitude2)
+    print(f"With Cosine, similarity coefficient is : {cosine_coeff}")
+
+    coefficients = [seq_match_coeff, levenshtein_coeff, jaccard_coeff, cosine_coeff]
+
+    # Calculating the similarity coefficient with Hamming (if the strings are the same length)
+    if len(s1) == len(s2):
+        hamming_coeff = 1 - sum(c1 != c2 for c1, c2 in zip(s1, s2)) / len(s1)
+        print(f"With Hamming, similarity coefficient is : {hamming_coeff}")
+        coefficients.append(hamming_coeff)
+    else:
+        print("Hamming similarity cannot be calculated: strings must be of equal length.")
+
+    # average_coefficient = sum(coefficients) / len(coefficients)
+    max_coefficient = max(coefficients)
+
+    return max_coefficient

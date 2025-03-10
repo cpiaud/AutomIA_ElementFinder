@@ -39,5 +39,5 @@
     "class": "fruit",
     "onclick": "ajouterAuPanier('Pomme - 2.50€/kg')",
     "style": "outline: red solid 2px;",
-    "textContent": "Pomme"
+    "textContent": "\"Pomme\""
 }

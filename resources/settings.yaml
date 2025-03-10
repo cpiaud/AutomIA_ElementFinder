@@ -15,3 +15,6 @@ SeleniumLibraryInstanceName: SeleniumLibrary
 
 # Relative path to your root project
 ObjectRepositoryPath: /demo/objectrepository/
+
+# Relative path to your root project
+SimilarityCoeffcientMin: 0.82
