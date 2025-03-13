@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Fruits et Légumes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        h2 {
+            color: green;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .fruit, .legume {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .legume {
+            background-color: green;
+        }
+        .quantity-input {
+            width: 50px;
+            margin-right: 10px;
+            padding: 5px;
+        }
+        .add-to-cart-btn {
+            background-color: gray; /* Changed to gray */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #panier {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+         #totalPanier {
+            margin-top: 10px; /* Add some space above the total */
+        }
+    </style>
+</head>
+<body>
+    <h1>Fruits et Légumes</h1>
+    
+    <h2>Fruits</h2>
+    <ul>
+        <li>
+            <span class="fruit">Raisin Blanc - 4.39€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Raisin Blanc', '4.39')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">"Pomme" Grany - 2.50€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Pomme Grany', '2.50')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">"Pomme" Verte - 2.73€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Pomme Verte', '2.73')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">Banane - 1.57€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Banane', '1.57')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">Orange - 2.77€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Orange', '2.77')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">Poire - 3.00€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Poire', '3.00')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">Kiwi - 3.00€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Kiwi', '3.00')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="fruit">Fraise - 5.50€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Fraise', '5.50')">Ajouter au panier</button>
+        </li>
+    </ul>
+    
+    <h2>Légumes</h2>
+    <ul>
+        <li>
+            <span class="legume">Carotte - 1.20€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Carotte', '1.20')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="legume">Tomate - 2.80€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Tomate', '2.80')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="legume">Pomme de terre - 1.50€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Pomme de terre', '1.50')">Ajouter au panier</button>
+        </li>
+        <li>
+            <span class="legume">Courgette - 2.67€/kg</span>
+            <input type="number" class="quantity-input" min="0" value="0">
+            <button class="add-to-cart-btn" onclick="ajouterAuPanier('Courgette', '2.67')">Ajouter au panier</button>
+        </li>
+    </ul>
+    
+    <h2>Panier</h2>
+    <div id="panier">
+        <ul id="listePanier"></ul>        
+    </div>
+    <div id="totalPanier"><b>Total: 0.00€</b></div>
+
+    
+    <script>
+        function ajouterAuPanier(item, price) {
+            let quantity = parseFloat(event.target.parentNode.querySelector('.quantity-input').value);
+            if (quantity <= 0) {
+                return; // No action if the user is trying to add 0 or less of an item.
+            }
+            let listePanier = document.getElementById("listePanier");
+            let nouvelElement = document.createElement("li");
+            let totalPriceForItem = (parseFloat(price) * quantity).toFixed(2);
+            nouvelElement.textContent = `${item} - ${quantity}kg x ${price}€/kg = ${totalPriceForItem}€`;
+            listePanier.appendChild(nouvelElement);
+            //update total
+            updateTotal();
+            // reset the input after add to chart
+            event.target.parentNode.querySelector('.quantity-input').value = "0";
+        }
+        function updateTotal() {
+            let total = 0;
+            let items = document.getElementById("listePanier").children;
+            for (let item of items) {
+                let priceText = item.textContent.split("= ")[1]; // extract total item price
+                total += parseFloat(priceText.replace("€", ""));
+            }
+            document.getElementById("totalPanier").textContent = `Total: ${total.toFixed(2)}€`;
+        }
+    </script>
+</body>
+</html>

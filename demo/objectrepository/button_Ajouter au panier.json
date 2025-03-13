@@ -1,0 +1,38 @@
+{
+    "tagName": "button",
+    "parents": [
+        {
+            "tagName": "li",
+            "style": "outline: none;",
+            "textContent": "\"Pomme\" Grany - 2.50€/kg\n            \n            Ajouter au panier"
+        },
+        {
+            "tagName": "ul",
+            "style": "outline: none;",
+            "textContent": "\"Pomme\" Grany - 2.50€/kg\n            \n            Ajouter au panier\n        \n        \n            \"Pomme\" Verte - 2.73€/kg\n            \n            Ajouter au panier\n        \n        \n            Banane - 1.57€/kg\n            \n            Ajouter au panier\n        \n        \n            Orange - 2.77€/kg\n            \n            Ajouter au panier\n        \n        \n            Poire - 3.00€/kg\n            \n            Ajouter au panier\n        \n        \n            Poire - 3.00€/kg\n            \n            Ajouter au panier\n        \n        \n            Fraise - 5.50€/kg\n            \n            Ajouter au panier"
+        },
+        {
+            "tagName": "body"
+        },
+        {
+            "tagName": "html",
+            "lang": "fr"
+        }
+    ],
+    "siblings": [
+        {
+            "tagName": "span",
+            "class": "fruit",
+            "textContent": ""
+        },
+        {
+            "tagName": "input",
+            "type": "number",
+            "class": "quantity-input",
+            "min": "0",
+            "value": "0",
+            "textContent": ""
+        }
+    ],
+    "class": "add-to-cart-btn"
+}

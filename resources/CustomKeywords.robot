@@ -3,20 +3,25 @@ Library    AutomIAlib.py
 Library    FindWebElements.py
 Library    SeleniumLibrary
 Library    String
+Library    Collections
+Variables   ./settings.yaml
 
 *** Keywords ***
 AutomIA Locator Strategy
     [Arguments]    ${browser}    ${locator}   ${tag}    ${constraints}
-    Import Variables    ./resources/settings.yaml
     ${locator_parts}=    Split String    ${locator}    |
     ${nbProperties}=    Get length    ${locator_parts}
     ${objFile}=    Set Variable    ${locator_parts[0]}
     ${objPath}=    Set Variable    ${EXECDIR}${ObjectRepositoryPath}${objFile}
-    # writes the additional properties passed as parameters to the element's json file
+    ${additionalProperties}=    Create Dictionary
+    # transform the additional properties passed as parameters to dictionary
     FOR    ${index}    IN RANGE    1    ${nbProperties}
-        Update JSON File    ${objPath}    ${locator_parts[${index}]}
+        ${property}=    Split String    ${locator_parts[${index}]}    :
+        ${propertyName}=    Set Variable    ${property[0]}
+        ${propertyValue}=    Set Variable    ${property[1]}
+        Set To Dictionary    ${additionalProperties}    ${propertyName}    ${propertyValue}
     END    
- #   Log To Console     nbCustomProperties : ${nbProperties}
- #   Log To Console     Object Path : ${objPath}
-    ${webelement}=     Find Elements By IA With Driver   ${objPath}
+ #  Log To Console     nbCustomProperties : ${nbProperties}
+ #  Log To Console     Object Path : ${objPath}
+    ${webelement}=     Find Elements By IA With Driver   ${objPath}    ${additionalProperties}
     RETURN    ${webelement}

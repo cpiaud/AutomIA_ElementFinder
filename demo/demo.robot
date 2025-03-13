@@ -81,7 +81,8 @@ Ajouter Banane Et Tomate Au Panier avec Regex
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
     Open Browser    ${loginpageurl}    ${BROWSER}
-    Click Element    FindElementsByIA:li_Banane|textContent:Banane - (\\\\d+\\\\.\\\\d{1,2})€\\\\/kg|index:1   # for regex in automIA via robot, 4 "\" are required to protect a character not only double.
+    Maximize Browser Window
+    Click Element    FindElementsByIA:li_Banane|textContent:Banane - (\\\\d+\\\\.\\\\d{1,2})€\\\\/kg|index:1   # for regex in automIA via robot, 4 "\" are required to protect a "\" character not only double.
     Click Element    FindElementsByIA:li_Pomme|textContent:"Pomme"
     Click Element    FindElementsByIA:li_Tomate
     ${panier}    Get Text    FindElementsByIA:div_Panier
@@ -90,10 +91,11 @@ Ajouter Banane Et Tomate Au Panier avec Regex
     Should Match Regexp    ${panier}    Banane - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
 
-Ajouter Banane Et Tomate Au Panier avec les principe de similarité
+Ajouter Orange Et Fraise et Courgette au Panier avec les principe de similarité
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
     Open Browser    ${loginpageurl}    ${BROWSER}
+    Maximize Browser Window
     Click Element    FindElementsByIA:li_Orange
     Click Element    FindElementsByIA:li_Fraise
     Click Element    FindElementsByIA:li_Courgette
@@ -103,7 +105,30 @@ Ajouter Banane Et Tomate Au Panier avec les principe de similarité
     Should Match Regexp    ${panier}    Courgette - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
 
+Ajouter Poire au Panier avec les principe de similarité
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
+    Open Browser    ${loginpageurl}    ${BROWSER}
+    Maximize Browser Window
+    Click Element    FindElementsByIA:li_Poire
+    ${panier}    Get Text    FindElementsByIA:div_Panier
+    Should Contain    ${panier}    Poire
+    Close Browser
 
+Choisir un élément parmis une liste d'élements identiques  # recherche avancée par siblings ou choix par numéro d'élément
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteMultipleIdenticalElement/listeElement.html
+    ${fruit}=    Set Variable    Orange
+    Open Browser    ${loginpageurl}    ${BROWSER}
+    Maximize Browser Window
+    Input Text    FindElementsByIA:input_Quantity|textContent:${fruit}    3   
+    Click Element    FindElementsByIA:button_Ajouter au panier|textContent:${fruit}
+    Input Text    FindElementsByIA:input_Quantity|elementNumber:3    5   
+    Click Element    FindElementsByIA:button_Ajouter au panier|elementNumber:3
+    ${panier}    Get Text    FindElementsByIA:div_Panier
+    Should Contain    ${panier}    ${fruit}
+    Should Contain    ${panier}    Pomme Verte
+    Close Browser
 *** Keywords ***
 TestClassic
     [Arguments]  ${siteDemo}
