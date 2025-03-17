@@ -2,9 +2,6 @@
 Resource   ../resources/CustomKeywords.robot
 Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}  
 
-#Library    Dialogs
-#Library    RPA.Browser.Selenium
-
 *** Variables ***
 ${BROWSER}    edge
 ${username}     myUsername
@@ -35,28 +32,28 @@ Test Classic V1
 Test Avec AutomIA V1
     TestAvecAutomIA   SiteDemoOriginal
 
-Test Classic V2
+Test Classic V2 (Resultat attendu FAILED)
     [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoEvoTexte
 
 Test Avec AutomIA V2
     TestAvecAutomIA   SiteDemoEvoTexte
 
-Test Classic V3
+Test Classic V3 (Resultat attendu FAILED)
     [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoEvoTech
 
 Test Avec AutomIA V3
     TestAvecAutomIA   SiteDemoEvoTech
 
-Test Classic V4
+Test Classic V4 (Resultat attendu FAILED)
     [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoRefonte
 
 Test Avec AutomIA V4
     TestAvecAutomIA   SiteDemoRefonte
 
-TestParentSibling
+Test qui utilise les Sibling (elements freres) pour trouver un element
     [Documentation]    Ce test ouvre une page web et récupère le contenu texte d'une cellule spécifique d'un tableau.
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteSibling/ClimatologieMensuelle-Infoclimat.html
@@ -66,6 +63,7 @@ TestParentSibling
     Wait Until Page Contains Element    FindElementsByIA:table_StationMeteo    timeout=30s
     ${cell_text}=    Get Text    FindElementsByIA:cell_AIGUES-MORTES_TXM
     Log    Le texte de la cellule est: ${cell_text}
+    Should Be Equal    ${cell_text}    32.5
     Close Browser
 
 TestDynamicAttributAutomIA
@@ -110,7 +108,7 @@ Ajouter Banane Et Fraise et Courgette au Panier avec les principe de similarité
     Should Match Regexp    ${panier}    Courgette - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
 
-Ajouter Poire au Panier avec les principe de similarité
+Ajouter Poire au Panier pour valider le paramètre continueOnMultipleElement
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
     Open Browser    ${loginpageurl}    ${BROWSER}

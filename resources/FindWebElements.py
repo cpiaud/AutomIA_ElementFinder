@@ -156,21 +156,10 @@ class FindWebElements:
 
             if (attribute_name == "textContent") and (len(value) > 0):
                 self.textContentValue = value
-                xpathContains = f"self::node()[contains(text(), '{}')]".format(value)
-                
-                # Search the Element contains the desired text
-                if "'" in value:    # avoid mixing single and double quotes in Xpath
-                    xpathContains = f'self::node()[contains(text(), "{value}")]'               
-                else: 
-                    xpathContains = f"self::node()[contains(text(), '{value}')]"
-                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, "self::node()[contains(text(), '{}')]".format(value))]
+                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, "self::node()[contains(text(), {})]".format(self.escape_xpath_text(value)))]
                 # Search the Element with strict content text
                 if len(filtered_elements) > 1:
-                    if "'" in value:    # avoid mixing single and double quotes in Xpath
-                        xpathStrict = f'self::node()[text()="{value}"]'              
-                    else: 
-                        xpathStrict = f"self::node()[text()='{value}']"                    
-                    strict_filtered_elements = [element for element in filtered_elements if element.find_elements(By.XPATH, xpathStrict)]
+                    strict_filtered_elements = [element for element in filtered_elements if element.find_elements(By.XPATH, "self::node()[text()={}]".format(self.escape_xpath_text(value)))]
                     if (len(strict_filtered_elements) > 0) and (len(strict_filtered_elements) < len(filtered_elements)):
                         filtered_elements = strict_filtered_elements[:]
                 # Search the Element with regEx on content text
@@ -210,12 +199,8 @@ class FindWebElements:
                         
 
             else:    # self:: --> forces the search to be carried out on the element itself
-                if "'" in value:    # avoid mixing single and double quotes in Xpath
-                    xpath = f'self::*[@{attribute_name}="{value}"]'                
-                else: 
-                    xpath = f"self::*[@{attribute_name}='{value}']"
-                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpath)]     # alternative : if element.get_attribute(attribute_name) == value
-                print("Nombre d'élement avec le Xpath : " + xpath + " = " + str(len(filtered_elements)))
+                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, "self::*[@{}={}]".format(attribute_name, self.escape_xpath_text(value)))]     # alternative : if element.get_attribute(attribute_name) == value
+                print("Nombre d'élement avec l'attribut : " + attribute_name + " = " + str(len(filtered_elements)))
 
             # Determines whether you have found the item you are looking for or whether you need to continue
             if len(filtered_elements) == 1: # Element found
@@ -279,8 +264,7 @@ class FindWebElements:
 
             # if sibling_text is empty verify if element with the tag and self.textContent existe on the DOM and replace sibling_text by self.textContentValue
             if not sibling_text.strip() and textContentValue.strip():
-                xpath = self.get_sibling_xpath(sibling_tag, textContentValue)
-                matching_elements = selenium_lib.driver.find_elements(By.XPATH, f"//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
+                matching_elements = selenium_lib.driver.find_elements(By.XPATH, f".//*[following-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(textContentValue)})] or preceding-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(textContentValue)})]]")
                 if len(matching_elements) > 0:
                     sibling_text = textContentValue
 
@@ -290,8 +274,7 @@ class FindWebElements:
                 parent_xpath = "./.."
                 parent_element = element.find_element(By.XPATH,parent_xpath)
                 # Execute the xpath for the sibling search into the parent element
-                xpath = self.get_sibling_xpath(sibling_tag, sibling_text)
-                sibling_elements = parent_element.find_elements(By.XPATH, f".//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
+                sibling_elements = parent_element.find_elements(By.XPATH, f".//*[following-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})] or preceding-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})]]")
                 # Filter sibling_elements to keep only those present in elements_list
                 valid_sibling_elements = [sib for sib in sibling_elements if sib in elements_list]
                 all_elements.extend(valid_sibling_elements)
@@ -333,9 +316,10 @@ class FindWebElements:
         # Iterate through each sibling property group in the JSON
         for sibling_props in json_sibling_properties:
             # Build an XPath based on properties to identify siblings
-            xpath = self.get_sibling_xpath(sibling_props['tagName'], sibling_props['textContent'])
+            sibling_tag = sibling_props['tagName']
+            sibling_text = sibling_props['textContent']
             # Find elements with siblings matching this XPath
-            matching_elements = selenium_lib.driver.find_elements(By.XPATH, f"//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
+            matching_elements = selenium_lib.driver.find_elements(By.XPATH, f".//*[following-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})] or preceding-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})]]")
             # Add the found elements to the merged list
             all_elements.extend(matching_elements)
 
@@ -371,6 +355,8 @@ class FindWebElements:
         """
         # Initialize the merged list for all found elements
         element_with_parents = []
+        lowest_level_elements = []
+
         # Iterate through each sibling property group in the JSON
         for parents_props in json_parents_properties:
             # Build an XPath based on properties to identify siblings
@@ -388,7 +374,7 @@ class FindWebElements:
             for element in elements_list:
                 try:
                     # Trouver l'ancêtre le plus proche contenant le texte recherché
-                    ancestor_with_text = element.find_element(By.XPATH, ".//ancestor::*[contains(text(), '{}')]".format(parents_text))  # CPD TODO:Modifier le code des autres construction de xpath avec la fonction .format pour alléger le code et sécuriser les xpaths
+                    ancestor_with_text = element.find_element(By.XPATH, ".//ancestor::*[contains(text(), {})]".format(self.escape_xpath_text(parents_text)))
                     # Calcul du niveau du parent
                     level = 0
                     current_element = element
@@ -467,10 +453,11 @@ class FindWebElements:
         if len(elements_found) == 1:
             return elements_found[0]
         if (len(elements_found) > 1) and self.continueOnMultipleElement:
-            if self.elementIndex < len(elements_found):
+            if (self.elementIndex < len(elements_found)) and (self.elementIndex >= 0):
                 return elements_found[self.elementIndex]
             else:
-                print(f"l'index de l'élement demandé : {self.elementIndex} est supérieur au nombre d'élements trouvés : {len(elements_found)}")
+                if self.elementIndex > 0:
+                    print(f"l'index de l'élement demandé : {self.elementIndex} est supérieur au nombre d'élements trouvés : {len(elements_found)}")
                 return elements_found[0]
         else:
             return []
@@ -540,21 +527,12 @@ class FindWebElements:
         return max_coefficient
     
 
-    def get_sibling_xpath(self, sibling_tag, textContentValue):
-        """
-         Construc sibling xpath to find element with this sibling.
-         Args:
-             text content value of the sibling.
-         Returns:
-             xpath to find element with this sibling.
-         """
-        if "'" in textContentValue:
-            sibling_xpath_contains = f"contains(., \"{textContentValue}\")"
+    def escape_xpath_text(self, text):
+        if "'" not in text:
+            return f"'{text}'"
+        elif '"' not in text:
+            return f'"{text}"'
         else:
-            sibling_xpath_contains = f"contains(., '{textContentValue}')"
-
-        # Construct the xpath to find the sibling in the DOM
-        xpath = f"{sibling_tag}[{sibling_xpath_contains}]"
-
-        return xpath
-
+            # Si les deux types de quotes sont présents, on utilise concat
+            parts = text.split("'")
+            return "concat(" + ", \"'\", ".join(f"'{part}'" for part in parts) + ")"
