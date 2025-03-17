@@ -9,6 +9,7 @@ from math import sqrt
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException
 from AutomIAlib import AutomIAlib
 from pathlib import Path
 
@@ -155,12 +156,14 @@ class FindWebElements:
 
             if (attribute_name == "textContent") and (len(value) > 0):
                 self.textContentValue = value
+                xpathContains = f"self::node()[contains(text(), '{}')]".format(value)
+                
                 # Search the Element contains the desired text
                 if "'" in value:    # avoid mixing single and double quotes in Xpath
                     xpathContains = f'self::node()[contains(text(), "{value}")]'               
                 else: 
                     xpathContains = f"self::node()[contains(text(), '{value}')]"
-                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, xpathContains)]
+                filtered_elements = [element for element in current_cached_list if element.find_elements(By.XPATH, "self::node()[contains(text(), '{}')]".format(value))]
                 # Search the Element with strict content text
                 if len(filtered_elements) > 1:
                     if "'" in value:    # avoid mixing single and double quotes in Xpath
@@ -275,11 +278,11 @@ class FindWebElements:
             sibling_text = sibling_props['textContent']
 
             # if sibling_text is empty verify if element with the tag and self.textContent existe on the DOM and replace sibling_text by self.textContentValue
-            if not sibling_text.strip() and self.textContentValue.strip():
-                xpath = self.get_sibling_xpath(sibling_tag, self.textContentValue)
+            if not sibling_text.strip() and textContentValue.strip():
+                xpath = self.get_sibling_xpath(sibling_tag, textContentValue)
                 matching_elements = selenium_lib.driver.find_elements(By.XPATH, f"//*[following-sibling::{xpath} or preceding-sibling::{xpath}]")
                 if len(matching_elements) > 0:
-                    sibling_text = self.textContentValue
+                    sibling_text = textContentValue
 
             # Iterate over the elements_list to find which have corresponding siblings.
             for element in elements_list:
@@ -348,10 +351,70 @@ class FindWebElements:
             max_frequency = most_common[0][1]  # Get the highest frequency
             most_frequent_elements = [element for element, count in most_common if count == max_frequency]
             if len(most_frequent_elements) > 1:
-                print(f"Warning: Multiple elements have the same highest frequency: {most_frequent_elements}. Multiple elements are return.")
+                print(f"Warning: Multiple elements have the same highest frequency in sibling research : {most_frequent_elements}. Multiple elements are return.")
 
         return most_frequent_elements
 
+
+    def find_most_frequent_elements_by_parents(self, elements_list: list[WebElement], json_parents_properties, textContentValue):
+        """
+        Finds the web element with the most parents matches based on JSON properties, 
+        but only among the provided elements.
+
+        Args:
+            elements_list (list[WebElement]): List of WebElements to filter from.
+            json_parents_properties: List of dictionaries containing parents properties.
+            textContentValue: the text content value of the element to find or their parents
+
+        Returns:
+            list[WebElement]: The list of WebElements that are the most frequent in sibling list.
+        """
+        # Initialize the merged list for all found elements
+        element_with_parents = []
+        # Iterate through each sibling property group in the JSON
+        for parents_props in json_parents_properties:
+            # Build an XPath based on properties to identify siblings
+            # parents_tag = parents_props['tagName']
+            parents_text_prop = parents_props.get('textContent', '').strip()
+            text_content_value = textContentValue.strip()
+            if not parents_text_prop and text_content_value:
+                parents_text = textContentValue
+            else:
+                parents_text = parents_text_prop
+            if not parents_text:
+                continue
+
+            # Parcourir chaque élément cible et chercher l'ancêtre contenant le texte
+            for element in elements_list:
+                try:
+                    # Trouver l'ancêtre le plus proche contenant le texte recherché
+                    ancestor_with_text = element.find_element(By.XPATH, ".//ancestor::*[contains(text(), '{}')]".format(parents_text))  # CPD TODO:Modifier le code des autres construction de xpath avec la fonction .format pour alléger le code et sécuriser les xpaths
+                    # Calcul du niveau du parent
+                    level = 0
+                    current_element = element
+                    while current_element != ancestor_with_text:
+                        current_element = current_element.find_element(By.XPATH, "./parent::*")
+                        level += 1      
+                    # Ajouter l'élément et son niveau à la liste des résultats
+                    element_with_parents.append((element, level))
+                except NoSuchElementException:
+                    pass  # Aucun ancêtre contenant le texte trouvé pour cet élément
+
+        # Extraction des éléments avec le niveau le plus bas
+        if element_with_parents:
+            # Trouver le niveau minimal dans les résultats
+            min_level = min(level for _, level in element_with_parents)
+            # Extraire les éléments correspondant au niveau le plus bas
+            # lowest_level_elements = [element for element, level in element_with_parents if level == min_level]
+            lowest_level_elements = list(dict.fromkeys(element for element, level in element_with_parents if level == min_level))
+            # Affichage des résultats
+            print(f"✅ Niveau le plus bas trouvé : {min_level}")
+            print(f"➡️ Warning: Multiple elements have the lowest parent level in parent research : {lowest_level_elements}. Multiple elements are return.")
+        else:
+            print("❌ Aucun élément n'a de parent contenant le texte recherché.")
+
+        return lowest_level_elements
+    
 
     def find_elements_by_ia_with_driver(self, scanned_element_json_name:str, additionalProperties:dict = None) -> any:
         """
@@ -387,16 +450,16 @@ class FindWebElements:
                     siblings_way_result = self.find_most_frequent_elements_by_siblings_fastway(scanned_element_json["siblings"])                    
                 else:
                     siblings_way_result = self.find_most_frequent_elements_by_siblings(elements_found, scanned_element_json["siblings"], self.textContentValue)
-                if (len(siblings_way_result) > 0):
+                if (len(siblings_way_result) > 0) and (len(siblings_way_result) < len(elements_found)):
                     elements_found = siblings_way_result[:]
 
         # if more than 1 element is in the list try search by parents
-#        if (len(elements_found) > 1):
-#            print(f"nombre d'élements encore en lice après recherche par attributs : {len(elements_found)}")
-#            if "siblings" in scanned_element_json and scanned_element_json["siblings"]:    # Check if "siblings" exists and is not empty
-#                siblings_way_result = self.find_most_frequent_elements_by_siblings(scanned_element_json["siblings"])
-#                if (len(siblings_way_result) > 0):
-#                    elements_found = siblings_way_result[:]
+        if (len(elements_found) > 1):
+            print(f"nombre d'élements encore en lice après recherche par siblings : {len(elements_found)}")
+            if "parents" in scanned_element_json and scanned_element_json["parents"]:    # Check if "parents" exists and is not empty
+                parents_way_result = self.find_most_frequent_elements_by_parents(elements_found, scanned_element_json["parents"], self.textContentValue)
+                if (len(parents_way_result) > 0) and (len(parents_way_result) < len(elements_found)):
+                    elements_found = parents_way_result[:]
 
         # Return one or none element
         if len(elements_found) == 0:

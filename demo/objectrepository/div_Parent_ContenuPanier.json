@@ -1,0 +1,51 @@
+{
+  "tagName": "div",
+  "parents": [
+    {
+      "tagName": "body",
+      "style": ""
+    },
+    {
+      "tagName": "html",
+      "lang": "fr",
+      "style": ""
+    }
+  ],
+  "siblings": [
+    {
+      "tagName": "h1",
+      "style": "",
+      "textContent": "Fruits et Légumes"
+    },
+    {
+      "tagName": "div",
+      "class": "product-lists",
+      "style": "",
+      "textContent": "Fruits\n                    Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Grany - 2.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Verte - 2.73€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Banane - 1.57€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Orange - 2.77€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Poire - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Kiwi - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Fraise - 5.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n      Légumes\n                    Carotte - 1.2€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Tomate - 2.8€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme de terre - 1.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    navet - 3.87€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Courgette - 2.67€/kg\n                    \n                        \n                        Ajouter au panier"
+    },
+    {
+      "tagName": "h2",
+      "style": "",
+      "textContent": "Panier"
+    },
+    {
+      "tagName": "div",
+      "id": "totalPanier",
+      "style": "",
+      "textContent": "Total: 0.00€"
+    },
+    {
+      "tagName": "script",
+      "textContent": "// Data embedded directly in the HTML as a JavaScript object\n        const productData = {\n            fruits: [\n                { name: \"Raisin Blanc\", price: 4.39 },\n                { name: \"Pomme Grany\", price: 2.50 },\n                { name: \"Pomme Verte\", price: 2.73 },\n                { name: \"Banane\", price: 1.57 },\n                { name: \"Orange\", price: 2.77 },\n                { name: \"Poire\", price: 3.00 },\n                { name: \"Kiwi\", price: 3.00 },\n                { name: \"Fraise\", price: 5.50 }\n            ],\n            legumes: [\n                { name: \"Carotte\", price: 1.20 },\n                { name: \"Tomate\", price: 2.80 },\n                { name: \"Pomme de terre\", price: 1.50 },\n                { name: \"navet\", price: 3.87 },\n                { name: \"Courgette\", price: 2.67 }\n            ]\n        };\n\n        function ajouterAuPanier(item, price) {\n            let quantity = parseFloat(event.target.parentNode.querySelector('.quantity-input').value);\n            if (quantity <= 0) {\n                return; // No action if the user is trying to add 0 or less of an item.\n            }\n            let listePanier = document.getElementById(\"listePanier\");\n            let nouvelElement = document.createElement(\"li\");\n            let totalPriceForItem = (parseFloat(price) * quantity).toFixed(2);\n            nouvelElement.textContent = `${item} - ${quantity}kg x ${price}€/kg = ${totalPriceForItem}€`;\n            listePanier.appendChild(nouvelElement);\n            //update total\n            updateTotal();\n            // reset the input after add to chart\n            event.target.parentNode.querySelector('.quantity-input').value = \"0\";\n        }\n\n        function updateTotal() {\n            let total = 0;\n            let items = document.getElementById(\"listePanier\").children;\n            for (let item of items) {\n                let priceText = item.textContent.split(\"= \")[1]; // extract total item price\n                total += parseFloat(priceText.replace(\"€\", \"\"));\n            }\n            document.getElementById(\"totalPanier\").textContent = `Total: ${total.toFixed(2)}€`;\n        }\n\n        function displayItems(items, containerId, itemClass) {\n            console.log(\"displayItems called for\", containerId); // Debugging line\n            if (!items || !Array.isArray(items)) {\n                console.error(\"Invalid items data for\", containerId, items);\n                return;\n            }\n            const container = document.getElementById(containerId);\n            if (!container) {\n                console.error(containerId + \" does not exist\");\n            }\n            const ul = document.createElement(\"ul\");\n            items.forEach(item => {\n                console.log(\"processing item\", item); // Debugging line\n                const li = document.createElement(\"li\");\n                li.innerHTML = `\n                    <span class=\"${itemClass}\">${item.name} - ${item.price}€/kg\n                    <div class=\"item-info\">\n                        <input type=\"number\" class=\"quantity-input\" min=\"0\" value=\"0\">\n                        <button class=\"add-to-cart-btn\" onclick=\"ajouterAuPanier('${item.name}', '${item.price}')\">Ajouter au panier</button>\n                    </div>\n                    </span>\n                `;\n                ul.appendChild(li);\n            });\n            container.innerHTML = `<h2>${containerId === \"fruits-container\" ? \"Fruits\" : \"Légumes\"}</h2>`;\n            container.appendChild(ul);\n        }\n\n        //Removed the async because no fetch is used.\n        (() => {\n            displayItems(productData.fruits, \"fruits-container\", \"fruit\");\n            displayItems(productData.legumes, \"legumes-container\", \"legume\");\n        })();"
+    },
+    {
+      "tagName": "div",
+      "id": "spyon-container",
+      "style": "position: absolute; left: 242px; top: 965.6px; width: auto; height: auto; padding: 10px; box-sizing: border-box; color: rgb(255, 255, 255); background-color: rgb(68, 68, 68); z-index: 100000; font-size: 12px; border-radius: 5px; line-height: 20px; max-width: 45%; display: block;",
+      "textContent": "divid=\"panier\"style=\"outline: red solid 2px;\"textContent=\"\"Parent Node Name: body style=\"\"Parent Node Name: html lang=\"fr\" style=\"\"Elements brothers: 6"
+    }
+  ],
+  "id": "panier",
+  "style": "",
+  "textContent": ""
+}

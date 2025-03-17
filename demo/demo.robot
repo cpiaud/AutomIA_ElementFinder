@@ -2,6 +2,8 @@
 Resource   ../resources/CustomKeywords.robot
 Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}  
 
+#Library    Dialogs
+#Library    RPA.Browser.Selenium
 
 *** Variables ***
 ${BROWSER}    edge
@@ -33,19 +35,22 @@ Test Classic V1
 Test Avec AutomIA V1
     TestAvecAutomIA   SiteDemoOriginal
 
-Test Classic V2 
+Test Classic V2
+    [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoEvoTexte
 
 Test Avec AutomIA V2
     TestAvecAutomIA   SiteDemoEvoTexte
 
 Test Classic V3
+    [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoEvoTech
 
 Test Avec AutomIA V3
     TestAvecAutomIA   SiteDemoEvoTech
 
 Test Classic V4
+    [Documentation]    Ce test est failed car sans AutomIA il faut faire la maintenance des locators.
     TestClassic       SiteDemoRefonte
 
 Test Avec AutomIA V4
@@ -54,7 +59,7 @@ Test Avec AutomIA V4
 TestParentSibling
     [Documentation]    Ce test ouvre une page web et récupère le contenu texte d'une cellule spécifique d'un tableau.
     [Tags]  AutomIA
-    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteParentSibling/ClimatologieMensuelle-Infoclimat.html
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteSibling/ClimatologieMensuelle-Infoclimat.html
     Log    New url: ${loginpageurl}
     Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
@@ -91,16 +96,16 @@ Ajouter Banane Et Tomate Au Panier avec Regex
     Should Match Regexp    ${panier}    Banane - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
 
-Ajouter Orange Et Fraise et Courgette au Panier avec les principe de similarité
+Ajouter Banane Et Fraise et Courgette au Panier avec les principe de similarité
     [Tags]  AutomIA
     ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteRegEx/listePrix.html
     Open Browser    ${loginpageurl}    ${BROWSER}
     Maximize Browser Window
-    Click Element    FindElementsByIA:li_Orange
+    Click Element    FindElementsByIA:li_Banane
     Click Element    FindElementsByIA:li_Fraise
     Click Element    FindElementsByIA:li_Courgette
     ${panier}    Get Text    FindElementsByIA:div_Panier
-    Should Contain    ${panier}    Orange
+    Should Contain    ${panier}    Banane
     Should Contain    ${panier}    Fraise
     Should Match Regexp    ${panier}    Courgette - (\\d+\\.\\d{1,2})€\\/kg
     Close Browser
@@ -129,6 +134,24 @@ Choisir un élément parmis une liste d'élements identiques  # recherche avanc�
     Should Contain    ${panier}    ${fruit}
     Should Contain    ${panier}    Pomme Verte
     Close Browser
+
+Choisir un élément parmis une liste d'élements identiques dont seuls les parents sont différenciant  # recherche avancée par parents
+    [Tags]  AutomIA
+    ${loginpageurl}=    Set Variable    file:///${CURDIR}/SiteParents/listeElementInParents.html
+    ${fruit}=    Set Variable    Orange
+    ${legume}=    Set Variable    Navet
+    Open Browser    ${loginpageurl}    ${BROWSER}
+    Maximize Browser Window
+    Input Text    FindElementsByIA:input_Quantity|textContent:${fruit}    3   
+    Click Element    FindElementsByIA:button_Ajouter au panier|textContent:${fruit}
+    Input Text    FindElementsByIA:input_Quantity|textContent:${legume}    5   
+    Click Element    FindElementsByIA:button_Ajouter au panier|textContent:${legume}
+    ${panier}    Get Text    FindElementsByIA:div_Panier
+    Should Contain    ${panier}    ${fruit}
+    Should Contain    ${panier}    ${legume}
+    Sleep    10
+    Close Browser
+
 *** Keywords ***
 TestClassic
     [Arguments]  ${siteDemo}

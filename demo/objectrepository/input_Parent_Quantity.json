@@ -1,0 +1,59 @@
+{
+  "tagName": "input",
+  "parents": [
+    {
+      "tagName": "div",
+      "class": "item-info",
+      "textContent": "Ajouter au panier"
+    },
+    {
+      "tagName": "span",
+      "class": "fruit",
+      "style": "",
+      "textContent": "Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier"
+    },
+    {
+      "tagName": "li",
+      "textContent": "Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier"
+    },
+    {
+      "tagName": "ul",
+      "style": "",
+      "textContent": "Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Grany - 2.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Verte - 2.73€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Banane - 1.57€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Orange - 2.77€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Poire - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Kiwi - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Fraise - 5.5€/kg\n                    \n                        \n                        Ajouter au panier"
+    },
+    {
+      "tagName": "div",
+      "id": "fruits-container",
+      "textContent": "Fruits\n                    Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Grany - 2.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Verte - 2.73€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Banane - 1.57€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Orange - 2.77€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Poire - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Kiwi - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Fraise - 5.5€/kg\n                    \n                        \n                        Ajouter au panier"
+    },
+    {
+      "tagName": "div",
+      "class": "product-lists",
+      "style": "",
+      "textContent": "Fruits\n                    Raisin Blanc - 4.39€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Grany - 2.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme Verte - 2.73€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Banane - 1.57€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Orange - 2.77€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Poire - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Kiwi - 3€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Fraise - 5.5€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n      Légumes\n                    Carotte - 1.2€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Tomate - 2.8€/kg\n                    \n                        \n                        Ajouter au panier\n                    \n                    \n                \n                    Pomme de terre - 1.5€/kg\n                    \n                        \n                        Ajouter a…"
+    },
+    {
+      "tagName": "body",
+      "style": ""
+    },
+    {
+      "tagName": "html",
+      "lang": "fr"
+    }
+  ],
+  "siblings": [
+    {
+      "tagName": "button",
+      "class": "add-to-cart-btn",
+      "onclick": "ajouterAuPanier('Raisin Blanc', '4.39')",
+      "style": "",
+      "textContent": "Ajouter au panier"
+    }
+  ],
+  "type": "number",
+  "class": "quantity-input",
+  "min": "0",
+  "value": "0",
+  "style": "",
+  "textContent": ""
+}

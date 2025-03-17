@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Fruits et Légumes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: rgb(190, 189, 189);
+        }
+        h2 {
+            color: green;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            flex-direction: column; /* Keep column direction inside each item */
+            margin-bottom: 10px;
+        }
+        .item-info {
+            display: flex;
+            align-items: center;
+        }
+        .fruit, .legume {
+            background-color: rgb(120, 120, 233);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .legume {
+            background-color: rgb(127, 199, 127);
+        }
+        .quantity-input {
+            width: 50px;
+            margin-right: 10px;
+            padding: 5px;
+        }
+        .add-to-cart-btn {
+            background-color: rgb(94, 94, 94);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #panier {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+        #totalPanier {
+            margin-top: 10px;
+        }
+        .product-lists { /* New container for fruits and legumes */
+            display: flex;
+            justify-content: space-around; /* Distribute space evenly */
+            width: 100%; /* Ensure the container takes full width */
+        }
+        .product-lists > div { /* Style each container inside */
+            width: 45%; /* Roughly half the width for each */
+        }
+    </style>
+</head>
+<body>
+    <h1>Fruits et Légumes</h1>
+
+    <div class="product-lists">
+      <div id="fruits-container"></div>
+      <div id="legumes-container"></div>
+    </div>
+    
+    <h2>Panier</h2>
+    <div id="panier">
+        <ul id="listePanier"></ul>
+    </div>
+    <div id="totalPanier"><b>Total: 0.00€</b></div>
+
+    <script>
+        // Data embedded directly in the HTML as a JavaScript object
+        const productData = {
+            fruits: [
+                { name: "Raisin Blanc", price: 4.39 },
+                { name: "Pomme Grany", price: 2.50 },
+                { name: "Pomme Verte", price: 2.73 },
+                { name: "Banane", price: 1.57 },
+                { name: "Orange", price: 2.77 },
+                { name: "Poire", price: 3.00 },
+                { name: "Kiwi", price: 3.00 },
+                { name: "Fraise", price: 5.50 }
+            ],
+            legumes: [
+                { name: "Carotte", price: 1.20 },
+                { name: "Tomate", price: 2.80 },
+                { name: "Pomme de terre", price: 1.50 },
+                { name: "Navet", price: 3.87 },
+                { name: "Courgette", price: 2.67 }
+            ]
+        };
+
+        function ajouterAuPanier(item, price) {
+            let quantity = parseFloat(event.target.parentNode.querySelector('.quantity-input').value);
+            if (quantity <= 0) {
+                return; // No action if the user is trying to add 0 or less of an item.
+            }
+            let listePanier = document.getElementById("listePanier");
+            let nouvelElement = document.createElement("li");
+            let totalPriceForItem = (parseFloat(price) * quantity).toFixed(2);
+            nouvelElement.textContent = `${item} - ${quantity}kg x ${price}€/kg = ${totalPriceForItem}€`;
+            listePanier.appendChild(nouvelElement);
+            //update total
+            updateTotal();
+            // reset the input after add to chart
+            event.target.parentNode.querySelector('.quantity-input').value = "0";
+        }
+
+        function updateTotal() {
+            let total = 0;
+            let items = document.getElementById("listePanier").children;
+            for (let item of items) {
+                let priceText = item.textContent.split("= ")[1]; // extract total item price
+                total += parseFloat(priceText.replace("€", ""));
+            }
+            document.getElementById("totalPanier").textContent = `Total: ${total.toFixed(2)}€`;
+        }
+
+        function displayItems(items, containerId, itemClass) {
+            console.log("displayItems called for", containerId); // Debugging line
+            if (!items || !Array.isArray(items)) {
+                console.error("Invalid items data for", containerId, items);
+                return;
+            }
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(containerId + " does not exist");
+            }
+            const ul = document.createElement("ul");
+            items.forEach(item => {
+                console.log("processing item", item); // Debugging line
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <span class="${itemClass}">${item.name} - ${item.price}€/kg
+                    <div class="item-info">
+                        <input type="number" class="quantity-input" min="0" value="0">
+                        <button class="add-to-cart-btn" onclick="ajouterAuPanier('${item.name}', '${item.price}')">Ajouter au panier</button>
+                    </div>
+                    </span>
+                `;
+                ul.appendChild(li);
+            });
+            container.innerHTML = `<h2>${containerId === "fruits-container" ? "Fruits" : "Légumes"}</h2>`;
+            container.appendChild(ul);
+        }
+
+        //Removed the async because no fetch is used.
+        (() => {
+            displayItems(productData.fruits, "fruits-container", "fruit");
+            displayItems(productData.legumes, "legumes-container", "legume");
+        })();
+    </script>
+</body>
+</html>
