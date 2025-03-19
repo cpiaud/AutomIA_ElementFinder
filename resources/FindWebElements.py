@@ -402,7 +402,7 @@ class FindWebElements:
         return lowest_level_elements
     
 
-    def find_elements_by_ia_with_driver(self, scanned_element_json_name:str, additionalProperties:dict = None) -> any:
+    def find_elements_by_ia_with_driver(self, objectPath:str, scanned_element_json_name:str, additionalProperties:dict = None) -> any:
         """
         Find elements by IA using Selenium WebDriver.
 
@@ -419,7 +419,7 @@ class FindWebElements:
         self.elementIndex = -1
 
         # Get the data of the element json file
-        scanned_element_json = self.AutomIAlib.read_json_file(f'{scanned_element_json_name}.json')
+        scanned_element_json = self.AutomIAlib.read_json_file(objectPath, f'{scanned_element_json_name}.json')
 
         # Add additional properties to the scanned element JSON
         if additionalProperties:

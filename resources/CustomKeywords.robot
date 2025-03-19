@@ -12,7 +12,7 @@ AutomIA Locator Strategy
     ${locator_parts}=    Split String    ${locator}    |
     ${nbProperties}=    Get length    ${locator_parts}
     ${objFile}=    Set Variable    ${locator_parts[0]}
-    ${objPath}=    Set Variable    ${EXECDIR}${ObjectRepositoryPath}${objFile}
+    ${objPath}=    Set Variable    ${EXECDIR}${ObjectRepositoryPath}
     ${additionalProperties}=    Create Dictionary
     # transform the additional properties passed as parameters to dictionary
     FOR    ${index}    IN RANGE    1    ${nbProperties}
@@ -23,5 +23,5 @@ AutomIA Locator Strategy
     END    
  #  Log To Console     nbCustomProperties : ${nbProperties}
  #  Log To Console     Object Path : ${objPath}
-    ${webelement}=     Find Elements By IA With Driver   ${objPath}    ${additionalProperties}
+    ${webelement}=     Find Elements By IA With Driver   ${objPath}    ${objFile}    ${additionalProperties}
     RETURN    ${webelement}

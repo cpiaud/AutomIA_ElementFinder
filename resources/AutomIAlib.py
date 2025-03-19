@@ -1,11 +1,12 @@
 from robot.api.deco import keyword
+from pathlib import Path
 import json
 
 
 class AutomIAlib:
 
     @staticmethod
-    def read_json_file(file_path:str) -> any:
+    def read_json_file(objectPath:str, file_name:str) -> any:
         """
         Reads the content of a JSON file and returns it as a dictionary.
 
@@ -15,6 +16,9 @@ class AutomIAlib:
         Returns:
         - A dictionary containing the JSON data.
         """
+
+        file_path = AutomIAlib.find_file_recursive(objectPath, file_name)
+        print(f'Json file Path: {file_path}')
         with open(file_path, 'r', encoding="utf8") as file:
             json_data:any = json.load(file)
         return json_data
@@ -48,7 +52,7 @@ class AutomIAlib:
         return properties
 
     @staticmethod
-    def update_json_file(file_path: str, key_value: str):
+    def update_json_file(objectPath:str, file_name:str, key_value: str):
         """
         Updates a JSON file by adding or modifying a key-value pair at the root level.
 
@@ -62,7 +66,7 @@ class AutomIAlib:
         value = int(value) if value.isdigit() else value
 
         # Load the existing JSON data
-        file_path = file_path + ".json"
+        file_path = AutomIAlib.find_file_recursive(objectPath, file_name + ".json")
         with open(file_path, 'r', encoding="utf8") as file:
             json_data = json.load(file)
 
@@ -76,3 +80,10 @@ class AutomIAlib:
         # Write the modified JSON data back to the file
         with open(file_path, 'w', encoding="utf8") as file:
             json.dump(json_data, file, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def find_file_recursive(directory, filename):
+        for path in Path(directory).rglob(filename):
+            if path.is_file():
+                return path.resolve()
+        raise FileNotFoundError(f"Fichier '{filename}' non trouvé dans '{directory}' et ses sous-répertoires.")
