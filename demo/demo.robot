@@ -3,7 +3,7 @@ Resource   ../resources/CustomKeywords.robot
 Suite Setup  Add Location Strategy    FindElementsByIA    AutomIA Locator Strategy   ${True}  
 
 *** Variables ***
-${BROWSER}    edge
+${BROWSER}    chrome   #edge
 ${username}     myUsername
 ${password}     myPassword
 ${firstnamevalue}     myFirstname
