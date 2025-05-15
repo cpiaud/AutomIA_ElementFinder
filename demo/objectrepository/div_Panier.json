@@ -1,0 +1,58 @@
+{
+  "tagName": "div",
+  "parents": [
+    {
+      "tagName": "body",
+      "style": "outline: none;"
+    },
+    {
+      "tagName": "html",
+      "lang": "fr"
+    }
+  ],
+  "siblings": [
+    {
+      "tagName": "h1",
+      "style": "outline: none;",
+      "textContent": "Fruits et Légumes"
+    },
+    {
+      "tagName": "h2",
+      "style": "outline: none;",
+      "textContent": "Fruits"
+    },
+    {
+      "tagName": "ul",
+      "style": "outline: none;",
+      "textContent": "Pomme - 2.50€/kg\n        Banane - 1.80€/kg\n        Orange - 3.00€/kg\n        Fraise - 5.50€/kg"
+    },
+    {
+      "tagName": "h2",
+      "style": "outline: none;",
+      "textContent": "Légumes"
+    },
+    {
+      "tagName": "ul",
+      "style": "outline: none;",
+      "textContent": "Carotte - 1.20€/kg\n        Tomate - 2.80€/kg\n        Pomme de terre - 1.50€/kg\n        Courgette - 2.00€/kg"
+    },
+    {
+      "tagName": "h2",
+      "style": "outline: none;",
+      "textContent": "Panier"
+    },
+    {
+      "tagName": "script",
+      "textContent": "function ajouterAuPanier(item) {\n            let listePanier = document.getElementById(\"listePanier\");\n            let nouvelElement = document.createElement(\"li\");\n            nouvelElement.textContent = item;\n            listePanier.appendChild(nouvelElement);\n        }"
+    },
+    {
+      "tagName": "div",
+      "id": "spyon-container",
+      "style": "position: absolute; left: 86px; top: 401px; width: auto; height: auto; padding: 10px; box-sizing: border-box; color: rgb(255, 255, 255); background-color: rgb(68, 68, 68); z-index: 100000; font-size: 12px; border-radius: 5px; line-height: 20px; max-width: 45%; display: block; outline: none;",
+      "textContent": "divid=\"panier\"style=\"outline: red solid 2px;\"textContent=\"Pomme - 2.50€/kgPomme de terre - 1.50€/kgCourgette - 2.00€/kg\"Parent Node Name: body style=\"outline: none;\"Parent Node Name: html lang=\"fr\"Elements brothers: 8"
+    }
+  ],
+  "id": "panier",
+  "style": "outline: red solid 2px;",
+  "textContent": "Pomme - 2.50€/kgPomme de terre - 1.50€/kgCourgette - 2.00€/kg"
+}

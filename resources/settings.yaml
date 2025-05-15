@@ -15,3 +15,9 @@ SeleniumLibraryInstanceName: SeleniumLibrary
 
 # Relative path to your root project
 ObjectRepositoryPath: /demo/objectrepository/
+
+# Relative path to your root project
+SimilarityCoeffcientMin: 0.82
+
+# Used to decide whether or not to continue the test with the first element in the list if the element search has failed to find a single element
+continueOnMultipleElement: true     # true or false (no quotes)

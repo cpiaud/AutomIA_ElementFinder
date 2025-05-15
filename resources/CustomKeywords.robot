@@ -3,21 +3,25 @@ Library    AutomIAlib.py
 Library    FindWebElements.py
 Library    SeleniumLibrary
 Library    String
+Library    Collections
+Variables   ./settings.yaml
 
 *** Keywords ***
 AutomIA Locator Strategy
-    [Arguments]    ${browser}    ${locator}    ${tag}    ${constraints}
-    Import Variables    ./resources/settings.yaml
+    [Arguments]    ${browser}    ${locator}   ${tag}    ${constraints}
     ${locator_parts}=    Split String    ${locator}    |
     ${nbProperties}=    Get length    ${locator_parts}
     ${objFile}=    Set Variable    ${locator_parts[0]}
-    ${objPath}=    Set Variable    ${EXECDIR}${ObjectRepositoryPath}${objFile}
-    Run Keyword If    ${nbProperties} > 1    Update JSON File    ${objPath}     ${locator_parts[1]}
-    Run Keyword If    ${nbProperties} > 2    Update JSON File    ${objPath}     ${locator_parts[2]}
-    Run Keyword If    ${nbProperties} > 3    Update JSON File    ${objPath}     ${locator_parts[3]}
-    Run Keyword If    ${nbProperties} > 4    Update JSON File    ${objPath}     ${locator_parts[4]}
-    Run Keyword If    ${nbProperties} > 5    Update JSON File    ${objPath}     ${locator_parts[5]}
- #   Log To Console     nbCustomProperties : ${nbProperties}
- #   Log To Console     Object Path : ${objPath}
-    ${webelement}=     Find Elements By IA With Driver   ${objPath}
+    ${objPath}=    Set Variable    ${EXECDIR}${ObjectRepositoryPath}
+    ${additionalProperties}=    Create Dictionary
+    # transform the additional properties passed as parameters to dictionary
+    FOR    ${index}    IN RANGE    1    ${nbProperties}
+        ${property}=    Split String    ${locator_parts[${index}]}    :
+        ${propertyName}=    Set Variable    ${property[0]}
+        ${propertyValue}=    Set Variable    ${property[1]}
+        Set To Dictionary    ${additionalProperties}    ${propertyName}    ${propertyValue}
+    END    
+ #  Log To Console     nbCustomProperties : ${nbProperties}
+ #  Log To Console     Object Path : ${objPath}
+    ${webelement}=     Find Elements By IA With Driver   ${objPath}    ${objFile}    ${additionalProperties}
     RETURN    ${webelement}
