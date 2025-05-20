@@ -1,12 +1,13 @@
 from robot.api.deco import keyword
 from pathlib import Path
+from typing import Any
 import json
 
 
 class AutomIAlib:
 
     @staticmethod
-    def read_json_file(objectPath:str, file_name:str) -> any:
+    def read_json_file(objectPath:str, file_name:str) -> Any:
         """
         Reads the content of a JSON file and returns it as a dictionary.
 
@@ -20,7 +21,7 @@ class AutomIAlib:
         file_path = AutomIAlib.find_file_recursive(objectPath, file_name)
         print(f'Json file Path: {file_path}')
         with open(file_path, 'r', encoding="utf8") as file:
-            json_data:any = json.load(file)
+            json_data:Any = json.load(file)
         return json_data
 
     @staticmethod

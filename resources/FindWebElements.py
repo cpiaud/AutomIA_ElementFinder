@@ -4,7 +4,6 @@ import yaml
 import re
 import Levenshtein
 from difflib import SequenceMatcher
-from collections import Counter
 from math import sqrt
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
@@ -12,23 +11,25 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException
 from AutomIAlib import AutomIAlib
 from pathlib import Path
+from typing import Any, List, Dict, Tuple, Optional, Union
 
 class FindWebElements:
     
     # Path to the attributes weight definition file
-    attributes_weight_file_path = Path(__file__).parent / "attributesWeight.properties"
-    seleniumInstanceName = "SeleniumLibrary"
+    attributes_weight_file_path: Path = Path(__file__).parent / "attributesWeight.properties"
+    seleniumInstanceName: str = "SeleniumLibrary"
 
     def __init__(self) -> None:
         self.AutomIAlib = AutomIAlib()
-        config = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
+        with open(Path(__file__).parent / "settings.yaml", 'r') as f:
+            config: Dict[str, Any] = yaml.safe_load(f)
         self.seleniumInstanceName = config["SeleniumLibraryInstanceName"]
-        self.SimilarityCoeffcientMin = config["SimilarityCoeffcientMin"]
-        self.continueOnMultipleElement = self.get_boolean_setting(config, "continueOnMultipleElement")
-        self.textContentValue = ""
-        self.elementIndex = -1
+        self.SimilarityCoeffcientMin: float = float(config.get("SimilarityCoeffcientMin", 0.0))
+        self.continueOnMultipleElement: bool = self.get_boolean_setting(config, "continueOnMultipleElement")
+        self.textContentValue: str = ""
+        self.elementIndex: int = -1
 
-    def get_boolean_setting(self, config, key, default=False):
+    def get_boolean_setting(self, config: Dict[str, Any], key: str, default: bool = False) -> bool:
         """
         Retrieves a boolean setting from the configuration, handling invalid values.
 
@@ -59,15 +60,15 @@ class FindWebElements:
             return default
 
 
-    def safe_int_conversion(self, value, default=0):
+    def safe_int_conversion(self, value: Any, default: int = 0) -> int:
         """Convert string to integer safely. Returns `default` if conversion fails."""
         try:
-            return int(value)
+            return int(str(value))
         except (ValueError, TypeError):
             return default
     
 
-    def filter_elements_by_tag_name_by_driver(self, tag_name:str) -> any:
+    def filter_elements_by_tag_name_by_driver(self, tag_name: str) -> List[WebElement]:
         """
         Filter elements by tag name using Selenium WebDriver.
 
@@ -86,21 +87,21 @@ class FindWebElements:
         return dom_elements
 
 
-    def get_element_attributes(self, scanned_element_json:any) -> list[any]:
+    def get_element_attributes(self, scanned_element_json: Dict[str, Any]) -> List[Tuple[str, Any, int]]:
         """
         Get all the attributes and their weight of the scanned_element_json.
         if one of the found attribute has no weight define in the attributes_weight file, is default weight will be 10
 
         Args:
-            scanned_element_json (json): scanned element JSON data.
+            scanned_element_json (Dict[str, Any]): scanned element JSON data.
         
         Returns:
-            list[(key, value, weight)]: A list of tuples containing this attribute key is value and is weight.
+            List[Tuple[str, Any, int]]: A list of tuples containing this attribute key is value and is weight.
         """
         # Read the attribute weight properties file
-        file_attributes = self.AutomIAlib.read_properties_file(self.attributes_weight_file_path)
+        file_attributes = self.AutomIAlib.read_properties_file(str(self.attributes_weight_file_path))
         # Extract values based on the sorted attribute list
-        attributes = []
+        attributes: List[Tuple[str, Any, int]] = []
 
         for attr in scanned_element_json:
             in_attributes_weight_file = False
@@ -116,18 +117,18 @@ class FindWebElements:
                     self.elementIndex = elementNumber - 1
                 continue
             for key, weight in file_attributes:
-                if attr == key:
+                if attr == str(key):
                     in_attributes_weight_file = True
                     print("Attibut traité : " + attr)
-                    attributes.append((attr, scanned_element_json[attr], weight))
+                    attributes.append((attr, scanned_element_json[attr], self.safe_int_conversion(weight, 10)))
                     break
             if not in_attributes_weight_file:
                 attributes.append((attr, scanned_element_json[attr], 10))
 
-        return sorted(attributes, key=lambda elm: elm[2], reverse=True) # sort the attributes by decreasing weight order
+        return sorted(attributes, key=lambda elm: int(elm[2]), reverse=True) # sort the attributes by decreasing weight order
 
 
-    def get_by_attributes(self, scanned_element_json:any) -> list[any]:
+    def get_by_attributes(self, scanned_element_json: Dict[str, Any]) -> List[WebElement]:
         """
         Get all corresponding elements with the attributes of the scanned element.
 
@@ -135,12 +136,16 @@ class FindWebElements:
             scanned_element_json (json): scanned element JSON data.
 
         Returns:
-            list: A list of filtered elements.
+            List[WebElement]: A list of filtered elements.
         """
         # Initialize a SeleniumLibrary instance
         selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         # Get the tagName of the element to retrieve in the DOM
         tag_name = scanned_element_json.get("tagName")
+        # Ensure tag_name is a non-empty string before proceeding
+        if not isinstance(tag_name, str) or not tag_name.strip():
+            print("Warning: 'tagName' is missing or not a valid string in the scanned element JSON. Cannot filter by tag name.")
+            return [] # Return empty list if tag name is missing or invalid
         # Get all the DOM elements possible for the element to find
         starting_list = self.filter_elements_by_tag_name_by_driver(tag_name)
         print("Nombre d'élement avec le TagName : " + tag_name + " = " + str(len(starting_list)))
@@ -150,7 +155,7 @@ class FindWebElements:
         # The most accurate list of possible element found by the attributes search
         current_cached_list = starting_list[:]
 
-        for attribute_name, value, _ in sorted_tag_list:
+        for attribute_name, value, _weight in sorted_tag_list:
             # The list of possible elements found by the current attribute
             filtered_elements = []
 
@@ -216,7 +221,7 @@ class FindWebElements:
 
 
     # Function to make the element blink
-    def blink_element(self, element, duration=4, interval=0.3):
+    def blink_element(self, element: WebElement, duration: float = 4.0, interval: float = 0.3) -> None:
         selenium_lib = BuiltIn().get_library_instance(self.seleniumInstanceName)
         
         # Scroll to bring the element into view
@@ -240,15 +245,15 @@ class FindWebElements:
         selenium_lib.driver.execute_script(f"arguments[0].style.backgroundColor = '{original_bg_color}'", element)
 
 
-    def find_most_frequent_elements_by_siblings(self, elements_list: list[WebElement], json_sibling_properties, textContentValue):
+    def find_most_frequent_elements_by_siblings(self, elements_list: List[WebElement], json_sibling_properties: List[Dict[str, Any]], textContentValue: str) -> List[WebElement]:
         """
         Finds the web element with the most sibling matches based on JSON properties, 
         but only among the provided elements.
 
         Args:
             elements_list (list[WebElement]): List of WebElements to filter from.
-            json_sibling_properties: List of dictionaries containing sibling properties.
-            textContentValue: the text content value
+            json_sibling_properties (List[Dict[str, Any]]): List of dictionaries containing sibling properties.
+            textContentValue (str): the text content value
 
         Returns:
             list[WebElement]: The list of WebElements that are the most frequent in sibling list.
@@ -259,8 +264,8 @@ class FindWebElements:
         # Iterate through each sibling property group in the JSON
         for sibling_props in json_sibling_properties:
             # Build an XPath based on properties to identify siblings
-            sibling_tag = sibling_props['tagName']
-            sibling_text = sibling_props['textContent']
+            sibling_tag = str(sibling_props.get('tagName', '*'))
+            sibling_text = str(sibling_props.get('textContent', ''))
 
             # if sibling_text is empty verify if element with the tag and self.textContent existe on the DOM and replace sibling_text by self.textContentValue
             if not sibling_text.strip() and textContentValue.strip():
@@ -296,13 +301,13 @@ class FindWebElements:
         return most_frequent_elements
 
 
-    def find_most_frequent_elements_by_siblings_fastway(self, json_sibling_properties):
+    def find_most_frequent_elements_by_siblings_fastway(self, json_sibling_properties: List[Dict[str, Any]]) -> List[WebElement]:
         """
         Finds the web element with the most sibling matches based on JSON properties.
         Fastway against find_most_frequent_elements_by_siblings but maybe less accurate.
 
         Arguments:
-        - driver: Instance of Selenium's WebDriver.
+        - driver: Instance of Selenium's WebDriver. (Note: driver is not a direct param, it's accessed via selenium_lib)
         - json_sibling_properties: List of dictionaries containing sibling properties.
 
         Returns:
@@ -316,8 +321,8 @@ class FindWebElements:
         # Iterate through each sibling property group in the JSON
         for sibling_props in json_sibling_properties:
             # Build an XPath based on properties to identify siblings
-            sibling_tag = sibling_props['tagName']
-            sibling_text = sibling_props['textContent']
+            sibling_tag = str(sibling_props.get('tagName', '*'))
+            sibling_text = str(sibling_props.get('textContent', ''))
             # Find elements with siblings matching this XPath
             matching_elements = selenium_lib.driver.find_elements(By.XPATH, f".//*[following-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})] or preceding-sibling::{sibling_tag}[contains(., {self.escape_xpath_text(sibling_text)})]]")
             # Add the found elements to the merged list
@@ -340,15 +345,15 @@ class FindWebElements:
         return most_frequent_elements
 
 
-    def find_most_frequent_elements_by_parents(self, elements_list: list[WebElement], json_parents_properties, textContentValue):
+    def find_most_frequent_elements_by_parents(self, elements_list: List[WebElement], json_parents_properties: List[Dict[str, Any]], textContentValue: str) -> List[WebElement]:
         """
         Finds the web element with the most parents matches based on JSON properties, 
         but only among the provided elements.
 
         Args:
             elements_list (list[WebElement]): List of WebElements to filter from.
-            json_parents_properties: List of dictionaries containing parents properties.
-            textContentValue: the text content value of the element to find or their parents
+            json_parents_properties (List[Dict[str, Any]]): List of dictionaries containing parents properties.
+            textContentValue (str): the text content value of the element to find or their parents
 
         Returns:
             list[WebElement]: The list of WebElements that are the most frequent in sibling list.
@@ -360,7 +365,7 @@ class FindWebElements:
         # Iterate through each sibling property group in the JSON
         for parents_props in json_parents_properties:
             # Build an XPath based on properties to identify siblings
-            # parents_tag = parents_props['tagName']
+            # parents_tag = str(parents_props.get('tagName', '*'))
             parents_text_prop = parents_props.get('textContent', '').strip()
             text_content_value = textContentValue.strip()
             if not parents_text_prop and text_content_value:
@@ -402,18 +407,21 @@ class FindWebElements:
         return lowest_level_elements
     
 
-    def find_elements_by_ia_with_driver(self, objectPath:str, scanned_element_json_name:str, additionalProperties:dict = None) -> any:
+    def find_elements_by_ia_with_driver(self, objectPath: str, scanned_element_json_name: str, additionalProperties: Optional[Dict[str, Any]] = None) -> Union[WebElement, List[WebElement]]:
         """
         Find elements by IA using Selenium WebDriver.
 
         Args:
-            scanned_element_json_name (str): Name of the scanned element JSON file.
+            objectPath (str): Path to the object repository.
+            scanned_element_json_name (str): Name of the scanned element JSON file (without .json extension).
+            additionalProperties (Optional[Dict[str, Any]]): Additional properties to merge into the scanned JSON.
 
         Returns:
-            list: A list of unique elements found.
+            Union[WebElement, List[WebElement]]: A single WebElement if uniquely found or specified by index, 
+                                                  or a list of WebElements (possibly empty if not found or ambiguous).
         """
         # reinit global variables
-        config = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
+        config: Dict[str, Any] = yaml.safe_load(open(Path(__file__).parent / "settings.yaml"))
         self.continueOnMultipleElement = self.get_boolean_setting(config, "continueOnMultipleElement")
         self.textContentValue = ""
         self.elementIndex = -1
@@ -463,7 +471,7 @@ class FindWebElements:
             return []
 
 
-    def is_a_regex(self, pattern):
+    def is_a_regex(self, pattern: str) -> bool:
         """
          Verify if a string is a valid regex.
          Args:
@@ -478,7 +486,7 @@ class FindWebElements:
             return False     # Error = this is not a valid regex
 
 
-    def similarity_coefficient(self, s1, s2):
+    def similarity_coefficient(self, s1: str, s2: str) -> float:
         """
          Calculat max similarity beteween two string.
          Args:
@@ -527,7 +535,7 @@ class FindWebElements:
         return max_coefficient
     
 
-    def escape_xpath_text(self, text):
+    def escape_xpath_text(self, text: str) -> str:
         if "'" not in text:
             return f"'{text}'"
         elif '"' not in text:
