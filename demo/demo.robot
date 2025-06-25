@@ -190,24 +190,24 @@ TestAvecAutomIA
     Open Browser        ${loginpageurl}     ${BROWSER}
     Maximize Browser Window
     Log to Console  login
-    Wait Until Element Is Visible       FindElementsByIA:login_username
-    Input Text      FindElementsByIA:login_username  ${username}
-    Input Text      FindElementsByIA:login_password  ${password}
-    Click Element   FindElementsByIA:login_ConnexionButton
+    # Wait Until Element Is Visible       FindElementsByIA:login_username
+    Strong    Input Text      FindElementsByIA:login_username  ${username}
+    Strong    Input Text      FindElementsByIA:login_password  ${password}
+    Strong    Click Element   FindElementsByIA:login_ConnexionButton
     Log to Console  job application form
-    Wait Until Element Is Visible       FindElementsByIA:JobApp_FirstName
-    Input Text	    FindElementsByIA:JobApp_FirstName    ${firstnamevalue}
-    Input Text      FindElementsByIA:JobApp_LastName     ${lastnamevalue}
-    Input Text	    FindElementsByIA:JobApp_Email        ${emailvalue}
-    Input Text  	FindElementsByIA:JobApp_MobileNumber      ${mobilenumbervalue}
-    Input Text  	FindElementsByIA:JobApp_Address      ${addressvalue}
-    Input Text      FindElementsByIA:JobApp_City     ${cityvalue}
-    Input Text	    FindElementsByIA:JobApp_ZipCode      ${zipcodevalue}
-    Select From List by Value	    FindElementsByIA:JobApp_Country      ${countryvalue}
-    Input Text	    FindElementsByIA:JobApp_AppliedPosition      ${appliedpositionvalue}
-    Input Text	    FindElementsByIA:JobApp_CoverLetter      ${coverlettervalue}
-    Input Text	    FindElementsByIA:JobApp_TotalYearsOfExperience      ${yearsexperiencevalue}
-    Click Element  FindElementsByIA:JobApp_ApplyButton
+    # Wait Until Element Is Visible       FindElementsByIA:JobApp_FirstName
+    Strong    Input Text	    FindElementsByIA:JobApp_FirstName    ${firstnamevalue}
+    Strong    Input Text      FindElementsByIA:JobApp_LastName     ${lastnamevalue}
+    Strong    Input Text	    FindElementsByIA:JobApp_Email        ${emailvalue}
+    Strong    Input Text  	FindElementsByIA:JobApp_MobileNumber      ${mobilenumbervalue}
+    Strong    Input Text  	FindElementsByIA:JobApp_Address      ${addressvalue}
+    Strong    Input Text      FindElementsByIA:JobApp_City     ${cityvalue}
+    Strong    Input Text	    FindElementsByIA:JobApp_ZipCode      ${zipcodevalue}
+    Strong    Select From List by Value	    FindElementsByIA:JobApp_Country      ${countryvalue}
+    Strong    Input Text	    FindElementsByIA:JobApp_AppliedPosition      ${appliedpositionvalue}
+    Strong    Input Text	    FindElementsByIA:JobApp_CoverLetter      ${coverlettervalue}
+    Strong    Input Text	    FindElementsByIA:JobApp_TotalYearsOfExperience      ${yearsexperiencevalue}
+    Strong    Click Element  FindElementsByIA:JobApp_ApplyButton
     Wait Until Element Is Visible       FindElementsByIA:JobApplicationForm_SuccessfullySubmittedMsg
     Log to Console  Job application complete
     Close Browser

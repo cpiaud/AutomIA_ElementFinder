@@ -8,9 +8,11 @@ AutomIA est une librairie qui permet d'utiliser un locator personnalisé dans Ro
 2. Copier le répertoire `resources` à la racine de votre projet
 3. Copier `requirements.txt` à la racine de votre projet
 4. Installer les dépendances Python :
+
    ```bash
    pip install -r requirements.txt
    ```
+
 5. Configurer le fichier `resources/settings.yaml` :
    - Chemin vers le répertoire `objectrepository`
    - Nom personnalisé de la librairie Selenium (si applicable)
@@ -36,6 +38,7 @@ AutomIA est une librairie qui permet d'utiliser un locator personnalisé dans Ro
    - Clic droit sur l'élément à enregistrer dans le `objectrepository`
 
 2. **Utilisation dans un test** :
+
    ```robot
    # Avant
    Click Element    locator=${locator_bouton_consulter_dossier}
@@ -81,7 +84,7 @@ Input Text    FindElementsByIA:input_Quantity|elementNumber:3
 
 ---
 
-## 📚 Organisation du `objectrepository`
+## 📚 Organisation de l'`objectrepository`
 
 - Vous pouvez créer des sous-dossiers.
 - ❌ **Les fichiers JSON doivent être nommés de manière unique** (même en sous-dossiers)
@@ -115,8 +118,8 @@ Le poids des attributs est configurable via `resources/attributesWeight.properti
 
 Comportement défini par `continueOnMultipleElement` dans `settings.yaml` :
 
-- `true` : prend le **premier élément**
-- `false` : ❌ lève une **erreur explicite**
+- `true` : Prend le **premier élément** pour effectuer l'action en cours
+- `false` : Lève une **erreur explicite** pour signaler que plusieurs éléments ont été trouvés
 
 ---
 
@@ -127,4 +130,3 @@ Comportement défini par `continueOnMultipleElement` dans `settings.yaml` :
 ---
 
 Pour toute question ou suggestion, n'hésitez pas à ouvrir une [issue](https://github.com/cpiaud/AutomIA_ElementFinder/issues) sur GitHub ✨
-

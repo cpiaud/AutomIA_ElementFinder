@@ -359,50 +359,37 @@ class FindWebElements:
             list[WebElement]: The list of WebElements that are the most frequent in sibling list.
         """
         # Initialize the merged list for all found elements
-        element_with_parents = []
         lowest_level_elements = []
+        niveau_min = float("inf")
 
-        # Iterate through each sibling property group in the JSON
-        for parents_props in json_parents_properties:
-            # Build an XPath based on properties to identify siblings
-            # parents_tag = str(parents_props.get('tagName', '*'))
-            parents_text_prop = parents_props.get('textContent', '').strip()
-            text_content_value = textContentValue.strip()
-            if not parents_text_prop and text_content_value:
-                parents_text = textContentValue
-            else:
-                parents_text = parents_text_prop
-            if not parents_text:
+        if textContentValue == "":
+            return lowest_level_elements
+ 
+        # Parcourir chaque élément cible et chercher l'ancêtre contenant le texte
+        for element in elements_list:
+            try:
+                ancestor = element.find_element(By.XPATH, "..")
+                niveau = 1
+                while ancestor:
+                    if textContentValue in ancestor.text:
+                        if niveau < niveau_min:
+                            niveau_min = niveau
+                            lowest_level_elements = [element]
+                        elif niveau == niveau_min:
+                            lowest_level_elements.append(element)
+                        break
+                    ancestor = ancestor.find_element(By.XPATH, "..")
+                    niveau += 1
+            except:
                 continue
 
-            # Parcourir chaque élément cible et chercher l'ancêtre contenant le texte
-            for element in elements_list:
-                try:
-                    # Trouver l'ancêtre le plus proche contenant le texte recherché
-                    ancestor_with_text = element.find_element(By.XPATH, ".//ancestor::*[contains(text(), {})]".format(self.escape_xpath_text(parents_text)))
-                    # Calcul du niveau du parent
-                    level = 0
-                    current_element = element
-                    while current_element != ancestor_with_text:
-                        current_element = current_element.find_element(By.XPATH, "./parent::*")
-                        level += 1      
-                    # Ajouter l'élément et son niveau à la liste des résultats
-                    element_with_parents.append((element, level))
-                except NoSuchElementException:
-                    pass  # Aucun ancêtre contenant le texte trouvé pour cet élément
-
-        # Extraction des éléments avec le niveau le plus bas
-        if element_with_parents:
-            # Trouver le niveau minimal dans les résultats
-            min_level = min(level for _, level in element_with_parents)
-            # Extraire les éléments correspondant au niveau le plus bas
-            # lowest_level_elements = [element for element, level in element_with_parents if level == min_level]
-            lowest_level_elements = list(dict.fromkeys(element for element, level in element_with_parents if level == min_level))
-            # Affichage des résultats
-            print(f"✅ Niveau le plus bas trouvé : {min_level}")
-            print(f"➡️ Warning: Multiple elements have the lowest parent level in parent research : {lowest_level_elements}. Multiple elements are return.")
+            # Résultat
+        if lowest_level_elements:
+            print(f"✅ Éléments trouvés avec un ancêtre au niveau {niveau_min} :")
+            for e in lowest_level_elements:
+                print(f" - {e.text}")
         else:
-            print("❌ Aucun élément n'a de parent contenant le texte recherché.")
+            print("❌ Aucun élément trouvé")
 
         return lowest_level_elements
     
